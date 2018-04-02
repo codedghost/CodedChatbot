@@ -1,0 +1,53 @@
+﻿@model CoreCodedChatbot.Web.Models.PlaylistBrowserSource
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link rel="stylesheet" href="~/css/StreamList.css" />
+    <script src="~/lib/signalr-client/signalr-clientES5-1.0.0-alpha2-final.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+</head>
+<body>
+<div id="messageArea">
+    @foreach (var item in Model.Songs)
+    {
+        <h1>@item</h1>
+    }
+</div>
+<script>
+
+    var transportType = signalR.TransportType.WebSockets;
+    var logger = new signalR.ConsoleLogger(signalR.LogLevel.Information);
+    var songListHub = new signalR.HttpConnection('http://' + document.location.host + '/SongList', { transport: transportType, logger: logger });
+    var chatConnection = new signalR.HubConnection(songListHub, logger);
+
+    chatConnection.onClosed = e => {
+        console.log('connection closed');
+    };
+    // This needs to have the currentList populated correctly
+    chatConnection.on('SendAll', (data) => {
+        $("#messageArea").empty();
+        var currentList = $("#messageArea").html();
+        for (var i = 0; i < data.length; i++) {
+            $("#messageArea").html(currentList + "<h1>" + data[i] + "</h1>");
+            currentList = $("#messageArea").html();
+        }
+
+        console.log('received message');
+    });
+
+    chatConnection.start().catch(err => {
+        console.log('connection error');
+    });
+
+</script>
+</body>
+
+</html>

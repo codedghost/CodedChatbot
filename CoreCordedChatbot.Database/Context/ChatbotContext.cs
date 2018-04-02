@@ -1,0 +1,48 @@
+﻿using System.IO;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+
+using CoreCodedChatbot.Database.Context.Models;
+using CoreCodedChatbot.Database.Context.Models.Mapping;
+
+namespace CoreCodedChatbot.Database.Context
+{
+    public class ChatbotContext : DbContext
+    {
+        public ChatbotContext()
+            :base()
+        {
+        }
+
+        public DbSet<Song> Songs { get; set; }
+        public DbSet<SongRequest> SongRequests { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Setting> Settings { get; set; }
+        public DbSet<GiveawayEntry> GiveawayEntries { get; set; }
+
+        private IConfigurationRoot ConfigRoot { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("config.json");
+
+            ConfigRoot = builder.Build();
+
+            var dbConn = ConfigRoot["LocalDbLocation"];
+
+            optionsBuilder.UseSqlite($"FileName={dbConn}");
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.AddConfiguration(new SongMap());
+            modelBuilder.AddConfiguration(new SongRequestMap());
+            modelBuilder.AddConfiguration(new UserMap());
+            modelBuilder.AddConfiguration(new SettingMap());
+            modelBuilder.AddConfiguration(new GiveawayEntryMap());
+        }
+    }
+}
