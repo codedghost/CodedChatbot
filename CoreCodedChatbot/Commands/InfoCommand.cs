@@ -9,10 +9,15 @@ namespace CoreCodedChatbot.Commands
     [ChatCommand(new []{"info"}, false)]
     public class InfoCommand : ICommand
     {
+        private readonly CommandHelper commandHelper;
+
+        public InfoCommand(CommandHelper commandHelper)
+        {
+            this.commandHelper = commandHelper;
+        }
+
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            var commandHelper = new CommandHelper();
-
             // Run all four info commands at once
             commandHelper.ProcessCommand("howtorequest", client, "Chatbot", string.Empty, true);
             commandHelper.ProcessCommand("customsforge", client, "Chatbot", string.Empty, true);

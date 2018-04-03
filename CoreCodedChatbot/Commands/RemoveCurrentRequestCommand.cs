@@ -9,9 +9,16 @@ namespace CoreCodedChatbot.Commands
     [ChatCommand(new[] { "rcr", "removecurrentrequest" }, true)]
     public class RemoveCurrentRequestCommand : ICommand
     {
+        private readonly PlaylistHelper playlistHelper;
+
+        public RemoveCurrentRequestCommand(PlaylistHelper playlistHelper)
+        {
+            this.playlistHelper = playlistHelper;
+        }
+
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            PlaylistHelper.ArchiveCurrentRequest();
+            playlistHelper.ArchiveCurrentRequest();
 
             client.SendMessage($"Hey @{username}, the current request has been removed");
         }

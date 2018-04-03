@@ -9,9 +9,16 @@ namespace CoreCodedChatbot.Commands
     [ChatCommand(new[] { "op", "openplaylist" }, true)]
     public class OpenPlaylistCommand : ICommand
     {
+        private readonly PlaylistHelper playlistHelper;
+
+        public OpenPlaylistCommand(PlaylistHelper playlistHelper)
+        {
+            this.playlistHelper = playlistHelper;
+        }
+
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            client.SendMessage(PlaylistHelper.OpenPlaylist() 
+            client.SendMessage(playlistHelper.OpenPlaylist() 
                 ? $"Hey @{username}, I have opened the playlist for you" 
                 : $"Hey @{username}, I can't seem to open the playlist :(");
         }

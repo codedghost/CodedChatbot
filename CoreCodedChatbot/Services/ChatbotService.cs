@@ -15,17 +15,18 @@ using TwitchLib.Events.Services.FollowerService;
 using TwitchLib.Models.API.v5.Channels;
 using TwitchLib.Services;
 
+
 namespace CoreCodedChatbot.Services
 {
     public class ChatbotService
     {
-        private CommandHelper CommandHelper { get; set; }
-        private TwitchClient client { get; set; }
-        private TwitchAPI api { get; set; }
-        private TwitchPubSub pubsub { get; set; }
-        private FollowerService followerService { get; set; }
-
-        private ConnectionCredentials creds;
+        private readonly CommandHelper commandHelper;
+        private readonly TwitchClient client;
+        private readonly TwitchAPI api;
+        private readonly TwitchPubSub pubsub;
+        private readonly FollowerService followerService;
+        private readonly VipHelper vipHelper;
+        private readonly BytesHelper bytesHelper;
 
         private ChannelAuthed Channel { get; set; }
 
@@ -41,23 +42,23 @@ namespace CoreCodedChatbot.Services
 
         private static readonly HttpClient httpClient = new HttpClient();
 
-        public ChatbotService()
+        public ChatbotService(CommandHelper commandHelper, TwitchClient client, TwitchAPI api, TwitchPubSub pubsub, FollowerService followerService, VipHelper vipHelper, BytesHelper bytesHelper)
         {
-            CommandHelper = new CommandHelper();
-                
-            creds = new ConnectionCredentials(config.ChatbotNick, config.ChatbotPass);
+            this.commandHelper = commandHelper;
+            this.client = client;
+            this.api = api;
+            this.pubsub = pubsub;
+            this.followerService = followerService;
+            this.vipHelper = vipHelper;
+            this.bytesHelper = bytesHelper;
 
-            client = new TwitchClient(creds, config.StreamerChannel);
+            this.commandHelper.Init();
+
             client.OnJoinedChannel += onJoinedChannel;
             client.OnChatCommandReceived += onCommandReceived;
             client.OnNewSubscriber += onNewSub;
             client.OnReSubscriber += onReSub;
             client.Connect();
-
-            api = new TwitchAPI(accessToken: config.ChatbotAccessToken);
-            followerService = new FollowerService(api, 5);
-
-            pubsub = new TwitchPubSub();
 
             pubsub.OnPubSubServiceConnected += onPubSubConnected;
             pubsub.OnListenResponse += onListenResponse;
@@ -76,7 +77,7 @@ namespace CoreCodedChatbot.Services
         {
             try
             {
-                CommandHelper.ProcessCommand(e.Command.CommandText, client, e.Command.ChatMessage.Username,
+                commandHelper.ProcessCommand(e.Command.CommandText, client, e.Command.ChatMessage.Username,
                     e.Command.ArgumentsAsString, e.Command.ChatMessage.IsModerator || e.Command.ChatMessage.IsBroadcaster);
             }
             catch (Exception ex)
@@ -91,7 +92,7 @@ namespace CoreCodedChatbot.Services
             {
                 Console.Out.WriteLine("New Sub! WOOOOO");
                 Console.Out.WriteLine(e.Subscriber.DisplayName);
-                VipHelper.GiveSubVip(e.Subscriber.DisplayName);
+                vipHelper.GiveSubVip(e.Subscriber.DisplayName);
             }
             catch (Exception ex)
             {
@@ -105,7 +106,7 @@ namespace CoreCodedChatbot.Services
             {
                 Console.Out.WriteLine("ReSub!!! WOOOOO");
                 Console.Out.WriteLine(e.ReSubscriber.DisplayName);
-                VipHelper.GiveSubVip(e.ReSubscriber.DisplayName);
+                vipHelper.GiveSubVip(e.ReSubscriber.DisplayName);
             }
             catch (Exception ex)
             {
@@ -144,7 +145,7 @@ namespace CoreCodedChatbot.Services
             {
                 Console.Out.WriteLine("Bits Dropped :O!");
                 Console.Out.WriteLine($"{e.Username} - {e.TotalBitsUsed}");
-                var vipGiven = VipHelper.GiveDonationVip(e.Username, e.TotalBitsUsed);
+                var vipGiven = vipHelper.GiveDonationVip(e.Username, e.TotalBitsUsed);
             }
             catch (Exception ex)
             {
@@ -165,31 +166,31 @@ namespace CoreCodedChatbot.Services
 
                     // VipHelper.StartupFollowVips(followers);
                     // TODO: Need to consider length of sub in db alignment
-                    VipHelper.StartupSubVips(subs);
+                    vipHelper.StartupSubVips(subs);
 
                     // Set threads for sending out stream info to the chat.
                     HowToRequestTimer = new Timer(
-                        e => CommandHelper.ProcessCommand("howtorequest", client, "Chatbot", string.Empty, true),
+                        e => commandHelper.ProcessCommand("howtorequest", client, "Chatbot", string.Empty, true),
                         null,
                         TimeSpan.Zero,
                         TimeSpan.FromMinutes(25));
                     CustomsForgeTimer = new Timer(
-                        e => CommandHelper.ProcessCommand("customsforge", client, "Chatbot", string.Empty, true),
+                        e => commandHelper.ProcessCommand("customsforge", client, "Chatbot", string.Empty, true),
                         null,
                         TimeSpan.FromMinutes(5),
                         TimeSpan.FromMinutes(25));
                     FollowTimer = new Timer(
-                        e => CommandHelper.ProcessCommand("followme", client, "Chatbot", string.Empty, true),
+                        e => commandHelper.ProcessCommand("followme", client, "Chatbot", string.Empty, true),
                         null,
                         TimeSpan.FromMinutes(10),
                         TimeSpan.FromMinutes(25));
                     DiscordTimer = new Timer(
-                        e => CommandHelper.ProcessCommand("discord", client, "Chatbot", string.Empty, true),
+                        e => commandHelper.ProcessCommand("discord", client, "Chatbot", string.Empty, true),
                         null,
                         TimeSpan.FromMinutes(15),
                         TimeSpan.FromMinutes(25));
                     TwitterTimer = new Timer(
-                        e => CommandHelper.ProcessCommand("twitter", client, "Chatbot", string.Empty, true),
+                        e => commandHelper.ProcessCommand("twitter", client, "Chatbot", string.Empty, true),
                         null,
                         TimeSpan.FromMinutes(20),
                         TimeSpan.FromMinutes(25));
@@ -205,7 +206,7 @@ namespace CoreCodedChatbot.Services
                                 // process json into username list.
                                 var chattersModel = JsonConvert.DeserializeObject<ChatViewersModel>(currentChattersJson);
                                 Console.Out.WriteLine(currentChattersJson);
-                                BytesHelper.GiveBytes(chattersModel);
+                                bytesHelper.GiveBytes(chattersModel);
                             }
                             catch (Exception ex)
                             {

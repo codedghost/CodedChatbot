@@ -1,5 +1,7 @@
 ﻿using System.IO;
 
+using CoreCodedChatbot.Database.Context.Interfaces;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -8,7 +10,7 @@ using CoreCodedChatbot.Database.Context.Models.Mapping;
 
 namespace CoreCodedChatbot.Database.Context
 {
-    public class ChatbotContext : DbContext
+    public class ChatbotContext : DbContext, IChatbotContext
     {
         public ChatbotContext()
             :base()
