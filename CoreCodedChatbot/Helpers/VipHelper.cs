@@ -10,56 +10,72 @@ using TwitchLib.Models.API.v5.Subscriptions;
 
 namespace CoreCodedChatbot.Helpers
 {
-    public static class VipHelper
+    public class VipHelper
     {
-        public static User FindUser(ChatbotContext context, string username, bool deferSave = false)
+        private readonly ChatbotContextFactory contextFactory;
+
+        public VipHelper(ChatbotContextFactory contextFactory)
         {
-            return context.Users.Find(username.ToLower()) ??
-                AddUser(context, username, deferSave);
+            this.contextFactory = contextFactory;
         }
 
-        public static void AddUsersDeferSave(ChatbotContext context, string[] usernames)
+        public User FindUser(string username, bool deferSave = false)
         {
-            var savedUsers = context.Users.Select(u => u.Username);
-            var currentUsers = usernames.Where(u => !savedUsers.Contains(u));
-
-            foreach (var user in currentUsers)
+            using (var context = this.contextFactory.Create())
             {
-                AddUser(context, user, true);
+                return context.Users.Find(username.ToLower())
+                    ?? this.AddUser(username, deferSave);
             }
         }
 
-        private static User AddUser(ChatbotContext context, string username, bool deferSave)
+        public void AddUsersDeferSave(string[] usernames)
         {
-            var userModel = new User
+            using (var context = this.contextFactory.Create())
             {
-                Username = username.ToLower(),
-                UsedVipRequests = 0,
-                ModGivenVipRequests = 0,
-                FollowVipRequest = 0,
-                SubVipRequests = 0,
-                DonationOrBitsVipRequests = 0,
-                TokenBytes = 0
-            };
+                var savedUsers = context.Users.Select(u => u.Username);
+                var currentUsers = usernames.Where(u => !savedUsers.Contains(u));
 
-            try
-            {
-                context.Users.Add(userModel);
-                if (!deferSave) context.SaveChanges();
+                foreach (var user in currentUsers)
+                {
+                    this.AddUser(user, true);
+                }
             }
-            catch (Exception e)
-            {
-                return null;
-            }
-
-            return userModel;
         }
-        
-        public static bool GiveVipRequest(string username)
+
+        private User AddUser(string username, bool deferSave)
         {
-            using (var context = new ChatbotContext())
+            using (var context = this.contextFactory.Create())
             {
-                var user = FindUser(context, username);
+                var userModel = new User
+                {
+                    Username = username.ToLower(),
+                    UsedVipRequests = 0,
+                    ModGivenVipRequests = 0,
+                    FollowVipRequest = 0,
+                    SubVipRequests = 0,
+                    DonationOrBitsVipRequests = 0,
+                    TokenBytes = 0
+                };
+
+                try
+                {
+                    context.Users.Add(userModel);
+                    if (!deferSave) context.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    return null;
+                }
+
+                return userModel;
+            }
+        }
+
+        public bool GiveVipRequest(string username)
+        {
+            using (var context = this.contextFactory.Create())
+            {
+                var user = this.FindUser(username);
 
                 if (user == null) return false;
                 try
@@ -76,11 +92,11 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        public static bool GiveFollowVip(string username)
+        public bool GiveFollowVip(string username)
         {
-            using (var context = new ChatbotContext())
+            using (var context = this.contextFactory.Create())
             {
-                var user = FindUser(context, username);
+                var user = this.FindUser(username);
                 if (user == null) return false;
 
                 try
@@ -97,9 +113,9 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        public static bool StartupFollowVips(List<ChannelFollow> follows)
+        public bool StartupFollowVips(List<ChannelFollow> follows)
         {
-            using (var context = new ChatbotContext())
+            using (var context = this.contextFactory.Create())
             {
                 try
                 {
@@ -134,9 +150,9 @@ namespace CoreCodedChatbot.Helpers
             return true;
         }
 
-        public static bool StartupSubVips(List<Subscription> subs)
+        public bool StartupSubVips(List<Subscription> subs)
         {
-            using (var context = new ChatbotContext())
+            using (var context = this.contextFactory.Create())
             {
                 try
                 {
@@ -171,11 +187,11 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        public static bool GiveSubVip(string username)
+        public bool GiveSubVip(string username)
         {
-            using (var context = new ChatbotContext())
+            using (var context = this.contextFactory.Create())
             {
-                var user = FindUser(context, username);
+                var user = this.FindUser(username);
                 if (user == null) return false;
 
                 try
@@ -192,11 +208,11 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        public static bool GiveDonationVip(string username, int totalBitsToDate)
+        public bool GiveDonationVip(string username, int totalBitsToDate)
         {
-            using (var context = new ChatbotContext())
+            using (var context = this.contextFactory.Create())
             {
-                var user = FindUser(context, username);
+                var user = this.FindUser(username);
                 if (user == null) return false;
 
                 try
@@ -213,14 +229,17 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        public static bool GiveTokenVip(ChatbotContext context, User user, int bytesToRemove)
+        public bool GiveTokenVip(User user, int bytesToRemove)
         {
             try
             {
-                user.TokenVipRequests++;
-                user.TokenBytes -= bytesToRemove;
-                context.SaveChanges();
-                return true;
+                using (var context = this.contextFactory.Create())
+                {
+                    user.TokenVipRequests++;
+                    user.TokenBytes -= bytesToRemove;
+                    context.SaveChanges();
+                    return true;
+                }
             }
             catch (Exception ex)
             {
@@ -228,11 +247,11 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        public static bool CanUseVipRequest(string username)
+        public bool CanUseVipRequest(string username)
         {
-            using (var context = new ChatbotContext())
+            using (var context = this.contextFactory.Create())
             {
-                var user = FindUser(context, username);
+                var user = this.FindUser(username);
                 if (user == null ||
                     user.UsedVipRequests >=
                     (user.FollowVipRequest + user.SubVipRequests + user.ModGivenVipRequests +
@@ -242,18 +261,18 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        public static bool UseVipRequest(string username)
+        public bool UseVipRequest(string username)
         {
             if (!CanUseVipRequest(username))
             {
                 return false;
             }
 
-            using (var context = new ChatbotContext())
+            using (var context = this.contextFactory.Create())
             {
                 try
                 {
-                    var user = FindUser(context, username);
+                    var user = this.FindUser(username);
                     user.UsedVipRequests++;
                     context.SaveChanges();
                 }
@@ -265,12 +284,12 @@ namespace CoreCodedChatbot.Helpers
             return true;
         }
 
-        public static VipRequests GetVipRequests(string username)
+        public VipRequests GetVipRequests(string username)
         {
             var requests = new VipRequests();
-            using (var context = new ChatbotContext())
+            using (var context = this.contextFactory.Create())
             {
-                var user = FindUser(context, username);
+                var user = this.FindUser(username);
                 if (user == null) return requests;
 
                 requests = new VipRequests

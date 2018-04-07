@@ -11,10 +11,16 @@ namespace CoreCodedChatbot.Commands
     [ChatCommand(new[] { "uptime", "live" }, false)]
     public class UptimeCommand : ICommand
     {
+        private readonly TwitchAPI api;
+
+        public UptimeCommand(TwitchAPI api)
+        {
+            this.api = api;
+        }
+
         public async void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
             var config = ConfigHelper.GetConfig();
-            var api = new TwitchAPI(accessToken: config.ChatbotAccessToken);
             var channel = await api.Channels.v5.GetChannelAsync(config.ChatbotAccessToken);
 
             var Stream = await api.Streams.v5.GetStreamByUserAsync(channel.Id);

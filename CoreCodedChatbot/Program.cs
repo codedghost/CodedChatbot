@@ -5,6 +5,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
 using CoreCodedChatbot.Services;
 using CoreCodedChatbot.Database.Context;
+using CoreCodedChatbot.Helpers;
+
+using Unity;
 
 namespace CoreCodedChatbot
 {
@@ -17,9 +20,10 @@ namespace CoreCodedChatbot
                 context.Database.Migrate();
             }
 
-            var ChatbotService = new ChatbotService();
+            var container = UnityHelper.Create();
+            var chatbotService = container.Resolve<ChatbotService>();
 
-            ChatbotService.Main();
+            chatbotService.Main();
 
             Console.ReadLine();
         }
