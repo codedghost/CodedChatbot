@@ -11,6 +11,13 @@ namespace CoreCodedChatbot.Commands
     [ChatCommand(new[] { "request", "rr", "sr", "songrequest", "rockrequest", "song" }, false)]
     public class RockRequestCommand : ICommand
     {
+        private readonly PlaylistHelper playlistHelper;
+
+        public RockRequestCommand(PlaylistHelper playlistHelper)
+        {
+            this.playlistHelper = playlistHelper;
+        }
+
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
             if (string.IsNullOrWhiteSpace(commandText))
@@ -19,7 +26,7 @@ namespace CoreCodedChatbot.Commands
                 return;
             }
 
-            var playlistPosition = PlaylistHelper.AddRequest(username, commandText);
+            var playlistPosition = playlistHelper.AddRequest(username, commandText);
             if (playlistPosition == -1)
             {
                 client.SendMessage($"Hey @{username}, the playlist is currently closed. If you want to request a song still, try !vip");

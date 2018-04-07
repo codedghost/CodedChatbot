@@ -9,12 +9,16 @@ namespace CoreCodedChatbot.Commands
     [ChatCommand(new[] { "removerequest", "rrr", "removerockrequest", "removesong", "rs", "removerequest" }, false)]
     public class RemoveRockRequestCommand : ICommand
     {
-        public RemoveRockRequestCommand()
-        { }
+        private readonly PlaylistHelper playlistHelper;
+
+        public RemoveRockRequestCommand(PlaylistHelper playlistHelper)
+        {
+            this.playlistHelper = playlistHelper;
+        }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            var success = PlaylistHelper.RemoveRockRequests(username, commandText, isMod);
+            var success = playlistHelper.RemoveRockRequests(username, commandText, isMod);
 
             client.SendMessage(success
                 ? $"Hi @{username}, I have removed number: {commandText} from the queue."
