@@ -7,7 +7,7 @@ using TwitchLib;
 
 namespace CoreCodedChatbot.Commands
 {
-    [ChatCommand(new []{ "songlist", "playlist", "requests", "list", "songs" }, false)]
+    [ChatCommand(new []{ "songlist", "playlist", "requests", "list", "songs" }, true)]
     public class SongListCommand: ICommand
     {
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
