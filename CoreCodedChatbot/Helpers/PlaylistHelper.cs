@@ -15,6 +15,8 @@ namespace CoreCodedChatbot.Helpers
 {
     public class PlaylistHelper
     {
+        private const int UserMaxSongCount = 1;
+
         private ConfigModel config = ConfigHelper.GetConfig();
 
         private readonly ChatbotContextFactory contextFactory;
@@ -24,7 +26,7 @@ namespace CoreCodedChatbot.Helpers
             this.contextFactory = contextFactory;
         }
 
-        public int AddRequest(string username, string commandText, bool vipRequest = false)
+        public (AddRequestResult, int) AddRequest(string username, string commandText, bool vipRequest = false)
         {
             var songIndex = 0;
             using (var context = contextFactory.Create())
@@ -46,12 +48,11 @@ namespace CoreCodedChatbot.Helpers
                     Console.Out.WriteLine($"Not a vip request: {playlistLength}, {userSongCount}");
                     if (status != null)
                     {
-                        if (status?.SettingValue == null || status?.SettingValue == "Closed") return -1;
+                        if (status?.SettingValue == null || status?.SettingValue == "Closed") return (AddRequestResult.PlaylistClosed, 0);
                     }
-                    if (playlistLength >= 5 && userSongCount > 0)
+                    if (userSongCount > UserMaxSongCount)
                     {
-                        Console.Out.WriteLine("returning -2");
-                        return -2;
+                        return (AddRequestResult.NoMultipleRequests, 0);
                     }
                 }
 
@@ -66,10 +67,11 @@ namespace CoreCodedChatbot.Helpers
 
             UpdatePlaylists();
 
-            return songIndex;
+            return (AddRequestResult.Success, songIndex);
         }
 
-        public int AddRequestSignalR(string username, string commandText, bool vipRequest = false)
+
+        public (AddRequestResult, int) AddRequestSignalR(string username, string commandText, bool vipRequest = false)
         {
             return AddRequest(username, commandText, vipRequest);
         }
@@ -457,5 +459,14 @@ namespace CoreCodedChatbot.Helpers
         {
             UpdateWebPlaylist();
         }
+    }
+
+    public enum AddRequestResult
+    {
+        PlaylistClosed,
+
+        NoMultipleRequests,
+
+        Success
     }
 }
