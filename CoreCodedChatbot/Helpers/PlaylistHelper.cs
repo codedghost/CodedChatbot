@@ -21,6 +21,10 @@ namespace CoreCodedChatbot.Helpers
 
         private readonly ChatbotContextFactory contextFactory;
 
+        private string FormatRequest(SongRequest sr, int index) => $"{index + 1}{this.PrefixVip(sr)} - {sr.RequestText} - {sr.RequestUsername}";
+
+        private string PrefixVip(SongRequest request) => request.VipRequestTime.HasValue ? " (VIP)" : string.Empty;
+
         public PlaylistHelper(ChatbotContextFactory contextFactory)
         {
             this.contextFactory = contextFactory;
@@ -108,23 +112,24 @@ namespace CoreCodedChatbot.Helpers
             {
                 using (var sw = new StreamWriter(file))
                 {
-                    var textToWrite = string.Empty;
+                    string textToWrite;
 
                     using (var context = contextFactory.Create())
                     {
                         var requests = context.SongRequests
                             .Where(sr => !sr.Played)
-                            .OrderRequests().ToList();
+                            .OrderRequests()
+                            .ToList();
 
-                        textToWrite = string.Join('\n', requests
-                            .Take(5)
-                            .Select((sr, index) => $"{index + 1} - {sr.RequestText} - {sr.RequestUsername}"));
+                        textToWrite = string.Join('\n', requests.Take(5).Select(this.FormatRequest));
                     }
 
                     sw.Write(textToWrite);
                 }
             }
         }
+
+
 
         private async void UpdateWebPlaylist()
         {
@@ -144,7 +149,7 @@ namespace CoreCodedChatbot.Helpers
                     .OrderRequests()
                     .Take(5)
                     .ToList()
-                    .Select((sr, index) => $"{index + 1} - {sr.RequestText} - {sr.RequestUsername}")
+                    .Select(this.FormatRequest)
                     .ToArray();
 
                 await connection.InvokeAsync("Send", new[] { requests });
@@ -167,7 +172,7 @@ namespace CoreCodedChatbot.Helpers
                     .Where(sr => !sr.Played)
                     .OrderRequests()
                     .ToList()
-                    .Select((sr, index) => $"{index + 1} - {sr.RequestText} - {sr.RequestUsername}")
+                    .Select(this.FormatRequest)
                     .ToArray();
 
                 await connection.InvokeAsync("SendAll", new[] { requests });
