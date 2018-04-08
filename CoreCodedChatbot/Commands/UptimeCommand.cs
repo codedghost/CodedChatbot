@@ -23,8 +23,8 @@ namespace CoreCodedChatbot.Commands
             var config = ConfigHelper.GetConfig();
             var channel = await api.Channels.v5.GetChannelAsync(config.ChatbotAccessToken);
 
-            var Stream = await api.Streams.v5.GetStreamByUserAsync(channel.Id);
-            var streamGoLiveTime = Stream.Stream.CreatedAt;
+            var stream = await api.Streams.v5.GetStreamByUserAsync(channel.Id);
+            var streamGoLiveTime = stream.Stream.CreatedAt;
 
             var timeLiveFor = DateTime.Now.Subtract(streamGoLiveTime);
 
