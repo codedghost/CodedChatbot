@@ -12,6 +12,7 @@ using TwitchLib.Models.Client;
 using TwitchLib.Events.Client;
 using TwitchLib.Events.PubSub;
 using TwitchLib.Events.Services.FollowerService;
+using TwitchLib.Exceptions.API;
 using TwitchLib.Models.API.v5.Channels;
 using TwitchLib.Services;
 
@@ -162,11 +163,19 @@ namespace CoreCodedChatbot.Services
                 {
                     // Align database with any potentially missed or offline follows/subs
                     // var followers = await api.Channels.v5.GetAllFollowersAsync(Channel.Id);
-                    var subs = await api.Channels.v5.GetAllSubscribersAsync(Channel.Id, config.ChatbotAccessToken);
+                    try
+                    {
+                        var subs = await api.Channels.v5.GetAllSubscribersAsync(Channel.Id, config.ChatbotAccessToken);
+
+                        // TODO: Need to consider length of sub in db alignment
+                        vipHelper.StartupSubVips(subs);
+                    }
+                    catch (NotPartneredException)
+                    {
+                        Console.Out.WriteLine("Not a partner. Skipping sub setup.");
+                    }
 
                     // VipHelper.StartupFollowVips(followers);
-                    // TODO: Need to consider length of sub in db alignment
-                    vipHelper.StartupSubVips(subs);
 
                     // Set threads for sending out stream info to the chat.
                     HowToRequestTimer = new Timer(
