@@ -7,7 +7,7 @@ using TwitchLib;
 
 namespace CoreCodedChatbot.Commands
 {
-    [ChatCommand(new []{"crr", "clearrockrequests" }, true)]
+    [ChatCommand(new []{"clearrequests", "clearrockrequests" }, true)]
     public class ClearRockRequestsCommand : ICommand
     {
         private readonly PlaylistHelper playlistHelper;
