@@ -318,7 +318,8 @@ namespace CoreCodedChatbot.Helpers
                     songRequestText = string.Empty;
                     syntaxError = true;
                     return false;
-                } else if (userRequestCount > 1 && playlistIndex == 0)
+                }
+                else if (userRequestCount > 1 && playlistIndex == 0)
                 {
                     songRequestText = string.Empty;
                     syntaxError = true;
@@ -342,7 +343,8 @@ namespace CoreCodedChatbot.Helpers
 
                     context.SongRequests.Update(userRequest.SongRequest);
                     context.SaveChanges();
-                } else if (userRequestCount == 1)
+                }
+                else if (userRequestCount == 1)
                 {
                     if (playlistIndex != 0)
                     {
@@ -358,7 +360,8 @@ namespace CoreCodedChatbot.Helpers
 
                         context.SongRequests.Update(userRequest.SongRequest);
                         context.SaveChanges();
-                    } else
+                    }
+                    else
                     {
                         var userRequest = userRequests?.Where(x => x.SongRequest.RequestUsername == username).FirstOrDefault();
 
@@ -367,7 +370,8 @@ namespace CoreCodedChatbot.Helpers
                         context.SongRequests.Update(userRequest.SongRequest);
                         context.SaveChanges();
                     }
-                } else
+                }
+                else
                 {
                     var userRequest = userRequests.FirstOrDefault(x => x.SongRequest.RequestUsername == username && x.Index == playlistIndex);
 
