@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Models.Data;
 using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Database.Context.Models;
@@ -10,8 +11,6 @@ using TwitchLib.Models.API.v5.Subscriptions;
 
 namespace CoreCodedChatbot.Helpers
 {
-    using CoreCodedChatbot.Database.Context.Interfaces;
-
     public class VipHelper
     {
         private readonly ChatbotContextFactory contextFactory;
