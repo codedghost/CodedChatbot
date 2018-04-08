@@ -46,7 +46,7 @@ namespace CoreCodedChatbot.Commands
                     return;
                 }
 
-                playlistPosition = playlistHelper.AddRequest(username, commandText, true);
+                (_, playlistPosition) = playlistHelper.AddRequest(username, commandText, true);
                 vipHelper.UseVipRequest(username);
                 client.SendMessage(
                     $"Hey @{username}, I have queued {commandText} for you, you're #{playlistPosition} in the queue!");
