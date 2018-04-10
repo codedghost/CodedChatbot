@@ -23,10 +23,10 @@ namespace CoreCodedChatbot.Commands
             var config = ConfigHelper.GetConfig();
             var channel = await api.Channels.v5.GetChannelAsync(config.ChatbotAccessToken);
 
-            var stream = await api.Streams.v5.GetStreamByUserAsync(channel.Id);
-            var streamGoLiveTime = stream.Stream.CreatedAt;
+            var Stream = await api.Streams.v5.GetStreamByUserAsync(channel.Id);
+            var streamGoLiveTime = Stream.Stream.CreatedAt.ToUniversalTime();
 
-            var timeLiveFor = DateTime.Now.Subtract(streamGoLiveTime);
+            var timeLiveFor = DateTime.Now.ToUniversalTime().Subtract(streamGoLiveTime);
 
             client.SendMessage($"Hey @{username}, {config.StreamerChannel} has been live for: {timeLiveFor.Hours} hours and {timeLiveFor.Minutes} minutes.");
         }
