@@ -460,9 +460,37 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
+        public static string GetEstimatedTime(ChatViewersModel chattersModel)
+        {
+            using (var context = new ChatbotContext())
+            {
+                try
+                {
+                    var allViewers = chattersModel.chatters.viewers
+                        .Concat(chattersModel.chatters.admins)
+                        .Concat(chattersModel.chatters.global_mods)
+                        .Concat(chattersModel.chatters.moderators)
+                        .Concat(chattersModel.chatters.staff)
+                        .ToArray();
+
+                    var requests = context.SongRequests.Where(sr => !sr.Played)
+                        .OrderRequests()
+                        .Count(sr => allViewers.Contains(sr.RequestUsername));
+
+                    var estimatedFinishTime = DateTime.Now.AddMinutes(requests * 6d).ToString("HH:mm:ss");
+                    return $"Estimated time to finish: {estimatedFinishTime}";
+                }
+                catch (Exception e)
+                {
+                    Console.Out.WriteLine(e);
+                    return string.Empty;
+                }
+            }
+        }
+
         private void UpdatePlaylists()
         {
-            UpdateWebPlaylist();
+            UpdateObsPlaylist();
         }
     }
 
