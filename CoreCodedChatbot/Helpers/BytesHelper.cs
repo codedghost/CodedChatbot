@@ -73,16 +73,24 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        public bool ConvertByte(string username)
+        public bool ConvertByte(string username, int tokensToConvert = 1)
         {
             using (var context = this.contextFactory.Create())
             {
                 try
                 {
                     var user = vipHelper.FindUser(context, username);
-                    if (user.TokenBytes >= bytesToVip)
+                    if ((user.TokenBytes * tokensToConvert) >= bytesToVip)
                     {
-                        return vipHelper.GiveTokenVip(context, user, bytesToVip);
+                        for (int i = 0; i < tokensToConvert; i++)
+                        {
+                            if (!vipHelper.GiveTokenVip(context, user, bytesToVip))
+                            {
+                                return false;
+                            }
+                        }
+
+                        return true;
                     }
                     return false;
                 }
