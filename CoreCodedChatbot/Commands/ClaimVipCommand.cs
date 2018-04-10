@@ -22,8 +22,11 @@ namespace CoreCodedChatbot.Commands
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            var success = bytesHelper.ConvertByte(username);
-            client.SendMessage(success ? $"Hey @{username}, I've converted your Byte to a VIP :D" : $"Hey @{username}, it looks like you don't have a full Byte yet. Stick around and you'll have one in no time!");
+            var giveTokenSuccess = int.TryParse(commandText, out var numberOfTokens) 
+                ? bytesHelper.ConvertByte(username, numberOfTokens) 
+                : bytesHelper.ConvertByte(username);
+
+            client.SendMessage(giveTokenSuccess ? $"Hey @{username}, I've converted your Byte to a VIP :D" : $"Hey @{username}, it looks like you don't have a full Byte yet. Stick around and you'll have one in no time!");
         }
 
         public void ShowHelp(TwitchClient client, string username)
