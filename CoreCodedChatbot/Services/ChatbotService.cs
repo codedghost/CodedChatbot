@@ -216,6 +216,7 @@ namespace CoreCodedChatbot.Services
                                 var chattersModel = JsonConvert.DeserializeObject<ChatViewersModel>(currentChattersJson);
                                 Console.Out.WriteLine(currentChattersJson);
                                 bytesHelper.GiveBytes(chattersModel);
+                                Console.Out.WriteLine(PlaylistHelper.GetEstimatedTime(chattersModel));
                             }
                             catch (Exception ex)
                             {
