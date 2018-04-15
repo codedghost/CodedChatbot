@@ -18,7 +18,7 @@ namespace CoreCodedChatbot.Web.Controllers
             this.playlistHelper = playlistHelper;
         }
 
-        public ActionResult Index(string accessKey)
+        public ActionResult Index()
         {
             var browserSourceModel = new PlaylistBrowserSource
             {
