@@ -93,8 +93,8 @@ namespace CoreCodedChatbot.Helpers
                 command.Process(client, username, userParameters, userIsModOrBroadcaster);
             }
         }
-        
-        public void ProcessHelp(TwitchClient client, string commandName, string username)
+
+        private void ProcessHelp(TwitchClient client, string commandName, string username)
         {
             var command = Commands.SingleOrDefault(c =>
                 c.GetType().GetTypeInfo().GetCustomAttributes<ChatCommand>()
