@@ -12,11 +12,12 @@ namespace CoreCodedChatbot.Commands
     public class InfoCommand : ICommand
     {
         private readonly CommandHelper commandHelper;
-        private readonly ConfigModel config = ConfigHelper.GetConfig();
+        private readonly ConfigModel config;
 
-        public InfoCommand(CommandHelper commandHelper)
+        public InfoCommand(CommandHelper commandHelper, ConfigModel config)
         {
             this.commandHelper = commandHelper;
+            this.config = config;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod)

@@ -15,12 +15,13 @@ namespace CoreCodedChatbot.Commands
 
         private readonly VipHelper vipHelper;
 
-        private readonly ConfigModel config = ConfigHelper.GetConfig();
+        private readonly ConfigModel config;
 
-        public VipCommand(VipHelper vipHelper, PlaylistHelper playlistHelper)
+        public VipCommand(VipHelper vipHelper, PlaylistHelper playlistHelper, ConfigModel config)
         {
             this.vipHelper = vipHelper;
             this.playlistHelper = playlistHelper;
+            this.config = config;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod)

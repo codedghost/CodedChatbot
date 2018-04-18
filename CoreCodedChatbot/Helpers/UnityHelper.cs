@@ -28,8 +28,9 @@ namespace CoreCodedChatbot.Helpers
             container.RegisterInstance(api);
             container.RegisterInstance(client);
             container.RegisterInstance(pubsub);
+            container.RegisterInstance(config);
 
-            var commandHelper = new CommandHelper(container);
+            var commandHelper = new CommandHelper(container, config);
             container.RegisterInstance(commandHelper);
 
             return container;

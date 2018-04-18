@@ -24,11 +24,12 @@ namespace CoreCodedChatbot.Helpers
         private bool allowModCommand = true;
         private System.Threading.Timer ModCommandTimeout { get; set; }
 
-        private readonly ConfigModel config = ConfigHelper.GetConfig();
+        private readonly ConfigModel config;
 
-        public CommandHelper(IUnityContainer container)
+        public CommandHelper(IUnityContainer container, ConfigModel config)
         {
             this.container = container;
+            this.config = config;
         }
 
         public void Init()
