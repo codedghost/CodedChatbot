@@ -11,11 +11,15 @@ namespace CoreCodedChatbot.Commands
     [ChatCommand(new[] { "twitter" }, false)]
     public class TwitterCommand : ICommand
     {
-        private readonly ConfigModel config = ConfigHelper.GetConfig();
+        private readonly ConfigModel config;
+
+        public TwitterCommand(ConfigModel config)
+        {
+            this.config = config;
+        }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            var config = ConfigHelper.GetConfig();
             client.SendMessage(config.StreamerChannel, $"Follow me on twitter too: {config.TwitterLink}");
         }
 

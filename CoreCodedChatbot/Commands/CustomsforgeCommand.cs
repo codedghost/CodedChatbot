@@ -11,7 +11,12 @@ namespace CoreCodedChatbot.Commands
     [ChatCommand(new[] { "customsforge", "cf", "customforge" }, false)]
     public class CustomsforgeCommand : ICommand
     {
-        private readonly ConfigModel config = ConfigHelper.GetConfig();
+        private readonly ConfigModel config;
+
+        public CustomsforgeCommand(ConfigModel config)
+        {
+            this.config = config;
+        }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {

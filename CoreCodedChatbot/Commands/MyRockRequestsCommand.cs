@@ -12,11 +12,12 @@ namespace CoreCodedChatbot.Commands
     public class MyRockRequestsCommand : ICommand
     {
         private readonly PlaylistHelper playlistHelper;
-        private readonly ConfigModel config = ConfigHelper.GetConfig();
+        private readonly ConfigModel config;
 
-        public MyRockRequestsCommand(PlaylistHelper playlistHelper)
+        public MyRockRequestsCommand(PlaylistHelper playlistHelper, ConfigModel config)
         {
             this.playlistHelper = playlistHelper;
+            this.config = config;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod)

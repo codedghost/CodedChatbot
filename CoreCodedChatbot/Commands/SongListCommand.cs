@@ -13,7 +13,12 @@ namespace CoreCodedChatbot.Commands
     [ChatCommand(new []{ "songlist", "playlist", "requests", "list", "songs" }, true)]
     public class SongListCommand: ICommand
     {
-        private readonly ConfigModel config = ConfigHelper.GetConfig();
+        private readonly ConfigModel config;
+
+        public SongListCommand(ConfigModel config)
+        {
+            this.config = config;
+        }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {

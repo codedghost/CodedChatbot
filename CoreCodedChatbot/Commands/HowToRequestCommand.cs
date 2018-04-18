@@ -11,7 +11,12 @@ namespace CoreCodedChatbot.Commands
     [ChatCommand(new[] { "howtorequest", "helprequest" }, false)]
     public class HowToRequestCommand : ICommand
     {
-        private readonly ConfigModel config = ConfigHelper.GetConfig();
+        private readonly ConfigModel config;
+
+        public HowToRequestCommand(ConfigModel config)
+        {
+            this.config = config;
+        }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {

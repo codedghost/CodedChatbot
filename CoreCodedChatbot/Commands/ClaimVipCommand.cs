@@ -16,11 +16,12 @@ namespace CoreCodedChatbot.Commands
     {
         private readonly BytesHelper bytesHelper;
 
-        private readonly ConfigModel config = ConfigHelper.GetConfig();
+        private readonly ConfigModel config;
 
-        public ClaimVipCommand(BytesHelper bytesHelper)
+        public ClaimVipCommand(BytesHelper bytesHelper, ConfigModel config)
         {
             this.bytesHelper = bytesHelper;
+            this.config = config;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod)

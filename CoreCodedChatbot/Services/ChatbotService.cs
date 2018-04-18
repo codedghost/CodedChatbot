@@ -36,11 +36,11 @@ namespace CoreCodedChatbot.Services
         private Timer BytesTimer { get; set; }
         private Timer DonationsTimer { get; set; }
 
-        private ConfigModel config = ConfigHelper.GetConfig();
+        private ConfigModel config;
 
         private static readonly HttpClient httpClient = new HttpClient();
 
-        public ChatbotService(CommandHelper commandHelper, TwitchClient client, TwitchAPI api, TwitchPubSub pubsub, VipHelper vipHelper, BytesHelper bytesHelper)
+        public ChatbotService(CommandHelper commandHelper, TwitchClient client, TwitchAPI api, TwitchPubSub pubsub, VipHelper vipHelper, BytesHelper bytesHelper, ConfigModel config)
         {
             this.commandHelper = commandHelper;
             this.client = client;
@@ -48,6 +48,7 @@ namespace CoreCodedChatbot.Services
             this.pubsub = pubsub;
             this.vipHelper = vipHelper;
             this.bytesHelper = bytesHelper;
+            this.config = config;
 
             this.commandHelper.Init();
 
