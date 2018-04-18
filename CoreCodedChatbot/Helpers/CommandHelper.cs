@@ -103,6 +103,7 @@ namespace CoreCodedChatbot.Helpers
             if (command == null)
             {
                 client.SendMessage(config.StreamerChannel, "Sorry, I can't help with that :(");
+                return;
             }
 
             command.ShowHelp(client, username);
