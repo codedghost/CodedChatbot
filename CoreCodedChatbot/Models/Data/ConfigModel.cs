@@ -20,5 +20,7 @@ namespace CoreCodedChatbot.Models.Data
         public string StreamLabsCode;
         public string LocalDbLocation;
         public string WebPlaylistUrl;
+        public int BitsToVip;
+        public int BytesToVip;
     }
 }

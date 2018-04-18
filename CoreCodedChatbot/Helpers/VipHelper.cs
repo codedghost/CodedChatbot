@@ -14,6 +14,7 @@ namespace CoreCodedChatbot.Helpers
     public class VipHelper
     {
         private readonly ChatbotContextFactory contextFactory;
+        private readonly ConfigModel config = ConfigHelper.GetConfig();
 
         public VipHelper(ChatbotContextFactory contextFactory)
         {
@@ -209,7 +210,7 @@ namespace CoreCodedChatbot.Helpers
 
                 try
                 {
-                    user.DonationOrBitsVipRequests = totalBitsToDate / 300;
+                    user.DonationOrBitsVipRequests = totalBitsToDate / config.BitsToVip;
                     context.SaveChanges();
                 }
                 catch (Exception e)
