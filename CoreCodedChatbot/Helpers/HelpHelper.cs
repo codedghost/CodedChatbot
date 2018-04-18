@@ -6,16 +6,25 @@ using System.Text;
 
 using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
+using CoreCodedChatbot.Models.Data;
 using TwitchLib;
 using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Helpers
 {
-    static class HelpHelper
+    public class HelpHelper
     {
-        public static void ProcessHelp(TwitchClient client, string commandName, string username)
+        private readonly TwitchClient client;
+        private readonly ConfigModel config;
+
+        public HelpHelper(TwitchClient client, ConfigModel config)
         {
-            var config = ConfigHelper.GetConfig();
+            this.client = client;
+            this.config = config;
+        }
+
+        public void ProcessHelp(string commandName, string username)
+        {
             var types = Assembly.GetEntryAssembly().GetTypes()
                 .Where(t => String.Equals(t.Namespace, "CoreCodedChatbot.Commands", StringComparison.Ordinal) &&
                             t.IsVisible).ToList();
