@@ -2,7 +2,9 @@
 using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Helpers;
+using CoreCodedChatbot.Models.Data;
 using TwitchLib;
+using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
 {
@@ -10,6 +12,8 @@ namespace CoreCodedChatbot.Commands
     public class RemoveCurrentRequestCommand : ICommand
     {
         private readonly PlaylistHelper playlistHelper;
+
+        private readonly ConfigModel config = ConfigHelper.GetConfig();
 
         public RemoveCurrentRequestCommand(PlaylistHelper playlistHelper)
         {
@@ -20,12 +24,12 @@ namespace CoreCodedChatbot.Commands
         {
             playlistHelper.ArchiveCurrentRequest();
 
-            client.SendMessage($"Hey @{username}, the current request has been removed");
+            client.SendMessage(config.StreamerChannel, $"Hey @{username}, the current request has been removed");
         }
 
         public void ShowHelp(TwitchClient client, string username)
         {
-            client.SendMessage($"Hey @{username}, this command will remove the current request from the queue.");
+            client.SendMessage(config.StreamerChannel, $"Hey @{username}, this command will remove the current request from the queue.");
         }
     }
 }

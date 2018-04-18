@@ -5,8 +5,9 @@ using System.Text;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.CustomAttributes;
-
+using CoreCodedChatbot.Models.Data;
 using TwitchLib;
+using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
 {
@@ -14,6 +15,8 @@ namespace CoreCodedChatbot.Commands
     public class ClaimVipCommand : ICommand
     {
         private readonly BytesHelper bytesHelper;
+
+        private readonly ConfigModel config = ConfigHelper.GetConfig();
 
         public ClaimVipCommand(BytesHelper bytesHelper)
         {
@@ -26,12 +29,12 @@ namespace CoreCodedChatbot.Commands
                 ? bytesHelper.ConvertByte(username, numberOfTokens) 
                 : bytesHelper.ConvertByte(username);
 
-            client.SendMessage(giveTokenSuccess ? $"Hey @{username}, I've converted your Byte(s) to VIP(s) :D" : $"Hey @{username}, it looks like you don't have a full Byte yet. Stick around and you'll have one in no time!");
+            client.SendMessage(config.StreamerChannel, giveTokenSuccess ? $"Hey @{username}, I've converted your Byte(s) to VIP(s) :D" : $"Hey @{username}, it looks like you don't have a full Byte yet. Stick around and you'll have one in no time!");
         }
 
         public void ShowHelp(TwitchClient client, string username)
         {
-            client.SendMessage($"Hey @{username}, this command will convert Bytes to VIPs if you have enough!");
+            client.SendMessage(config.StreamerChannel, $"Hey @{username}, this command will convert Bytes to VIPs if you have enough!");
         }
     }
 }

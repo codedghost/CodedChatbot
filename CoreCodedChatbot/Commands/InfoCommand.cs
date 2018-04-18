@@ -2,7 +2,9 @@
 using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Helpers;
+using CoreCodedChatbot.Models.Data;
 using TwitchLib;
+using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
 {
@@ -10,6 +12,7 @@ namespace CoreCodedChatbot.Commands
     public class InfoCommand : ICommand
     {
         private readonly CommandHelper commandHelper;
+        private readonly ConfigModel config = ConfigHelper.GetConfig();
 
         public InfoCommand(CommandHelper commandHelper)
         {
@@ -27,7 +30,7 @@ namespace CoreCodedChatbot.Commands
 
         public void ShowHelp(TwitchClient client, string username)
         {
-            client.SendMessage($"Hey @{username}, this command outputs general stream info from time to time.");
+            client.SendMessage(config.StreamerChannel, $"Hey @{username}, this command outputs general stream info from time to time.");
         }
     }
 }
