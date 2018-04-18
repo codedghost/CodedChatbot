@@ -13,14 +13,13 @@ namespace CoreCodedChatbot.Helpers
         private readonly ChatbotContextFactory contextFactory;
 
         private readonly VipHelper vipHelper;
+        private readonly ConfigModel config = ConfigHelper.GetConfig();
 
         public BytesHelper(ChatbotContextFactory contextFactory, VipHelper vipHelper)
         {
             this.contextFactory = contextFactory;
             this.vipHelper = vipHelper;
         }
-
-        private const int bytesToVip = 300;
 
         public void GiveBytes(ChatViewersModel chatViewersModel)
         {
@@ -69,20 +68,28 @@ namespace CoreCodedChatbot.Helpers
             using (var context = this.contextFactory.Create())
             {
                 var user = vipHelper.FindUser(context, username);
-                return (user.TokenBytes / (float)bytesToVip).ToString("n3");
+                return (user.TokenBytes / (float)config.BytesToVip).ToString("n3");
             }
         }
 
-        public bool ConvertByte(string username)
+        public bool ConvertByte(string username, int tokensToConvert = 1)
         {
             using (var context = this.contextFactory.Create())
             {
                 try
                 {
                     var user = vipHelper.FindUser(context, username);
-                    if (user.TokenBytes >= bytesToVip)
+                    if ((user.TokenBytes * tokensToConvert) >= config.BytesToVip)
                     {
-                        return vipHelper.GiveTokenVip(context, user, bytesToVip);
+                        for (int i = 0; i < tokensToConvert; i++)
+                        {
+                            if (!vipHelper.GiveTokenVip(context, user, config.BytesToVip))
+                            {
+                                return false;
+                            }
+                        }
+
+                        return true;
                     }
                     return false;
                 }

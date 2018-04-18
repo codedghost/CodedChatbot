@@ -63,6 +63,7 @@ namespace CoreCodedChatbot.Services
 
             pubsub.OnPubSubServiceConnected += onPubSubConnected;
             pubsub.OnListenResponse += onListenResponse;
+            pubsub.OnBitsReceived += onBitsReceived;
 
             // followerService.OnNewFollowersDetected += onNewFollowers;
 
@@ -107,7 +108,7 @@ namespace CoreCodedChatbot.Services
             {
                 Console.Out.WriteLine("ReSub!!! WOOOOO");
                 Console.Out.WriteLine(e.ReSubscriber.DisplayName);
-                vipHelper.GiveSubVip(e.ReSubscriber.DisplayName);
+                vipHelper.GiveSubVip(e.ReSubscriber.DisplayName, e.ReSubscriber.Months);
             }
             catch (Exception ex)
             {
@@ -124,8 +125,8 @@ namespace CoreCodedChatbot.Services
 
                 followerService.SetChannelByChannelId(Channel.Id);
                 await followerService.StartService();
+
                 pubsub.ListenToBitsEvents(Channel.Id);
-                pubsub.OnBitsReceived += onBitsReceived;
             }
             catch (Exception ex)
             {
@@ -145,7 +146,7 @@ namespace CoreCodedChatbot.Services
             try
             {
                 Console.Out.WriteLine("Bits Dropped :O!");
-                Console.Out.WriteLine($"{e.Username} - {e.TotalBitsUsed}");
+                Console.Out.WriteLine($"{e.Username} dropped {e.BitsUsed} - Total {e.TotalBitsUsed}");
                 var vipGiven = vipHelper.GiveDonationVip(e.Username, e.TotalBitsUsed);
             }
             catch (Exception ex)
