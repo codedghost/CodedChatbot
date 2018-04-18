@@ -54,7 +54,7 @@ namespace CoreCodedChatbot.Helpers
                     {
                         if (status?.SettingValue == null || status?.SettingValue == "Closed") return (AddRequestResult.PlaylistClosed, 0);
                     }
-                    if (userSongCount > UserMaxSongCount)
+                    if (userSongCount >= UserMaxSongCount)
                     {
                         return (AddRequestResult.NoMultipleRequests, 0);
                     }
