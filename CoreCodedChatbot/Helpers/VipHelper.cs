@@ -179,7 +179,7 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        public bool GiveSubVip(string username)
+        public bool GiveSubVip(string username, int subStreak = 1)
         {
             using (var context = this.contextFactory.Create())
             {
