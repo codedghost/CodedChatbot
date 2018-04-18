@@ -2,8 +2,9 @@
 using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
+using CoreCodedChatbot.Models.Data;
 using TwitchLib;
-
+using TwitchLib.Client;
 
 
 namespace CoreCodedChatbot.Commands
@@ -12,6 +13,8 @@ namespace CoreCodedChatbot.Commands
     public class RockRequestCommand : ICommand
     {
         private readonly PlaylistHelper playlistHelper;
+
+        private readonly ConfigModel config = ConfigHelper.GetConfig();
 
         public RockRequestCommand(PlaylistHelper playlistHelper)
         {
@@ -22,28 +25,28 @@ namespace CoreCodedChatbot.Commands
         {
             if (string.IsNullOrWhiteSpace(commandText))
             {
-                client.SendMessage($"Hi @{username}, looks like you haven't included a request there!");
+                client.SendMessage(config.StreamerChannel, $"Hi @{username}, looks like you haven't included a request there!");
                 return;
             }
 
             var (result, playlistPosition) = playlistHelper.AddRequest(username, commandText);
             if (result == AddRequestResult.PlaylistClosed)
             {
-                client.SendMessage($"Hey @{username}, the playlist is currently closed. If you want to request a song still, try !vip");
+                client.SendMessage(config.StreamerChannel, $"Hey @{username}, the playlist is currently closed. If you want to request a song still, try !vip");
             }
             else if (result == AddRequestResult.NoMultipleRequests)
             {
-                client.SendMessage($"Hey @{username}, you can only have one non-vip request in the list!");
+                client.SendMessage(config.StreamerChannel, $"Hey @{username}, you can only have one non-vip request in the list!");
             }
             else
             {
-                client.SendMessage($"Hey @{username}, I have queued {commandText} for you, you're #{playlistPosition} in the queue!");
+                client.SendMessage(config.StreamerChannel, $"Hey @{username}, I have queued {commandText} for you, you're #{playlistPosition} in the queue!");
             }
         }
 
         public void ShowHelp(TwitchClient client, string username)
         {
-            client.SendMessage(
+            client.SendMessage(config.StreamerChannel,
                 $"Hey @{username}, this command is used to add a song request to the queue. Usage: !request <SongArtist> - <SongName>");
         }
     }

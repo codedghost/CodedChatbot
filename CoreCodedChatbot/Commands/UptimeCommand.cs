@@ -4,7 +4,9 @@ using System.Threading;
 using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Helpers;
-using TwitchLib;
+using CoreCodedChatbot.Models.Data;
+using TwitchLib.Api;
+using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
 {
@@ -12,6 +14,8 @@ namespace CoreCodedChatbot.Commands
     public class UptimeCommand : ICommand
     {
         private readonly TwitchAPI api;
+
+        private readonly ConfigModel config = ConfigHelper.GetConfig();
 
         public UptimeCommand(TwitchAPI api)
         {
@@ -28,12 +32,12 @@ namespace CoreCodedChatbot.Commands
 
             var timeLiveFor = DateTime.Now.ToUniversalTime().Subtract(streamGoLiveTime);
 
-            client.SendMessage($"Hey @{username}, {config.StreamerChannel} has been live for: {timeLiveFor.Hours} hours and {timeLiveFor.Minutes} minutes.");
+            client.SendMessage(config.StreamerChannel, $"Hey @{username}, {config.StreamerChannel} has been live for: {timeLiveFor.Hours} hours and {timeLiveFor.Minutes} minutes.");
         }
 
         public void ShowHelp(TwitchClient client, string username)
         {
-            client.SendMessage($"Hey @{username}, this command outputs how long the stream has been live!");
+            client.SendMessage(config.StreamerChannel, $"Hey @{username}, this command outputs how long the stream has been live!");
         }
     }
 }

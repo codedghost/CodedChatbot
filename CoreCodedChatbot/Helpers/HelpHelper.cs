@@ -7,6 +7,7 @@ using System.Text;
 using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
 using TwitchLib;
+using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Helpers
 {
@@ -14,6 +15,7 @@ namespace CoreCodedChatbot.Helpers
     {
         public static void ProcessHelp(TwitchClient client, string commandName, string username)
         {
+            var config = ConfigHelper.GetConfig();
             var types = Assembly.GetEntryAssembly().GetTypes()
                 .Where(t => String.Equals(t.Namespace, "CoreCodedChatbot.Commands", StringComparison.Ordinal) &&
                             t.IsVisible).ToList();
@@ -24,7 +26,7 @@ namespace CoreCodedChatbot.Helpers
 
             if (command == null)
             {
-                client.SendMessage("Sorry, I can't help with that :(");
+                client.SendMessage(config.StreamerChannel, "Sorry, I can't help with that :(");
             }
 
             command.ShowHelp(client, username);

@@ -2,7 +2,9 @@
 using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Helpers;
+using CoreCodedChatbot.Models.Data;
 using TwitchLib;
+using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
 {
@@ -10,6 +12,8 @@ namespace CoreCodedChatbot.Commands
     public class RemoveRockRequestCommand : ICommand
     {
         private readonly PlaylistHelper playlistHelper;
+
+        private readonly ConfigModel config = ConfigHelper.GetConfig();
 
         public RemoveRockRequestCommand(PlaylistHelper playlistHelper)
         {
@@ -20,14 +24,14 @@ namespace CoreCodedChatbot.Commands
         {
             var success = playlistHelper.RemoveRockRequests(username, commandText, isMod);
 
-            client.SendMessage(success
+            client.SendMessage(config.StreamerChannel, success
                 ? $"Hi @{username}, I have removed number: {commandText} from the queue."
                 : $"Hi @{username}, I can't do that. Please use the command as follows: !removerequest <playlist index>. If your usage is correct you may not own the request or the playlist order has recently changed");
         }
 
         public void ShowHelp(TwitchClient client, string username)
         {
-            client.SendMessage(
+            client.SendMessage(config.StreamerChannel,
                 $"Hey @{username}, this command is used to remove one of your requests from the queue. Use !mrr to check your SongRequestIndex. Usage: !removerequest <SongRequestIndex>");
         }
     }

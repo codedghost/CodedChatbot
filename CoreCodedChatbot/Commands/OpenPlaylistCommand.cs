@@ -2,7 +2,9 @@
 using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Helpers;
+using CoreCodedChatbot.Models.Data;
 using TwitchLib;
+using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
 {
@@ -11,6 +13,8 @@ namespace CoreCodedChatbot.Commands
     {
         private readonly PlaylistHelper playlistHelper;
 
+        private readonly ConfigModel config = ConfigHelper.GetConfig();
+
         public OpenPlaylistCommand(PlaylistHelper playlistHelper)
         {
             this.playlistHelper = playlistHelper;
@@ -18,14 +22,14 @@ namespace CoreCodedChatbot.Commands
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            client.SendMessage(playlistHelper.OpenPlaylist() 
+            client.SendMessage(config.StreamerChannel, playlistHelper.OpenPlaylist() 
                 ? $"Hey @{username}, I have opened the playlist for you" 
                 : $"Hey @{username}, I can't seem to open the playlist :(");
         }
 
         public void ShowHelp(TwitchClient client, string username)
         {
-            client.SendMessage($"Hey @{username}, this command will open the playlist!");
+            client.SendMessage(config.StreamerChannel, $"Hey @{username}, this command will open the playlist!");
         }
     }
 }
