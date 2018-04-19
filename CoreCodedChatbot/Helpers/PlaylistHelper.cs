@@ -17,7 +17,7 @@ namespace CoreCodedChatbot.Helpers
     {
         private const int UserMaxSongCount = 1;
 
-        private ConfigModel config = ConfigHelper.GetConfig();
+        private ConfigModel config;
 
         private readonly ChatbotContextFactory contextFactory;
 
@@ -25,9 +25,10 @@ namespace CoreCodedChatbot.Helpers
 
         private string PrefixVip(SongRequest request) => request.VipRequestTime.HasValue ? " (VIP)" : string.Empty;
 
-        public PlaylistHelper(ChatbotContextFactory contextFactory)
+        public PlaylistHelper(ChatbotContextFactory contextFactory, ConfigModel config)
         {
             this.contextFactory = contextFactory;
+            this.config = config;
         }
 
         public (AddRequestResult, int) AddRequest(string username, string commandText, bool vipRequest = false)
