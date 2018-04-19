@@ -1,4 +1,4 @@
-﻿using TwitchLib;
+﻿using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Interfaces
 {

@@ -13,12 +13,13 @@ namespace CoreCodedChatbot.Helpers
         private readonly ChatbotContextFactory contextFactory;
 
         private readonly VipHelper vipHelper;
-        private readonly ConfigModel config = ConfigHelper.GetConfig();
+        private readonly ConfigModel config;
 
-        public BytesHelper(ChatbotContextFactory contextFactory, VipHelper vipHelper)
+        public BytesHelper(ChatbotContextFactory contextFactory, VipHelper vipHelper, ConfigModel config)
         {
             this.contextFactory = contextFactory;
             this.vipHelper = vipHelper;
+            this.config = config;
         }
 
         public void GiveBytes(ChatViewersModel chatViewersModel)
