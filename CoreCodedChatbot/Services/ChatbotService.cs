@@ -58,8 +58,12 @@ namespace CoreCodedChatbot.Services
             client.OnReSubscriber += onReSub;
             client.Connect();
 
+            pubsub.ListenToWhispers(config.ChannelId);
+            pubsub.ListenToBitsEvents(config.ChannelId);
+
             pubsub.OnPubSubServiceConnected += onPubSubConnected;
             pubsub.OnListenResponse += onListenResponse;
+            pubsub.OnWhisper += onWhisperResponse;
             pubsub.OnBitsReceived += onBitsReceived;
 
             pubsub.Connect();
@@ -116,14 +120,17 @@ namespace CoreCodedChatbot.Services
             try
             {
                 Console.Out.WriteLine("PubSub Connected!");
-                Channel = await api.Channels.v5.GetChannelAsync(config.ChatbotAccessToken);
-
-                pubsub.ListenToBitsEvents(Channel.Id);
             }
             catch (Exception ex)
             {
                 Console.Out.WriteLine(ex.ToString());
             }
+        }
+
+
+        private void onWhisperResponse(object sender, OnWhisperArgs e)
+        {
+            Console.Out.WriteLine(e.Whisper.Data);
         }
 
         private void onListenResponse(object sender, OnListenResponseArgs e)
