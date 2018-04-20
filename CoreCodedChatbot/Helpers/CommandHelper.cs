@@ -13,24 +13,33 @@ using CoreCodedChatbot.CustomAttributes;
 
 using TwitchLib;
 
+using Unity;
+
 namespace CoreCodedChatbot.Helpers
 {
     public class CommandHelper
     {
+        private readonly IUnityContainer container;
+
         private List<ICommand> Commands { get; set; }
         private bool allowModCommand = true;
         private System.Threading.Timer ModCommandTimeout { get; set; }
 
-        public CommandHelper()
+        public CommandHelper(IUnityContainer container)
+        {
+            this.container = container;
+        }
+
+        public void Init()
         {
             Commands = new List<ICommand>();
 
             var types = Assembly.GetEntryAssembly().GetTypes()
                 .Where(t => String.Equals(t.Namespace, "CoreCodedChatbot.Commands", StringComparison.Ordinal) && t.IsVisible).ToList();
 
-            foreach(var type in types)
+            foreach (var type in types)
             {
-                Commands.Add((ICommand)Activator.CreateInstance(type));
+                Commands.Add((ICommand)container.Resolve(type));
             }
         }
 

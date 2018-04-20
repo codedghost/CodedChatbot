@@ -13,9 +13,16 @@ namespace CoreCodedChatbot.Commands
     [ChatCommand(new[] { "mybytes", "mybites" }, false)]
     public class MyBytesCommand : ICommand
     {
+        private readonly BytesHelper bytesHelper;
+
+        public MyBytesCommand(BytesHelper bytesHelper)
+        {
+            this.bytesHelper = bytesHelper;
+        }
+
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            var bytes = BytesHelper.CheckBytes(username);
+            var bytes = bytesHelper.CheckBytes(username);
             client.SendMessage($"Hey @{username}, you have {bytes} Bytes!");
         }
 

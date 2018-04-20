@@ -6,12 +6,19 @@ using TwitchLib;
 
 namespace CoreCodedChatbot.Commands
 {
-    [ChatCommand(new[] { "myrequests", "mrr", "myrockrequests", "mysongs" }, false)]
+    [ChatCommand(new[] { "myrequests", "mrr", "myrockrequests", "mysongs", "myrequest", "mysong" }, false)]
     public class MyRockRequestsCommand : ICommand
     {
+        private readonly PlaylistHelper playlistHelper;
+
+        public MyRockRequestsCommand(PlaylistHelper playlistHelper)
+        {
+            this.playlistHelper = playlistHelper;
+        }
+
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            var requests = PlaylistHelper.GetUserRequests(username);
+            var requests = playlistHelper.GetUserRequests(username);
 
             client.SendMessage($"Hey @{username}, you have requested: {requests}");
         }

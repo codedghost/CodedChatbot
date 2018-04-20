@@ -9,9 +9,16 @@ namespace CoreCodedChatbot.Commands
     [ChatCommand(new []{ "myvips", "mvip", "myvip", "vips"}, false)]
     public class MyVipsCommand : ICommand
     {
+        private readonly VipHelper vipHelper;
+
+        public MyVipsCommand(VipHelper vipHelper)
+        {
+            this.vipHelper = vipHelper;
+        }
+
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            var vips = VipHelper.GetVipRequests(username);
+            var vips = vipHelper.GetVipRequests(username);
 
             if (vips == null) client.SendMessage($"Hey @{username}, something went wrong with the chatbot. Ask @CodedGhost2 what he's playing at!");
 

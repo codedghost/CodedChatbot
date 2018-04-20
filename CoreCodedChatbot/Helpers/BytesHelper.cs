@@ -8,45 +8,54 @@ using CoreCodedChatbot.Models.Data;
 
 namespace CoreCodedChatbot.Helpers
 {
-    public static class BytesHelper
+    public class BytesHelper
     {
-        private const int bytesToVip = 300;
+        private readonly ChatbotContextFactory contextFactory;
 
-        public static void GiveBytes(ChatViewersModel chatViewersModel)
+        private readonly VipHelper vipHelper;
+        private readonly ConfigModel config = ConfigHelper.GetConfig();
+
+        public BytesHelper(ChatbotContextFactory contextFactory, VipHelper vipHelper)
         {
-            using (var context = new ChatbotContext())
+            this.contextFactory = contextFactory;
+            this.vipHelper = vipHelper;
+        }
+
+        public void GiveBytes(ChatViewersModel chatViewersModel)
+        {
+            using (var context = this.contextFactory.Create())
             {
-                if (chatViewersModel.chatters.moderators.Any()) VipHelper.AddUsersDeferSave(context, chatViewersModel.chatters.moderators);
-                if (chatViewersModel.chatters.staff.Any()) VipHelper.AddUsersDeferSave(context, chatViewersModel.chatters.staff);
-                if (chatViewersModel.chatters.global_mods.Any()) VipHelper.AddUsersDeferSave(context, chatViewersModel.chatters.global_mods);
-                if (chatViewersModel.chatters.admins.Any()) VipHelper.AddUsersDeferSave(context, chatViewersModel.chatters.admins);
-                if (chatViewersModel.chatters.viewers.Any()) VipHelper.AddUsersDeferSave(context, chatViewersModel.chatters.viewers);
+                if (chatViewersModel.chatters.moderators.Any()) vipHelper.AddUsersDeferSave(context, chatViewersModel.chatters.moderators);
+                if (chatViewersModel.chatters.staff.Any()) vipHelper.AddUsersDeferSave(context, chatViewersModel.chatters.staff);
+                if (chatViewersModel.chatters.global_mods.Any()) vipHelper.AddUsersDeferSave(context, chatViewersModel.chatters.global_mods);
+                if (chatViewersModel.chatters.admins.Any()) vipHelper.AddUsersDeferSave(context, chatViewersModel.chatters.admins);
+                if (chatViewersModel.chatters.viewers.Any()) vipHelper.AddUsersDeferSave(context, chatViewersModel.chatters.viewers);
 
                 context.SaveChanges();
 
                 foreach (var mod in chatViewersModel.chatters.moderators)
                 {
-                    var user = VipHelper.FindUser(context, mod);
+                    var user = vipHelper.FindUser(context, mod);
                     user.TokenBytes++;
                 }
                 foreach (var staff in chatViewersModel.chatters.staff)
                 {
-                    var user = VipHelper.FindUser(context, staff);
+                    var user = vipHelper.FindUser(context, staff);
                     user.TokenBytes++;
                 }
                 foreach (var global_mod in chatViewersModel.chatters.global_mods)
                 {
-                    var user = VipHelper.FindUser(context, global_mod);
+                    var user = vipHelper.FindUser(context, global_mod);
                     user.TokenBytes++;
                 }
                 foreach (var admin in chatViewersModel.chatters.admins)
                 {
-                    var user = VipHelper.FindUser(context, admin);
+                    var user = vipHelper.FindUser(context, admin);
                     user.TokenBytes++;
                 }
                 foreach (var viewer in chatViewersModel.chatters.viewers)
                 {
-                    var user = VipHelper.FindUser(context, viewer);
+                    var user = vipHelper.FindUser(context, viewer);
                     user.TokenBytes++;
                 }
 
@@ -54,25 +63,33 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        public static string CheckBytes(string username)
+        public string CheckBytes(string username)
         {
-            using (var context = new ChatbotContext())
+            using (var context = this.contextFactory.Create())
             {
-                var user = VipHelper.FindUser(context, username);
-                return (user.TokenBytes / (float)bytesToVip).ToString("n3");
+                var user = vipHelper.FindUser(context, username);
+                return (user.TokenBytes / (float)config.BytesToVip).ToString("n3");
             }
         }
 
-        public static bool ConvertByte(string username)
+        public bool ConvertByte(string username, int tokensToConvert = 1)
         {
-            using (var context = new ChatbotContext())
+            using (var context = this.contextFactory.Create())
             {
                 try
                 {
-                    var user = VipHelper.FindUser(context, username);
-                    if (user.TokenBytes >= bytesToVip)
+                    var user = vipHelper.FindUser(context, username);
+                    if ((user.TokenBytes * tokensToConvert) >= config.BytesToVip)
                     {
-                        return VipHelper.GiveTokenVip(context, user, bytesToVip);
+                        for (int i = 0; i < tokensToConvert; i++)
+                        {
+                            if (!vipHelper.GiveTokenVip(context, user, config.BytesToVip))
+                            {
+                                return false;
+                            }
+                        }
+
+                        return true;
                     }
                     return false;
                 }

@@ -9,11 +9,18 @@ namespace CoreCodedChatbot.Commands
     [ChatCommand(new[] { "editrequest", "err", "editrockrequest", "editsong", "edit" }, false)]
     public class EditRockRequestCommand : ICommand
     {
+        private readonly PlaylistHelper playlistHelper;
+
+        public EditRockRequestCommand(PlaylistHelper playlistHelper)
+        {
+            this.playlistHelper = playlistHelper;
+        }
+
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
             string songRequestText = string.Empty;
             bool syntaxError = false;
-            var success = PlaylistHelper.EditRequest(username, commandText, isMod, out songRequestText, out syntaxError);
+            var success = playlistHelper.EditRequest(username, commandText, isMod, out songRequestText, out syntaxError);
 
             if (success)
             {

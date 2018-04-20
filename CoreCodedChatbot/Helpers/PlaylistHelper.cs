@@ -8,23 +8,32 @@ using Microsoft.AspNetCore.SignalR.Client;
 
 using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Database.Context.Models;
+using CoreCodedChatbot.Extensions;
 using CoreCodedChatbot.Models.Data;
 
 namespace CoreCodedChatbot.Helpers
 {
-    public static class PlaylistHelper
+    public class PlaylistHelper
     {
-        private static ConfigModel config = ConfigHelper.GetConfig();
+        private const int UserMaxSongCount = 1;
 
-        private static IOrderedQueryable<SongRequest> OrderRequests(this IQueryable<SongRequest> requests)
+        private ConfigModel config = ConfigHelper.GetConfig();
+
+        private readonly ChatbotContextFactory contextFactory;
+
+        private string FormatRequest(SongRequest sr, int index) => $"{index + 1}{this.PrefixVip(sr)} - {sr.RequestText} - {sr.RequestUsername}";
+
+        private string PrefixVip(SongRequest request) => request.VipRequestTime.HasValue ? " (VIP)" : string.Empty;
+
+        public PlaylistHelper(ChatbotContextFactory contextFactory)
         {
-            return requests.OrderBy(sr => sr.VipRequestTime ?? DateTime.MaxValue).ThenBy(sr => sr.RequestTime);
+            this.contextFactory = contextFactory;
         }
 
-        public static int AddRequest(string username, string commandText, bool vipRequest = false)
+        public (AddRequestResult, int) AddRequest(string username, string commandText, bool vipRequest = false)
         {
             var songIndex = 0;
-            using (var context = new ChatbotContext())
+            using (var context = contextFactory.Create())
             {
                 var request = new SongRequest
                 {
@@ -43,12 +52,11 @@ namespace CoreCodedChatbot.Helpers
                     Console.Out.WriteLine($"Not a vip request: {playlistLength}, {userSongCount}");
                     if (status != null)
                     {
-                        if (status?.SettingValue == null || status?.SettingValue == "Closed") return -1;
+                        if (status?.SettingValue == null || status?.SettingValue == "Closed") return (AddRequestResult.PlaylistClosed, 0);
                     }
-                    if (playlistLength >= 5 && userSongCount > 0)
+                    if (userSongCount >= UserMaxSongCount)
                     {
-                        Console.Out.WriteLine("returning -2");
-                        return -2;
+                        return (AddRequestResult.NoMultipleRequests, 0);
                     }
                 }
 
@@ -63,18 +71,19 @@ namespace CoreCodedChatbot.Helpers
 
             UpdatePlaylists();
 
-            return songIndex;
+            return (AddRequestResult.Success, songIndex);
         }
 
-        public static int AddRequestSignalR(string username, string commandText, bool vipRequest = false)
+
+        public (AddRequestResult, int) AddRequestSignalR(string username, string commandText, bool vipRequest = false)
         {
             return AddRequest(username, commandText, vipRequest);
         }
 
-        public static int PromoteRequest(string username, int songIndex)
+        public int PromoteRequest(string username, int songIndex)
         {
             var newSongIndex = 0;
-            using (var context = new ChatbotContext())
+            using (var context = contextFactory.Create())
             {
                 var request = context.SongRequests.Where(sr => !sr.Played).OrderRequests()
                     .ToList().ElementAtOrDefault(songIndex);
@@ -96,24 +105,23 @@ namespace CoreCodedChatbot.Helpers
             return newSongIndex;
         }
 
-        private static void UpdateObsPlaylist()
+        private void UpdateObsPlaylist()
         {
             using (var file = File.Open(config.ObsPlaylistPath,
                 File.Exists(config.ObsPlaylistPath) ? FileMode.Truncate : FileMode.OpenOrCreate, FileAccess.Write))
             {
                 using (var sw = new StreamWriter(file))
                 {
-                    var textToWrite = string.Empty;
+                    string textToWrite;
 
-                    using (var context = new ChatbotContext())
+                    using (var context = contextFactory.Create())
                     {
                         var requests = context.SongRequests
                             .Where(sr => !sr.Played)
-                            .OrderRequests().ToList();
+                            .OrderRequests()
+                            .ToList();
 
-                        textToWrite = string.Join('\n', requests
-                            .Take(5)
-                            .Select((sr, index) => $"{index + 1} - {sr.RequestText} - {sr.RequestUsername}"));
+                        textToWrite = string.Join('\n', requests.Take(5).Select(this.FormatRequest));
                     }
 
                     sw.Write(textToWrite);
@@ -121,7 +129,9 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        private static async void UpdateWebPlaylist()
+
+
+        private async void UpdateWebPlaylist()
         {
             //TODO:
             // URL needs to come from config
@@ -132,14 +142,14 @@ namespace CoreCodedChatbot.Helpers
 
             await connection.StartAsync();
 
-            using (var context = new ChatbotContext())
+            using (var context = contextFactory.Create())
             {
                 var requests = context.SongRequests
                     .Where(sr => !sr.Played)
                     .OrderRequests()
                     .Take(5)
                     .ToList()
-                    .Select((sr, index) => $"{index + 1} - {sr.RequestText} - {sr.RequestUsername}")
+                    .Select(this.FormatRequest)
                     .ToArray();
 
                 await connection.InvokeAsync("Send", new[] { requests });
@@ -147,7 +157,7 @@ namespace CoreCodedChatbot.Helpers
             await connection.DisposeAsync();
         }
 
-        private static async void UpdateFullPlaylist()
+        private async void UpdateFullPlaylist()
         {
             var connection = new HubConnectionBuilder()
                 .WithUrl($"{config.WebPlaylistUrl}")
@@ -156,24 +166,24 @@ namespace CoreCodedChatbot.Helpers
 
             await connection.StartAsync();
 
-            using (var context = new ChatbotContext())
+            using (var context = contextFactory.Create())
             {
                 var requests = context.SongRequests
                     .Where(sr => !sr.Played)
                     .OrderRequests()
                     .ToList()
-                    .Select((sr, index) => $"{index + 1} - {sr.RequestText} - {sr.RequestUsername}")
+                    .Select(this.FormatRequest)
                     .ToArray();
 
-                await connection.InvokeAsync("SendAll", new[] {requests});
+                await connection.InvokeAsync("SendAll", new[] { requests });
             }
 
             await connection.DisposeAsync();
         }
 
-        public static void ArchiveCurrentRequest()
+        public void ArchiveCurrentRequest()
         {
-            using (var context = new ChatbotContext())
+            using (var context = contextFactory.Create())
             {
                 var currentRequest = context.SongRequests.Where(sr => !sr.Played)
                     .OrderRequests()
@@ -189,23 +199,23 @@ namespace CoreCodedChatbot.Helpers
             UpdatePlaylists();
         }
 
-        public static string GetUserRequests(string username)
+        public string GetUserRequests(string username)
         {
             var relevantItems = GetUserRelevantRequests(username);
 
-            return relevantItems.Any() 
-                    ? string.Join(", ", relevantItems) 
+            return relevantItems.Any()
+                    ? string.Join(", ", relevantItems)
                     : "Looks like you don't have any songs in the queue, get requestin' dude! <!rr>";
         }
 
-        private static List<string> GetUserRelevantRequests(string username)
+        private List<string> GetUserRelevantRequests(string username)
         {
-            using (var context = new ChatbotContext())
+            using (var context = contextFactory.Create())
             {
                 var userRequests = context.SongRequests
                     .Where(sr => !sr.Played)
                     ?.OrderRequests().ToList()
-                    ?.Select((sr, index) => new { Index = index+1, SongRequest = sr })
+                    ?.Select((sr, index) => new { Index = index + 1, SongRequest = sr })
                     ?.Where(x => x.SongRequest.RequestUsername == username)
                     ?.OrderBy(x => x.Index)
                     ?.Select(x => $"{x.Index} - {x.SongRequest.RequestText}")
@@ -215,9 +225,9 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        public static string[] GetTopSongs()
+        public string[] GetTopSongs()
         {
-            using (var context = new ChatbotContext())
+            using (var context = contextFactory.Create())
             {
                 var requests = context.SongRequests.Where(sr => !sr.Played)
                     .OrderRequests()
@@ -229,9 +239,9 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        public static string[] GetAllSongs()
+        public string[] GetAllSongs()
         {
-            using (var context = new ChatbotContext())
+            using (var context = contextFactory.Create())
             {
                 var requests = context.SongRequests.Where(sr => !sr.Played)
                     .OrderRequests()
@@ -242,9 +252,9 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        public static void ClearRockRequests()
+        public void ClearRockRequests()
         {
-            using (var context = new ChatbotContext())
+            using (var context = contextFactory.Create())
             {
                 var requests = context.SongRequests.Where(sr => !sr.Played);
 
@@ -257,19 +267,19 @@ namespace CoreCodedChatbot.Helpers
             UpdatePlaylists();
         }
 
-        public static bool RemoveRockRequests(string username, string commandText, bool isMod)
+        public bool RemoveRockRequests(string username, string commandText, bool isMod)
         {
             if (!int.TryParse(commandText.Trim(), out var playlistIndex))
             {
                 return false;
             }
 
-            using (var context = new ChatbotContext())
+            using (var context = contextFactory.Create())
             {
                 var userRequest = context.SongRequests
                     ?.Where(sr => !sr.Played)
                     ?.OrderRequests().ToList()
-                    ?.Select((sr, index) => new { Index = index+1, SongRequest = sr })
+                    ?.Select((sr, index) => new { Index = index + 1, SongRequest = sr })
                     ?.Where(x => (x.SongRequest.RequestUsername == username || isMod) && x.Index == playlistIndex)
                     .FirstOrDefault();
 
@@ -284,9 +294,9 @@ namespace CoreCodedChatbot.Helpers
             return true;
         }
 
-        public static bool EditRequest(string username, string commandText, bool isMod, out string songRequestText, out bool syntaxError)
+        public bool EditRequest(string username, string commandText, bool isMod, out string songRequestText, out bool syntaxError)
         {
-            using (var context = new ChatbotContext())
+            using (var context = contextFactory.Create())
             {
                 var userRequests = context.SongRequests
                     ?.Where(sr => !sr.Played)
@@ -383,9 +393,9 @@ namespace CoreCodedChatbot.Helpers
             return true;
         }
 
-        public static bool OpenPlaylist()
+        public bool OpenPlaylist()
         {
-            using (var context = new ChatbotContext())
+            using (var context = contextFactory.Create())
             {
                 try
                 {
@@ -416,9 +426,9 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        public static bool ClosePlaylist()
+        public bool ClosePlaylist()
         {
-            using (var context = new ChatbotContext())
+            using (var context = contextFactory.Create())
             {
                 try
                 {
@@ -450,9 +460,46 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        private static void UpdatePlaylists()
+        public static string GetEstimatedTime(ChatViewersModel chattersModel)
         {
-            UpdateWebPlaylist();
+            using (var context = new ChatbotContext())
+            {
+                try
+                {
+                    var allViewers = chattersModel.chatters.viewers
+                        .Concat(chattersModel.chatters.admins)
+                        .Concat(chattersModel.chatters.global_mods)
+                        .Concat(chattersModel.chatters.moderators)
+                        .Concat(chattersModel.chatters.staff)
+                        .ToArray();
+
+                    var requests = context.SongRequests.Where(sr => !sr.Played)
+                        .OrderRequests()
+                        .Count(sr => allViewers.Contains(sr.RequestUsername));
+
+                    var estimatedFinishTime = DateTime.Now.AddMinutes(requests * 6d).ToString("HH:mm:ss");
+                    return $"Estimated time to finish: {estimatedFinishTime}";
+                }
+                catch (Exception e)
+                {
+                    Console.Out.WriteLine(e);
+                    return string.Empty;
+                }
+            }
         }
+
+        private void UpdatePlaylists()
+        {
+            UpdateObsPlaylist();
+        }
+    }
+
+    public enum AddRequestResult
+    {
+        PlaylistClosed,
+
+        NoMultipleRequests,
+
+        Success
     }
 }

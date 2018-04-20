@@ -9,6 +9,16 @@ namespace CoreCodedChatbot.Commands
     [ChatCommand(new []{"vip", "viprequest"}, false)]
     public class VipCommand : ICommand
     {
+        private readonly PlaylistHelper playlistHelper;
+
+        private readonly VipHelper vipHelper;
+
+        public VipCommand(VipHelper vipHelper, PlaylistHelper playlistHelper)
+        {
+            this.vipHelper = vipHelper;
+            this.playlistHelper = playlistHelper;
+        }
+
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
             if (string.IsNullOrWhiteSpace(commandText))
@@ -17,13 +27,13 @@ namespace CoreCodedChatbot.Commands
                 return;
             }
 
-            if (VipHelper.CanUseVipRequest(username))
+            if (vipHelper.CanUseVipRequest(username))
             {
                 var playlistPosition = 0;
                 var songIndex = 0;
                 if (int.TryParse(commandText.Trim('#'), out songIndex))
                 {
-                    playlistPosition = PlaylistHelper.PromoteRequest(username, songIndex-1);
+                    playlistPosition = playlistHelper.PromoteRequest(username, songIndex-1);
                     client.SendMessage(playlistPosition == -1
                         ? $"Hey @{username}, I can't find a song at that position! Please check your requests with !myrequests"
                         : playlistPosition == -2
@@ -32,12 +42,12 @@ namespace CoreCodedChatbot.Commands
                                 ? $"Hey @{username}, something seems to have gone wrong. Please try again in a minute or two"
                                 : $"Hey @{username}, I have promoted #{commandText} to #{playlistPosition} for you!");
 
-                    if (playlistPosition > 0) VipHelper.UseVipRequest(username);
+                    if (playlistPosition > 0) vipHelper.UseVipRequest(username);
                     return;
                 }
 
-                playlistPosition = PlaylistHelper.AddRequest(username, commandText, true);
-                VipHelper.UseVipRequest(username);
+                (_, playlistPosition) = playlistHelper.AddRequest(username, commandText, true);
+                vipHelper.UseVipRequest(username);
                 client.SendMessage(
                     $"Hey @{username}, I have queued {commandText} for you, you're #{playlistPosition} in the queue!");
             }

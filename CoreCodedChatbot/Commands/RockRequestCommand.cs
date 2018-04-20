@@ -11,6 +11,13 @@ namespace CoreCodedChatbot.Commands
     [ChatCommand(new[] { "request", "rr", "sr", "songrequest", "rockrequest", "song" }, false)]
     public class RockRequestCommand : ICommand
     {
+        private readonly PlaylistHelper playlistHelper;
+
+        public RockRequestCommand(PlaylistHelper playlistHelper)
+        {
+            this.playlistHelper = playlistHelper;
+        }
+
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
             if (string.IsNullOrWhiteSpace(commandText))
@@ -19,14 +26,14 @@ namespace CoreCodedChatbot.Commands
                 return;
             }
 
-            var playlistPosition = PlaylistHelper.AddRequest(username, commandText);
-            if (playlistPosition == -1)
+            var (result, playlistPosition) = playlistHelper.AddRequest(username, commandText);
+            if (result == AddRequestResult.PlaylistClosed)
             {
                 client.SendMessage($"Hey @{username}, the playlist is currently closed. If you want to request a song still, try !vip");
             }
-            else if (playlistPosition == -2)
+            else if (result == AddRequestResult.NoMultipleRequests)
             {
-                client.SendMessage($"Hey @{username}, the playlist has more than five songs, so you can only have one non-vip request in the list right now!");
+                client.SendMessage($"Hey @{username}, you can only have one non-vip request in the list!");
             }
             else
             {
