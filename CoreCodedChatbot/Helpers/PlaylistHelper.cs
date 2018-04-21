@@ -131,7 +131,7 @@ namespace CoreCodedChatbot.Helpers
             //TODO:
             // URL needs to come from config
             var connection = new HubConnectionBuilder()
-                .WithUrl($"{config.WebPlaylistUrl}")
+                .WithUrl($"{config.WebPlaylistUrl}/SongList")
                 .WithConsoleLogger()
                 .Build();
 
@@ -485,7 +485,7 @@ namespace CoreCodedChatbot.Helpers
 
         private void UpdatePlaylists()
         {
-            UpdateObsPlaylist();
+            UpdateWebPlaylist();
         }
     }
 
