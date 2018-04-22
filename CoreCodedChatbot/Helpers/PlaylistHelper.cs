@@ -155,7 +155,7 @@ namespace CoreCodedChatbot.Helpers
         private async void UpdateFullPlaylist()
         {
             var connection = new HubConnectionBuilder()
-                .WithUrl($"{config.WebPlaylistUrl}")
+                .WithUrl($"{config.WebPlaylistUrl}/SongList")
                 .WithConsoleLogger()
                 .Build();
 
@@ -486,6 +486,7 @@ namespace CoreCodedChatbot.Helpers
         private void UpdatePlaylists()
         {
             UpdateWebPlaylist();
+            UpdateFullPlaylist();
         }
     }
 
