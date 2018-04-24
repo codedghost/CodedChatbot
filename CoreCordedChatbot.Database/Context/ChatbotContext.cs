@@ -32,8 +32,9 @@ namespace CoreCodedChatbot.Database.Context
                 .AddJsonFile("config.json");
 
             ConfigRoot = builder.Build();
-
-            var dbConn = ConfigRoot["LocalDbLocation"];
+            
+            // Reconstructing path for platform independency
+            var dbConn = Path.GetFullPath(ConfigRoot["LocalDbLocation"]);
 
             optionsBuilder.UseSqlite($"FileName={dbConn}");
         }
