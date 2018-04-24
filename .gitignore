@@ -22,3 +22,4 @@
 /.ssh
 /CodedChatbot.sln.DotSettings.user
 /CoreCodedChatbot.Web/config.json
+/CoreCodedChatbot.Web/wwwroot/lib/
