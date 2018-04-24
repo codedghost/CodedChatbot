@@ -2,20 +2,40 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CoreCodedChatbot.Models.Data;
+using CoreCodedChatbot.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace CoreCodedChatbot.Web.SignalRHubs
 {
     public class SongList : Hub
     {
-        public async Task Send(object[] songText)
+        private ConfigModel config { get; set; }
+
+        public SongList(ConfigModel config)
         {
-            await this.Clients.All.InvokeAsync("Send", new[] { songText });
+            this.config = config;
         }
 
-        public async Task SendAll(object[] songText)
+        public async Task Send(SongListHubModel data)
         {
-            await this.Clients.All.InvokeAsync("SendAll", new[] {songText});
+            var psk = config.SignalRKey;
+
+            if (psk == data.psk)
+            {
+                await this.Clients.All.InvokeAsync("Send", new[] { data.requests });
+            }
+        }
+
+        public async Task SendAll(SongListHubModel data)
+        {
+            var psk = config.SignalRKey;
+
+            if (psk == data.psk)
+            {
+                await this.Clients.All.InvokeAsync("SendAll", new[] {data.requests});
+            }
         }
 
         public override Task OnConnectedAsync()
