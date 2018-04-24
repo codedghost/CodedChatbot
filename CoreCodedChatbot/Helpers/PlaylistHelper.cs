@@ -128,8 +128,8 @@ namespace CoreCodedChatbot.Helpers
 
         private async void UpdateWebPlaylist()
         {
-            //TODO:
-            // URL needs to come from config
+            var psk = config.SignalRKey;
+
             var connection = new HubConnectionBuilder()
                 .WithUrl($"{config.WebPlaylistUrl}/SongList")
                 .WithConsoleLogger()
@@ -147,13 +147,15 @@ namespace CoreCodedChatbot.Helpers
                     .Select(this.FormatRequest)
                     .ToArray();
 
-                await connection.InvokeAsync("Send", new[] { requests });
+                await connection.InvokeAsync("Send", new { psk, requests });
             }
             await connection.DisposeAsync();
         }
 
         private async void UpdateFullPlaylist()
         {
+            var psk = config.SignalRKey;
+
             var connection = new HubConnectionBuilder()
                 .WithUrl($"{config.WebPlaylistUrl}/SongList")
                 .WithConsoleLogger()
@@ -170,7 +172,7 @@ namespace CoreCodedChatbot.Helpers
                     .Select(this.FormatRequest)
                     .ToArray();
 
-                await connection.InvokeAsync("SendAll", new[] { requests });
+                await connection.InvokeAsync("SendAll", new { psk, requests });
             }
 
             await connection.DisposeAsync();
