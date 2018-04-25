@@ -21,7 +21,6 @@ namespace CoreCodedChatbot.Database.Context
         public DbSet<SongRequest> SongRequests { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Setting> Settings { get; set; }
-        public DbSet<GiveawayEntry> GiveawayEntries { get; set; }
 
         private IConfigurationRoot ConfigRoot { get; set; }
 
@@ -45,7 +44,6 @@ namespace CoreCodedChatbot.Database.Context
             modelBuilder.AddConfiguration(new SongRequestMap());
             modelBuilder.AddConfiguration(new UserMap());
             modelBuilder.AddConfiguration(new SettingMap());
-            modelBuilder.AddConfiguration(new GiveawayEntryMap());
         }
     }
 }
