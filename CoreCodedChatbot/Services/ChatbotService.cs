@@ -54,21 +54,21 @@ namespace CoreCodedChatbot.Services
 
             this.commandHelper.Init();
 
-            client.OnJoinedChannel += onJoinedChannel;
-            client.OnChatCommandReceived += onCommandReceived;
-            client.OnNewSubscriber += onNewSub;
-            client.OnReSubscriber += onReSub;
-            client.Connect();
+            this.client.OnJoinedChannel += onJoinedChannel;
+            this.client.OnChatCommandReceived += onCommandReceived;
+            this.client.OnNewSubscriber += onNewSub;
+            this.client.OnReSubscriber += onReSub;
+            this.client.Connect();
 
-            pubsub.ListenToWhispers(config.ChannelId);
-            pubsub.ListenToBitsEvents(config.ChannelId);
+            this.pubsub.ListenToWhispers(config.ChannelId);
+            this.pubsub.ListenToBitsEvents(config.ChannelId);
 
-            pubsub.OnPubSubServiceConnected += onPubSubConnected;
-            pubsub.OnListenResponse += onListenResponse;
-            pubsub.OnWhisper += onWhisperResponse;
-            pubsub.OnBitsReceived += onBitsReceived;
+            this.pubsub.OnPubSubServiceConnected += onPubSubConnected;
+            this.pubsub.OnBitsReceived += onBitsReceived;
+            this.pubsub.OnListenResponse += onListenResponse;
+            this.pubsub.OnWhisper += onWhisperResponse;
 
-            pubsub.Connect();
+            this.pubsub.Connect();
         }
 
         private void onJoinedChannel(object sender, OnJoinedChannelArgs e)
@@ -122,6 +122,9 @@ namespace CoreCodedChatbot.Services
             try
             {
                 Console.Out.WriteLine("PubSub Connected!");
+                pubsub.ListenToBitsEvents(config.ChannelId);
+
+                pubsub.SendTopics();
             }
             catch (Exception ex)
             {
