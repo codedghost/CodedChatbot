@@ -76,22 +76,30 @@ namespace CoreCodedChatbot.Helpers
 
             if (userIsModOrBroadcaster && allowModCommand && isCommandModOnly)
             {
-                allowModCommand = false;
-                // In two seconds it will release the lock
-                ModCommandTimeout = new System.Threading.Timer(e =>
+                TimeoutModCommand();
+                command.Process(client, username, userParameters, userIsModOrBroadcaster);
+            }
+            else if (!isCommandModOnly)
+            {
+                if (command.GetType() == typeof(RockRequestCommand) || command.GetType() == typeof(VipCommand))
+                {
+                    TimeoutModCommand();
+                }
+                command.Process(client, username, userParameters, userIsModOrBroadcaster);
+            }
+        }
+
+        private void TimeoutModCommand()
+        {
+            allowModCommand = false;
+            // In seven seconds it will release the lock
+            ModCommandTimeout = new System.Threading.Timer(e =>
                 {
                     allowModCommand = true;
                 },
                 null,
                 TimeSpan.FromSeconds(7),
                 TimeSpan.FromSeconds(0));
-
-                command.Process(client, username, userParameters, userIsModOrBroadcaster);
-            }
-            else if (!isCommandModOnly)
-            {
-                command.Process(client, username, userParameters, userIsModOrBroadcaster);
-            }
         }
 
         private void ProcessHelp(TwitchClient client, string commandName, string username)
