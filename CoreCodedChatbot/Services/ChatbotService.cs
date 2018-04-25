@@ -65,16 +65,15 @@ namespace CoreCodedChatbot.Services
             this.client.OnReSubscriber += onReSub;
             this.client.Connect();
 
+            this.liveStreamMonitor.SetStreamsByUserId(new List<string>{config.ChannelId});
             this.liveStreamMonitor.OnStreamOnline += onStreamOnline;
             this.liveStreamMonitor.OnStreamOffline += onStreamOffline;
 
-            this.pubsub.ListenToWhispers(config.ChannelId);
-            this.pubsub.ListenToBitsEvents(config.ChannelId);
+            this.liveStreamMonitor.StartService();
 
             this.pubsub.OnPubSubServiceConnected += onPubSubConnected;
             this.pubsub.OnBitsReceived += onBitsReceived;
             this.pubsub.OnListenResponse += onListenResponse;
-            this.pubsub.OnWhisper += onWhisperResponse;
 
             this.pubsub.Connect();
         }
@@ -218,8 +217,8 @@ namespace CoreCodedChatbot.Services
                     try
                     {
                         var currentChattersJson = await httpClient.GetStringAsync($"https://tmi.twitch.tv/group/user/{config.StreamerChannel}/chatters");
-                                // process json into username list.
-                                var chattersModel = JsonConvert.DeserializeObject<ChatViewersModel>(currentChattersJson);
+                        // process json into username list.
+                        var chattersModel = JsonConvert.DeserializeObject<ChatViewersModel>(currentChattersJson);
                         Console.Out.WriteLine(currentChattersJson);
                         bytesHelper.GiveBytes(chattersModel);
                         Console.Out.WriteLine(playlistHelper.GetEstimatedTime(chattersModel));
