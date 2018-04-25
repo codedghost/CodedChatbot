@@ -131,7 +131,7 @@ namespace CoreCodedChatbot.Services
                 Console.Out.WriteLine("PubSub Connected!");
                 pubsub.ListenToBitsEvents(config.ChannelId);
 
-                pubsub.SendTopics();
+                pubsub.SendTopics(config.ChatbotAccessToken);
             }
             catch (Exception ex)
             {
@@ -139,17 +139,11 @@ namespace CoreCodedChatbot.Services
             }
         }
 
-
-        private void onWhisperResponse(object sender, OnWhisperArgs e)
-        {
-            Console.Out.WriteLine(e.Whisper.Data);
-        }
-
         private void onListenResponse(object sender, OnListenResponseArgs e)
         {
             Console.Out.WriteLine(e.Successful
                 ? $"Successfully verified listening to topic: {e.Topic}"
-                : $"Failed to listen! Error: {e.Response.Error}");
+                : $"Failed to listen! {e.Topic} - Error: {e.Response.Error}");
         }
 
         private void onBitsReceived(object sender, OnBitsReceivedArgs e)
