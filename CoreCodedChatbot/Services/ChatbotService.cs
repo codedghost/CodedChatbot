@@ -25,6 +25,7 @@ namespace CoreCodedChatbot.Services
         private readonly TwitchPubSub pubsub;
         private readonly VipHelper vipHelper;
         private readonly BytesHelper bytesHelper;
+        private readonly PlaylistHelper playlistHelper;
 
         private ChannelAuthed Channel { get; set; }
 
@@ -40,7 +41,7 @@ namespace CoreCodedChatbot.Services
 
         private static readonly HttpClient httpClient = new HttpClient();
 
-        public ChatbotService(CommandHelper commandHelper, TwitchClient client, TwitchAPI api, TwitchPubSub pubsub, VipHelper vipHelper, BytesHelper bytesHelper, ConfigModel config)
+        public ChatbotService(CommandHelper commandHelper, TwitchClient client, TwitchAPI api, TwitchPubSub pubsub, VipHelper vipHelper, BytesHelper bytesHelper, PlaylistHelper playlistHelper, ConfigModel config)
         {
             this.commandHelper = commandHelper;
             this.client = client;
@@ -48,6 +49,7 @@ namespace CoreCodedChatbot.Services
             this.pubsub = pubsub;
             this.vipHelper = vipHelper;
             this.bytesHelper = bytesHelper;
+            this.playlistHelper = playlistHelper;
             this.config = config;
 
             this.commandHelper.Init();
@@ -216,7 +218,7 @@ namespace CoreCodedChatbot.Services
                                 var chattersModel = JsonConvert.DeserializeObject<ChatViewersModel>(currentChattersJson);
                                 Console.Out.WriteLine(currentChattersJson);
                                 bytesHelper.GiveBytes(chattersModel);
-                                Console.Out.WriteLine(PlaylistHelper.GetEstimatedTime(chattersModel));
+                                Console.Out.WriteLine(playlistHelper.GetEstimatedTime(chattersModel));
                             }
                             catch (Exception ex)
                             {
