@@ -117,7 +117,7 @@ namespace CoreCodedChatbot.Services
             }
         }
 
-        private async void onPubSubConnected(object sender, EventArgs e)
+        private void onPubSubConnected(object sender, EventArgs e)
         {
             try
             {
