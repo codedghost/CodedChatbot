@@ -30,8 +30,6 @@ namespace CoreCodedChatbot.Services
         private readonly PlaylistHelper playlistHelper;
         private readonly LiveStreamMonitor liveStreamMonitor;
 
-        private ChannelAuthed Channel { get; set; }
-
         private Timer HowToRequestTimer { get; set; }
         private Timer CustomsForgeTimer { get; set; }
         private Timer DiscordTimer { get; set; }
@@ -129,6 +127,7 @@ namespace CoreCodedChatbot.Services
             try
             {
                 Console.Out.WriteLine("PubSub Connected!");
+
                 pubsub.ListenToBitsEvents(config.ChannelId);
 
                 pubsub.SendTopics(config.ChatbotAccessToken);
@@ -166,7 +165,7 @@ namespace CoreCodedChatbot.Services
             // Align database with any potentially missed or offline subs
             try
             {
-                var subs = await api.Channels.v5.GetAllSubscribersAsync(Channel.Id, config.ChatbotAccessToken);
+                var subs = await api.Channels.v5.GetAllSubscribersAsync(config.ChannelId, config.ChatbotAccessToken);
 
                 // TODO: Need to consider length of sub in db alignment
                 vipHelper.StartupSubVips(subs);
@@ -294,17 +293,7 @@ namespace CoreCodedChatbot.Services
 
         public void Main()
         {
-            var firstRun = true;
-            while (true)
-            {
-                if (firstRun && Channel?.Id != null)
-                {
-                    ScheduleStreamTasks();
-
-                    firstRun = false;
-                    break;
-                }
-            }
+            ScheduleStreamTasks();
         }
     }
 }
