@@ -8,7 +8,7 @@ using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
 {
-    [ChatCommand(new[] { "myrequests", "mrr", "myrockrequests", "mysongs", "myrequest", "mysong" }, false)]
+    [ChatCommand(new[] { "myrequests", "mrr", "myrockrequests", "mysongs", "myrequest", "mysong", "pos", "position" }, false)]
     public class MyRockRequestsCommand : ICommand
     {
         private readonly PlaylistHelper playlistHelper;
