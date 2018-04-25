@@ -26,11 +26,19 @@ namespace CoreCodedChatbot.Commands
         public async void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
             var Stream = await api.Streams.v5.GetStreamByUserAsync(config.ChannelId);
-            var streamGoLiveTime = Stream.Stream.CreatedAt.ToUniversalTime();
+            var streamGoLiveTime = Stream?.Stream?.CreatedAt;
 
-            var timeLiveFor = DateTime.Now.ToUniversalTime().Subtract(streamGoLiveTime);
+            if (streamGoLiveTime != null)
+            {
+                var timeLiveFor = DateTime.Now.ToUniversalTime().Subtract(streamGoLiveTime.Value.ToUniversalTime());
 
-            client.SendMessage(config.StreamerChannel, $"Hey @{username}, {config.StreamerChannel} has been live for: {timeLiveFor.Hours} hours and {timeLiveFor.Minutes} minutes.");
+                client.SendMessage(config.StreamerChannel, $"Hey @{username}, {config.StreamerChannel} has been live for: {timeLiveFor.Hours} hours and {timeLiveFor.Minutes} minutes.");
+            }
+            else
+            {
+                client.SendMessage(config.StreamerChannel,
+                    $"Hey @{username}, {config.StreamerChannel} seems to be offline right now");
+            }
         }
 
         public void ShowHelp(TwitchClient client, string username)
