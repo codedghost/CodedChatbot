@@ -10,54 +10,17 @@ namespace CoreCodedChatbot.Extensions
     {
         public static List<SongRequest> OrderRequests(this IQueryable<SongRequest> requests, bool isCurrentVip)
         {
-            var newRequestList = new List<SongRequest>();
-            var vipsFirst = requests.OrderBy(sr => sr.VipRequestTime ?? DateTime.MaxValue).ThenBy(sr => sr.RequestTime).ToList();
-            var vipRequestCount = requests.Count(sr => sr.VipRequestTime != null);
+            var vips = requests.Where(sr => sr.VipRequestTime != null).OrderBy(sr => sr.VipRequestTime);
+            var regulars = requests.Where(sr => sr.VipRequestTime == null).OrderBy(sr => sr.RequestTime);
 
-            var vipsAdded = 0;
-            var regularsAdded = 0;
+            var vipOrdered = vips.ToList().Select((obj, index) =>
+                new {songRequest = obj, playlistIndex = index * 2 + (isCurrentVip ? 0 : 1)});
 
-            for (var i = 0; i < vipsFirst.Count(); i++)
-            {
-                if (i % 2 == 0)
-                {
-                    if (isCurrentVip)
-                    {
-                        if (i - regularsAdded < vipRequestCount)
-                        {
-                            newRequestList.Add(vipsFirst[i - regularsAdded]);
-                        }
-                        else
-                        {
-                            newRequestList.Add(vipsFirst[i + vipRequestCount]);
-                        }
-                    }
-                    else
-                    {
-                        if (i + vipRequestCount - vipsAdded < vipsFirst.Count() - vipRequestCount)
-                        {
-                            newRequestList.Add(vipsFirst[(i + vipRequestCount) - vipsAdded]);
-                        }
-                        else
-                        {
-                            newRequestList.Add();
-                        }
-                    }
-                }
-                else
-                {
-                    if (isCurrentVip)
-                    {
-                        newRequestList.Add(vipsFirst[(i + vipRequestCount) - vipsAdded]);
-                    }
-                    else
-                    {
-                        newRequestList.Add(vipsFirst[i - regularsAdded]);
-                    }
-                }
-            }
+            var regularOrdered = regulars.ToList().Select((obj, index) =>
+                new {songRequest = obj, playlistIndex = index * 2 + (isCurrentVip ? 1 : 0)});
 
-            return newRequestList;
+            var combined = vipOrdered.Union(regularOrdered);
+            return combined.OrderBy(sr => sr.playlistIndex).ToList().Select(sr => sr.songRequest).ToList();
         }
     }
 }

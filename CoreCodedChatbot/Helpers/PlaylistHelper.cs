@@ -202,6 +202,7 @@ namespace CoreCodedChatbot.Helpers
                 context.SaveChanges();
             }
 
+            isCurrentVip = !isCurrentVip;
             UpdatePlaylists();
         }
 
