@@ -144,7 +144,7 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        public bool GiveDonationVip(string username, int totalBitsToDate)
+        public bool GiveBitsVip(string username, int totalBitsToDate)
         {
             using (var context = this.contextFactory.Create())
             {
@@ -153,7 +153,7 @@ namespace CoreCodedChatbot.Helpers
 
                 try
                 {
-                    user.DonationOrBitsVipRequests = totalBitsToDate / config.BitsToVip;
+                    user.TotalBitsDropped = totalBitsToDate;
                     context.SaveChanges();
                 }
                 catch (Exception)
@@ -162,6 +162,44 @@ namespace CoreCodedChatbot.Helpers
                 }
 
                 return true;
+            }
+        }
+
+        public bool GiveDonationVipsDb(User user)
+        {
+            try
+            {
+                var totalBitsGiven = user.TotalBitsDropped;
+                var totalDonated = user.TotalDonated;
+
+                var bitsVipPercentage = (double) totalBitsGiven / (double) config.BitsToVip;
+                var donationVipPercentage = (double) totalDonated / (double) config.DonationAmountToVip;
+
+                user.DonationOrBitsVipRequests = (int) Math.Floor(bitsVipPercentage + donationVipPercentage);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public bool GiveDonationVips(string username, bool deferSave = false)
+        {
+            try
+            {
+                using (var context = new ChatbotContextFactory().Create())
+                {
+                    var user = FindUser(context, username);
+                    GiveDonationVipsDb(user);
+                    if (deferSave) return true;
+                    context.SaveChanges();
+                    return true;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
             }
         }
 

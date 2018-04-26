@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Newtonsoft.Json;
 
@@ -28,6 +29,7 @@ namespace CoreCodedChatbot.Services
         private readonly VipHelper vipHelper;
         private readonly BytesHelper bytesHelper;
         private readonly PlaylistHelper playlistHelper;
+        private readonly StreamLabsHelper streamLabsHelper;
         private readonly LiveStreamMonitor liveStreamMonitor;
 
         private Timer HowToRequestTimer { get; set; }
@@ -43,7 +45,7 @@ namespace CoreCodedChatbot.Services
         private static readonly HttpClient httpClient = new HttpClient();
 
         public ChatbotService(CommandHelper commandHelper, TwitchClient client, TwitchAPI api, TwitchPubSub pubsub, LiveStreamMonitor liveStreamMonitor,
-            VipHelper vipHelper, BytesHelper bytesHelper, PlaylistHelper playlistHelper, ConfigModel config)
+            VipHelper vipHelper, BytesHelper bytesHelper, PlaylistHelper playlistHelper, StreamLabsHelper streamLabsHelper, ConfigModel config)
         {
             this.commandHelper = commandHelper;
             this.client = client;
@@ -53,6 +55,7 @@ namespace CoreCodedChatbot.Services
             this.vipHelper = vipHelper;
             this.bytesHelper = bytesHelper;
             this.playlistHelper = playlistHelper;
+            this.streamLabsHelper = streamLabsHelper;
             this.config = config;
 
             this.commandHelper.Init();
@@ -151,7 +154,9 @@ namespace CoreCodedChatbot.Services
             {
                 Console.Out.WriteLine("Bits Dropped :O!");
                 Console.Out.WriteLine($"{e.Username} dropped {e.BitsUsed} - Total {e.TotalBitsUsed}");
-                var vipGiven = vipHelper.GiveDonationVip(e.Username, e.TotalBitsUsed);
+                if (vipHelper.GiveBitsVip(e.Username, e.TotalBitsUsed))
+                    vipHelper.GiveDonationVips(e.Username);
+
             }
             catch (Exception ex)
             {
@@ -227,30 +232,13 @@ namespace CoreCodedChatbot.Services
 
             // Set thread for checking for any new Donations from streamlabs and synchronise with the db.
             // Commenting out so bot can be used.
-            /*
+            
             DonationsTimer = new System.Threading.Timer(
-                async e =>
+                e =>
                 {
                     try
                     {
-                        var vals = new Dictionary<string, string>
-                        {
-                            { "grant_type", "authorization_code" },
-                            { "client_id", config.StreamLabsClientId },
-                            { "client_secret", config.StreamLabsClientSecret },
-                            { "redirect_uri", "localhost" },
-                            { "code", config.StreamLabsCode }
-                        };
-                        var content = new FormUrlEncodedContent(vals);
-                        var tokenResponse = await httpClient.PostAsync("https://streamlabs.com/api/v1.0/token", content);
-                        var tokenJsonString = await tokenResponse.Content.ReadAsStringAsync();
-                        var tokenModel = JsonConvert.DeserializeObject<TokenJsonModel>(tokenJsonString);
-
-
-
-                        var donationsJsonString = await httpClient.GetStringAsync($"https://streamlabs.com/api/v1.0/donations?access_token={tokenModel.access_token}");
-                        var donationsModel = JsonConvert.DeserializeObject<TokenJsonModel>(donationsJsonString);
-                        var text = "";
+                        var success = streamLabsHelper.CheckDonationVips();
 
                         // NOTES TO SELF. Add &after=<donationId> to end of donations call. 
                         // This can start at any number (for initialising db) after this it will get anything past whichever donation_id we pass
@@ -264,8 +252,6 @@ namespace CoreCodedChatbot.Services
                 null,
                 TimeSpan.Zero,
                 TimeSpan.FromMinutes(1));
-            */
-
         }
 
         private void UnScheduleStreamTasks()
