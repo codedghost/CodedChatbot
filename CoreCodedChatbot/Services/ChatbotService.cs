@@ -267,7 +267,7 @@ namespace CoreCodedChatbot.Services
 
         private void onStreamOnline(object sender, OnStreamOnlineArgs e)
         {
-            client.SendMessage(e.Channel, $"Looks like @{e.Channel} has come online, better get to work!");
+            //client.SendMessage(e.Channel, $"Looks like @{e.Channel} has come online, better get to work!");
             ScheduleStreamTasks();
         }
 
