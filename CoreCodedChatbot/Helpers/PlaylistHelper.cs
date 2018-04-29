@@ -75,8 +75,6 @@ namespace CoreCodedChatbot.Helpers
 
             UpdatePlaylists();
 
-            isCurrentVip = !isCurrentVip;
-
             return (AddRequestResult.Success, songIndex);
         }
 
@@ -187,19 +185,21 @@ namespace CoreCodedChatbot.Helpers
         {
             using (var context = contextFactory.Create())
             {
+                Console.Out.WriteLine(isCurrentVip.ToString());
                 var currentRequest = context.SongRequests.Where(sr => !sr.Played)
                     .OrderRequests(isCurrentVip)
                     .FirstOrDefault();
-
+                
                 if (currentRequest == null)
                     return;
+
+                Console.Out.WriteLine(currentRequest.RequestText);
 
                 currentRequest.Played = true;
                 context.SaveChanges();
             }
-
-            isCurrentVip = !isCurrentVip;
-            UpdatePlaylists();
+            
+            UpdatePlaylists(!isCurrentVip);
         }
 
         public string GetUserRequests(string username)
@@ -491,10 +491,17 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
+        private void UpdatePlaylists(bool isCurrentVip)
+        {
+            this.isCurrentVip = isCurrentVip;
+            UpdateObsPlaylist();
+        }
+
         private void UpdatePlaylists()
         {
-            UpdateWebPlaylist();
-            UpdateFullPlaylist();
+            //UpdateWebPlaylist();
+            //UpdateFullPlaylist();
+            UpdateObsPlaylist();
         }
     }
 

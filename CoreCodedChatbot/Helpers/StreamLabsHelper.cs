@@ -124,10 +124,10 @@ namespace CoreCodedChatbot.Helpers
                 if (latestDonationId == null) return true;
 
                 // Get all donation amounts together
-                var groupedDonations = donations.OrderByDescending(d => d.created_at).ToList().GroupBy(d => d.name).ToList()
+                var groupedDonations = donations.OrderByDescending(d => d.created_at).ToList().GroupBy(d => d.name.ToLower()).ToList()
                     .Select(d => new
                     {
-                        name = d.First().name,
+                        name = d.First().name.ToLower(),
                         amount = (int) Math.Round(d.Sum(rec => rec.amount) * 100)
                     });
 
@@ -147,6 +147,7 @@ namespace CoreCodedChatbot.Helpers
                         user.TotalDonated += donation.amount;
 
                         vipHelper.GiveDonationVipsDb(user);
+                        context.SaveChanges();
                     }
 
                     context.SaveChanges();
