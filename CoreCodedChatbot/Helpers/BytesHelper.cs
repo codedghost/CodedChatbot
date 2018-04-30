@@ -93,7 +93,7 @@ namespace CoreCodedChatbot.Helpers
                     }
                     return false;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     return false;
                 }
