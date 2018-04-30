@@ -3,6 +3,7 @@
 using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Helpers.Interfaces;
+using CoreCodedChatbot.Models.Data;
 
 using TwitchLib.Api;
 using TwitchLib.Client;
@@ -12,18 +13,17 @@ namespace CoreCodedChatbot.Commands
     [ChatCommand(new[] { "uptime", "live" }, false)]
     public class UptimeCommand : ICommand
     {
-        private readonly IConfigHelper configHelper;
+        private readonly ConfigModel config;
         private readonly TwitchAPI api;
 
         public UptimeCommand(TwitchAPI api, IConfigHelper configHelper)
         {
             this.api = api;
-            this.configHelper = configHelper;
+            this.config = configHelper.GetConfig();
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            var config = configHelper.GetConfig();
             var Stream = await api.Streams.v5.GetStreamByUserAsync(config.ChannelId);
             var streamGoLiveTime = Stream.Stream.CreatedAt.ToUniversalTime();
 
@@ -34,7 +34,6 @@ namespace CoreCodedChatbot.Commands
 
         public void ShowHelp(TwitchClient client, string username)
         {
-            var config = configHelper.GetConfig();
             client.SendMessage(config.StreamerChannel, $"Hey @{username}, this command outputs how long the stream has been live!");
         }
     }
