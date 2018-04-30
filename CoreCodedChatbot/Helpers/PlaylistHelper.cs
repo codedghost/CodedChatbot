@@ -25,13 +25,13 @@ namespace CoreCodedChatbot.Helpers
 
         private string PrefixVip(SongRequest request) => request.VipRequestTime.HasValue ? " (VIP)" : string.Empty;
 
-        private bool isCurrentVip { get; set; }
+        private static bool isCurrentVip { get; set; }
 
         public PlaylistHelper(ChatbotContextFactory contextFactory, ConfigModel config)
         {
             this.contextFactory = contextFactory;
             this.config = config;
-            this.isCurrentVip = false;
+            isCurrentVip = false;
         }
 
         public (AddRequestResult, int) AddRequest(string username, string commandText, bool vipRequest = false)
