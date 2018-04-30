@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Runtime.InteropServices;
-using System.Text;
 
 namespace CoreCodedChatbot.Database.Context.Models
 {
@@ -18,5 +14,7 @@ namespace CoreCodedChatbot.Database.Context.Models
         public int DonationOrBitsVipRequests { get; set; }
         public int TokenVipRequests { get; set; }
         public int TokenBytes { get; set; }
+        public int TotalBitsDropped { get; set; }
+        public int TotalDonated { get; set; }
     }
 }

@@ -1,7 +1,7 @@
 ﻿@model CoreCodedChatbot.Web.Models.PlaylistBrowserSource
 
 @{
-    Layout = null;
+    Layout = "_Layout";
 }
 
 <!DOCTYPE html>
@@ -33,6 +33,7 @@
     };
     // This needs to have the currentList populated correctly
     chatConnection.on('SendAll', (data) => {
+        debugger;
         $("#messageArea").empty();
         var currentList = $("#messageArea").html();
         for (var i = 0; i < data.length; i++) {
