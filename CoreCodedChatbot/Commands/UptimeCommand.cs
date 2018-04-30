@@ -4,7 +4,9 @@ using System.Threading;
 using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Helpers;
-using TwitchLib;
+using CoreCodedChatbot.Models.Data;
+using TwitchLib.Api;
+using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
 {
@@ -13,27 +15,27 @@ namespace CoreCodedChatbot.Commands
     {
         private readonly TwitchAPI api;
 
-        public UptimeCommand(TwitchAPI api)
+        private readonly ConfigModel config;
+
+        public UptimeCommand(TwitchAPI api, ConfigModel config)
         {
             this.api = api;
+            this.config = config;
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            var config = ConfigHelper.GetConfig();
-            var channel = await api.Channels.v5.GetChannelAsync(config.ChatbotAccessToken);
-
-            var Stream = await api.Streams.v5.GetStreamByUserAsync(channel.Id);
+            var Stream = await api.Streams.v5.GetStreamByUserAsync(config.ChannelId);
             var streamGoLiveTime = Stream.Stream.CreatedAt.ToUniversalTime();
 
             var timeLiveFor = DateTime.Now.ToUniversalTime().Subtract(streamGoLiveTime);
 
-            client.SendMessage($"Hey @{username}, {config.StreamerChannel} has been live for: {timeLiveFor.Hours} hours and {timeLiveFor.Minutes} minutes.");
+            client.SendMessage(config.StreamerChannel, $"Hey @{username}, {config.StreamerChannel} has been live for: {timeLiveFor.Hours} hours and {timeLiveFor.Minutes} minutes.");
         }
 
         public void ShowHelp(TwitchClient client, string username)
         {
-            client.SendMessage($"Hey @{username}, this command outputs how long the stream has been live!");
+            client.SendMessage(config.StreamerChannel, $"Hey @{username}, this command outputs how long the stream has been live!");
         }
     }
 }
