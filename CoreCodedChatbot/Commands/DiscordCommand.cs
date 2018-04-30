@@ -1,9 +1,8 @@
-﻿using System.Threading;
-using CoreCodedChatbot.CustomAttributes;
-using CoreCodedChatbot.Helpers;
+﻿using CoreCodedChatbot.CustomAttributes;
+using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Models.Data;
-using TwitchLib;
+
 using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
@@ -13,13 +12,14 @@ namespace CoreCodedChatbot.Commands
     {
         private readonly ConfigModel config;
 
-        public DiscordCommand(ConfigModel config)
+        public DiscordCommand(IConfigHelper configHelper)
         {
-            this.config = config;
+            this.config = configHelper.GetConfig();
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
+            // load discord link from config
             client.SendMessage(config.StreamerChannel, $"Join us on discord: { config.DiscordLink }");
         }
 

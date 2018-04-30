@@ -22,4 +22,7 @@
 /.ssh
 /CodedChatbot.sln.DotSettings.user
 /CoreCodedChatbot.Web/config.json
-/CoreCodedChatbot.Tests
+/CoreCodedChatbot.Tests/obj
+/CoreCodedChatbot.Tests/bin
+/CoreCodedChatbot.Tests/CoreCodedChatbot.Tests.csproj.user
+/CoreCodedChatbot.Database/CoreCodedChatbot.Database.csproj.user

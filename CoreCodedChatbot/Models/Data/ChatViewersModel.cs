@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CoreCodedChatbot.Models.Data
+﻿namespace CoreCodedChatbot.Models.Data
 {
     public class ChatViewersModel
     {
