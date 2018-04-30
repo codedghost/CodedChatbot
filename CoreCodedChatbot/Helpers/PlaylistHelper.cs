@@ -25,6 +25,8 @@ namespace CoreCodedChatbot.Helpers
 
         private string PrefixVip(SongRequest request) => request.VipRequestTime.HasValue ? " (VIP)" : string.Empty;
 
+        private bool isCurrentVip { get; set; }
+
         public PlaylistHelper(IChatbotContextFactory contextFactory, IConfigHelper configHelper)
         {
             this.contextFactory = contextFactory;

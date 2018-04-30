@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-using CoreCodedChatbot.Helpers;
+﻿using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Models.Data;
-using TwitchLib;
+
 using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
