@@ -1,8 +1,7 @@
 ﻿using System;
-using System.IO;
+
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.Json;
+
 using CoreCodedChatbot.Services;
 using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Helpers;

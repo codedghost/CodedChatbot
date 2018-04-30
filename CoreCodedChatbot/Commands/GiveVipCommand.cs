@@ -1,11 +1,10 @@
-﻿using System.Threading;
-using System.Linq;
+﻿using System.Linq;
 
 using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Models.Data;
-using TwitchLib;
+
 using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
