@@ -1,14 +1,13 @@
-﻿using System.Threading;
-using CoreCodedChatbot.CustomAttributes;
+﻿using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Models.Data;
-using TwitchLib;
+
 using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
 {
-    [ChatCommand(new[] { "myrequests", "mrr", "myrockrequests", "mysongs", "myrequest", "mysong" }, false)]
+    [ChatCommand(new[] { "myrequests", "mrr", "myrockrequests", "mysongs", "myrequest", "mysong", "pos", "position" }, false)]
     public class MyRockRequestsCommand : ICommand
     {
         private readonly PlaylistHelper playlistHelper;

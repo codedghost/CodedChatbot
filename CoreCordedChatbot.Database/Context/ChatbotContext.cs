@@ -13,7 +13,12 @@ namespace CoreCodedChatbot.Database.Context
     public class ChatbotContext : DbContext, IChatbotContext
     {
         public ChatbotContext()
-            :base()
+            : base()
+        {
+        }
+
+        public ChatbotContext(DbContextOptions<ChatbotContext> options)
+            : base(options)
         {
         }
 
@@ -21,7 +26,6 @@ namespace CoreCodedChatbot.Database.Context
         public DbSet<SongRequest> SongRequests { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Setting> Settings { get; set; }
-        public DbSet<GiveawayEntry> GiveawayEntries { get; set; }
 
         private IConfigurationRoot ConfigRoot { get; set; }
 
@@ -29,11 +33,12 @@ namespace CoreCodedChatbot.Database.Context
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("config.json");
+                .AddJsonFile("config.json", true);
 
             ConfigRoot = builder.Build();
-
-            var dbConn = ConfigRoot["LocalDbLocation"];
+            
+            // Reconstructing path for platform independency
+            var dbConn = Path.GetFullPath(ConfigRoot["LocalDbLocation"]);
 
             optionsBuilder.UseSqlite($"FileName={dbConn}");
         }
@@ -44,7 +49,6 @@ namespace CoreCodedChatbot.Database.Context
             modelBuilder.AddConfiguration(new SongRequestMap());
             modelBuilder.AddConfiguration(new UserMap());
             modelBuilder.AddConfiguration(new SettingMap());
-            modelBuilder.AddConfiguration(new GiveawayEntryMap());
         }
     }
 }

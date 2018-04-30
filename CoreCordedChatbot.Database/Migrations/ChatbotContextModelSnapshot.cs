@@ -2,10 +2,7 @@
 using CoreCodedChatbot.Database.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.EntityFrameworkCore.Storage.Internal;
+
 using System;
 
 namespace CoreCodedChatbot.Database.Migrations
@@ -17,7 +14,7 @@ namespace CoreCodedChatbot.Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.0.0-rtm-26452");
+                .HasAnnotation("ProductVersion", "2.0.2-rtm-10011");
 
             modelBuilder.Entity("CoreCodedChatbot.Database.Context.Models.Setting", b =>
                 {
@@ -104,6 +101,12 @@ namespace CoreCodedChatbot.Database.Migrations
                     b.Property<int>("TokenBytes");
 
                     b.Property<int>("TokenVipRequests");
+
+                    b.Property<int>("TotalBitsDropped")
+                        .HasColumnName("TotalBitsDropped");
+
+                    b.Property<int>("TotalDonated")
+                        .HasColumnName("TotalDonated");
 
                     b.Property<int>("UsedVipRequests")
                         .HasColumnName("UsedVipRequests");
