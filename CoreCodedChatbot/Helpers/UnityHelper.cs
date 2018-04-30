@@ -1,4 +1,6 @@
-﻿using TwitchLib;
+﻿using CoreCodedChatbot.Helpers.Interfaces;
+
+using TwitchLib;
 using TwitchLib.Models.Client;
 using TwitchLib.Services;
 
@@ -11,7 +13,9 @@ namespace CoreCodedChatbot.Helpers
         public static IUnityContainer Create()
         {
             var container = new UnityContainer();
-            var config = ConfigHelper.GetConfig();
+            container.RegisterType<IConfigHelper, ConfigHelper>();
+            var configHelper = container.Resolve<IConfigHelper>();
+            var config = configHelper.GetConfig();
 
             var creds = new ConnectionCredentials(config.ChatbotNick, config.ChatbotPass);
             var client = new TwitchClient(creds, config.StreamerChannel);

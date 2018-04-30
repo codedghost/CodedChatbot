@@ -1,0 +1,17 @@
+E:\Dokumente\GitHub\CodedChatbot\CoreCodedChatbot.Tests\bin\Debug\netcoreapp2.0\xunit.runner.visualstudio.dotnetcore.testadapter.dll
+E:\Dokumente\GitHub\CodedChatbot\CoreCodedChatbot.Tests\bin\Debug\netcoreapp2.0\xunit.runner.reporters.netcoreapp10.dll
+E:\Dokumente\GitHub\CodedChatbot\CoreCodedChatbot.Tests\bin\Debug\netcoreapp2.0\xunit.runner.utility.netcoreapp10.dll
+E:\Dokumente\GitHub\CodedChatbot\CoreCodedChatbot.Tests\bin\Debug\netcoreapp2.0\config.json
+E:\Dokumente\GitHub\CodedChatbot\CoreCodedChatbot.Tests\bin\Debug\netcoreapp2.0\CoreCodedChatbot.Tests.deps.json
+E:\Dokumente\GitHub\CodedChatbot\CoreCodedChatbot.Tests\bin\Debug\netcoreapp2.0\CoreCodedChatbot.Tests.runtimeconfig.json
+E:\Dokumente\GitHub\CodedChatbot\CoreCodedChatbot.Tests\bin\Debug\netcoreapp2.0\CoreCodedChatbot.Tests.runtimeconfig.dev.json
+E:\Dokumente\GitHub\CodedChatbot\CoreCodedChatbot.Tests\bin\Debug\netcoreapp2.0\CoreCodedChatbot.Tests.dll
+E:\Dokumente\GitHub\CodedChatbot\CoreCodedChatbot.Tests\bin\Debug\netcoreapp2.0\CoreCodedChatbot.Database.dll
+E:\Dokumente\GitHub\CodedChatbot\CoreCodedChatbot.Tests\bin\Debug\netcoreapp2.0\CoreCodedChatbot.dll
+E:\Dokumente\GitHub\CodedChatbot\CoreCodedChatbot.Tests\bin\Debug\netcoreapp2.0\CoreCodedChatbot.pdb
+E:\Dokumente\GitHub\CodedChatbot\CoreCodedChatbot.Tests\bin\Debug\netcoreapp2.0\CoreCodedChatbot.Database.pdb
+E:\Dokumente\GitHub\CodedChatbot\CoreCodedChatbot.Tests\obj\Debug\netcoreapp2.0\CoreCodedChatbot.Tests.csprojResolveAssemblyReference.cache
+E:\Dokumente\GitHub\CodedChatbot\CoreCodedChatbot.Tests\obj\Debug\netcoreapp2.0\CoreCodedChatbot.Tests.csproj.CoreCompileInputs.cache
+E:\Dokumente\GitHub\CodedChatbot\CoreCodedChatbot.Tests\obj\Debug\netcoreapp2.0\CoreCodedChatbot.Tests.AssemblyInfoInputs.cache
+E:\Dokumente\GitHub\CodedChatbot\CoreCodedChatbot.Tests\obj\Debug\netcoreapp2.0\CoreCodedChatbot.Tests.AssemblyInfo.cs
+E:\Dokumente\GitHub\CodedChatbot\CoreCodedChatbot.Tests\obj\Debug\netcoreapp2.0\CoreCodedChatbot.Tests.csproj.CopyComplete

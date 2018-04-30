@@ -13,7 +13,12 @@ namespace CoreCodedChatbot.Database.Context
     public class ChatbotContext : DbContext, IChatbotContext
     {
         public ChatbotContext()
-            :base()
+            : base()
+        {
+        }
+
+        public ChatbotContext(DbContextOptions<ChatbotContext> options)
+            : base(options)
         {
         }
 
@@ -29,13 +34,14 @@ namespace CoreCodedChatbot.Database.Context
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("config.json");
+                .AddJsonFile("config.json", true);
 
             ConfigRoot = builder.Build();
-
-            var dbConn = ConfigRoot["LocalDbLocation"];
-
-            optionsBuilder.UseSqlite($"FileName={dbConn}");
+            if (ConfigRoot["LocalDbLocation"] != null)
+            {
+                var dbConn = ConfigRoot["LocalDbLocation"];
+                optionsBuilder.UseSqlite($"FileName={dbConn}");
+            }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

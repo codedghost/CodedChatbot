@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Models.Data;
 using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Database.Context.Models;
+using CoreCodedChatbot.Helpers.Interfaces;
+
 using TwitchLib.Models.API.v5.Channels;
 using TwitchLib.Models.API.v5.Subscriptions;
 
@@ -14,11 +16,12 @@ namespace CoreCodedChatbot.Helpers
     public class VipHelper
     {
         private readonly ChatbotContextFactory contextFactory;
-        private readonly ConfigModel config = ConfigHelper.GetConfig();
+        private readonly ConfigModel config;
 
-        public VipHelper(ChatbotContextFactory contextFactory)
+        public VipHelper(ChatbotContextFactory contextFactory, IConfigHelper configHelper)
         {
             this.contextFactory = contextFactory;
+            this.config = configHelper.GetConfig();
         }
 
         public User FindUser(IChatbotContext context, string username, bool deferSave = false)

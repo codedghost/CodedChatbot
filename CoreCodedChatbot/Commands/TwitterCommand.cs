@@ -1,6 +1,5 @@
-﻿using System.Threading;
-using CoreCodedChatbot.CustomAttributes;
-using CoreCodedChatbot.Helpers;
+﻿using CoreCodedChatbot.CustomAttributes;
+using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Interfaces;
 using TwitchLib;
 
@@ -9,9 +8,16 @@ namespace CoreCodedChatbot.Commands
     [ChatCommand(new[] { "twitter" }, false)]
     public class TwitterCommand : ICommand
     {
+        private readonly IConfigHelper configHelper;
+
+        public TwitterCommand(IConfigHelper configHelper)
+        {
+            this.configHelper = configHelper;
+        }
+
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            var config = ConfigHelper.GetConfig();
+            var config = configHelper.GetConfig();
             client.SendMessage($"Follow me on twitter too: {config.TwitterLink}");
         }
 
