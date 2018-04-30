@@ -80,12 +80,6 @@ namespace CoreCodedChatbot.Helpers
             return (AddRequestResult.Success, songIndex);
         }
 
-
-        public (AddRequestResult, int) AddRequestSignalR(string username, string commandText, bool vipRequest = false)
-        {
-            return AddRequest(username, commandText, vipRequest);
-        }
-
         public int PromoteRequest(string username, int songIndex)
         {
             var newSongIndex = 0;
