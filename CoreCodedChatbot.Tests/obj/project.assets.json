@@ -4793,7 +4793,7 @@
       ]
     },
     "Microsoft.Win32.Registry/4.0.0": {
-      "sha512": "q+eLtROUAQ3OxYA5mpQrgyFgzLQxIyrfT2eLpYX5IEPlHmIio2nh4F5bgOaQoGOV865kFKZZso9Oq9RlazvXtg==",
+      "sha512": "Sk+ewaxqgD/lyyKqsbqZozIaaRYTyA7ZU+aWQ0jw8RBpzfwu2n7wwzU6S8TpE14B2xS6DQz/mH3gbHoQcB6W7g==",
       "type": "package",
       "path": "microsoft.win32.registry/4.0.0",
       "files": [
@@ -6081,7 +6081,7 @@
       ]
     },
     "System.Diagnostics.Contracts/4.0.1": {
-      "sha512": "HvQQjy712vnlpPxaloZYkuE78Gn353L0SJLJVeLcNASeg9c4qla2a1Xq8I7B3jZoDzKPtHTkyVO7AZ5tpeQGuA==",
+      "sha512": "1gSGCOD96tjIUYdWIabl6gGLuFkJdPbhchKJ8Pk4nrdMqmiJ7PsuCgIRPZCbwlZIj/N6TmJcIb3TdN6PhP9Tig==",
       "type": "package",
       "path": "system.diagnostics.contracts/4.0.1",
       "files": [
@@ -6230,7 +6230,7 @@
       ]
     },
     "System.Diagnostics.Process/4.1.0": {
-      "sha512": "mpVZ5bnlSs3tTeJ6jYyDJEIa6tavhAd88lxq1zbYhkkCu0Pno2+gHXcvZcoygq2d8JxW3gojXqNJMTAshduqZA==",
+      "sha512": "C+2PWqxnGrM2zcGshca4uP6qKh5yV5uEuHf8qo6piHjhjUrO8yRo+sDuizfoQJkB+jvceNjVb8Ygm9ilDFG3NA==",
       "type": "package",
       "path": "system.diagnostics.process/4.1.0",
       "files": [
@@ -7745,7 +7745,7 @@
       ]
     },
     "System.Reflection.Metadata/1.3.0": {
-      "sha512": "jMSCxA4LSyKBGRDm/WtfkO03FkcgRzHxwvQRib1bm2GZ8ifKM1MX1al6breGCEQK280mdl9uQS7JNPXRYk90jw==",
+      "sha512": "AV2eBsj2+pPzRnGQTykPSfcFuV+Sx/qjvx02UQFF6a+1+zJ0H4iYWGGhSD2k9JuAmXV4jA4i7pE4WYXto2Vquw==",
       "type": "package",
       "path": "system.reflection.metadata/1.3.0",
       "files": [
@@ -8271,7 +8271,7 @@
       ]
     },
     "System.Runtime.Loader/4.0.0": {
-      "sha512": "4UN78GOVU/mbDFcXkEWtetJT/sJ0yic2gGk1HSlSpWI0TDf421xnrZTDZnwNBapk1GQeYN7U1lTj/aQB1by6ow==",
+      "sha512": "tGh3/KXyUrVscFnWX9MtoX9BVdt1CB7gZjiyMsKi+LI/21x5uzywl118Bh78JCsgYqY9IbQqDXE3Uc/O6yUlRw==",
       "type": "package",
       "path": "system.runtime.loader/4.0.0",
       "files": [
@@ -9219,7 +9219,7 @@
       ]
     },
     "System.Threading.Thread/4.0.0": {
-      "sha512": "gIdJqDXlOr5W9zeqFErLw3dsOsiShSCYtF9SEHitACycmvNvY8odf9kiKvp6V7aibc8C4HzzNBkWXjyfn7plbQ==",
+      "sha512": "LuGcne5CI3ji7vKF0vwF9vm8W9k+pXN4ItFunA+4ciF2DRnzkHdA045GfwuXCA04ZKOzgvn0Ab9H6W/apl1jFw==",
       "type": "package",
       "path": "system.threading.thread/4.0.0",
       "files": [
@@ -9524,7 +9524,7 @@
       ]
     },
     "System.Xml.XPath/4.0.1": {
-      "sha512": "UWd1H+1IJ9Wlq5nognZ/XJdyj8qPE4XufBUkAW59ijsCPjZkZe0MUzKKJFBr+ZWBe5Wq1u1d5f2CYgE93uH7DA==",
+      "sha512": "N+kkP27FN0MHAWiHz2dGbqRIZd6n1UzN9EP4BAaQYrqB3z2hdKRXiOJF5kt4SnJoL2Lgnu8CCi0W8aa6z1Zf7g==",
       "type": "package",
       "path": "system.xml.xpath/4.0.1",
       "files": [
@@ -9897,23 +9897,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\webma_000\\.nuget\\packages\\": {},
+    "C:\\Users\\Sean\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\Dokumente\\GitHub\\CodedChatbot\\CoreCodedChatbot.Tests\\CoreCodedChatbot.Tests.csproj",
+      "projectUniqueName": "C:\\Code\\CodedChatbot\\CoreCodedChatbot.Tests\\CoreCodedChatbot.Tests.csproj",
       "projectName": "CoreCodedChatbot.Tests",
-      "projectPath": "E:\\Dokumente\\GitHub\\CodedChatbot\\CoreCodedChatbot.Tests\\CoreCodedChatbot.Tests.csproj",
-      "packagesPath": "C:\\Users\\webma_000\\.nuget\\packages\\",
-      "outputPath": "E:\\Dokumente\\GitHub\\CodedChatbot\\CoreCodedChatbot.Tests\\obj\\",
+      "projectPath": "C:\\Code\\CodedChatbot\\CoreCodedChatbot.Tests\\CoreCodedChatbot.Tests.csproj",
+      "packagesPath": "C:\\Users\\Sean\\.nuget\\packages\\",
+      "outputPath": "C:\\Code\\CodedChatbot\\CoreCodedChatbot.Tests\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\webma_000\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Sean\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -9921,17 +9921,16 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "E:\\Dokumente\\Nuget Packages": {},
         "https://www.nuget.org/api/v2/": {}
       },
       "frameworks": {
         "netcoreapp2.0": {
           "projectReferences": {
-            "E:\\Dokumente\\GitHub\\CodedChatbot\\CoreCodedChatbot\\CoreCodedChatbot.csproj": {
-              "projectPath": "E:\\Dokumente\\GitHub\\CodedChatbot\\CoreCodedChatbot\\CoreCodedChatbot.csproj"
+            "C:\\Code\\CodedChatbot\\CoreCodedChatbot\\CoreCodedChatbot.csproj": {
+              "projectPath": "C:\\Code\\CodedChatbot\\CoreCodedChatbot\\CoreCodedChatbot.csproj"
             },
-            "E:\\Dokumente\\GitHub\\CodedChatbot\\CoreCordedChatbot.Database\\CoreCodedChatbot.Database.csproj": {
-              "projectPath": "E:\\Dokumente\\GitHub\\CodedChatbot\\CoreCordedChatbot.Database\\CoreCodedChatbot.Database.csproj"
+            "C:\\Code\\CodedChatbot\\CoreCordedChatbot.Database\\CoreCodedChatbot.Database.csproj": {
+              "projectPath": "C:\\Code\\CodedChatbot\\CoreCordedChatbot.Database\\CoreCodedChatbot.Database.csproj"
             }
           }
         }
