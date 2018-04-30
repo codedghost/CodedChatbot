@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-using CoreCodedChatbot.Database.Context;
+using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Models.Data;
 
@@ -9,12 +9,12 @@ namespace CoreCodedChatbot.Helpers
 {
     public class BytesHelper
     {
-        private readonly ChatbotContextFactory contextFactory;
+        private readonly IChatbotContextFactory contextFactory;
 
         private readonly VipHelper vipHelper;
         private readonly ConfigModel config;
 
-        public BytesHelper(ChatbotContextFactory contextFactory, VipHelper vipHelper, IConfigHelper configHelper)
+        public BytesHelper(IChatbotContextFactory contextFactory, VipHelper vipHelper, IConfigHelper configHelper)
         {
             this.contextFactory = contextFactory;
             this.vipHelper = vipHelper;
