@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Models.Data;
-using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Database.Context.Models;
+using CoreCodedChatbot.Helpers.Interfaces;
 using TwitchLib.Api.Models.v5.Subscriptions;
 
 
@@ -13,13 +13,13 @@ namespace CoreCodedChatbot.Helpers
 {
     public class VipHelper
     {
-        private readonly ChatbotContextFactory contextFactory;
+        private readonly IChatbotContextFactory contextFactory;
         private readonly ConfigModel config;
 
-        public VipHelper(ChatbotContextFactory contextFactory, ConfigModel config)
+        public VipHelper(IChatbotContextFactory contextFactory, IConfigHelper configHelper)
         {
             this.contextFactory = contextFactory;
-            this.config = config;
+            this.config = configHelper.GetConfig();
         }
 
         public User FindUser(IChatbotContext context, string username, bool deferSave = false)
@@ -144,7 +144,7 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        public bool GiveDonationVip(string username, int totalBitsToDate)
+        public bool GiveBitsVip(string username, int totalBitsToDate)
         {
             using (var context = this.contextFactory.Create())
             {
@@ -153,7 +153,7 @@ namespace CoreCodedChatbot.Helpers
 
                 try
                 {
-                    user.DonationOrBitsVipRequests = totalBitsToDate / config.BitsToVip;
+                    user.TotalBitsDropped = totalBitsToDate;
                     context.SaveChanges();
                 }
                 catch (Exception)
@@ -162,6 +162,44 @@ namespace CoreCodedChatbot.Helpers
                 }
 
                 return true;
+            }
+        }
+
+        public bool GiveDonationVipsDb(User user)
+        {
+            try
+            {
+                var totalBitsGiven = user.TotalBitsDropped;
+                var totalDonated = user.TotalDonated;
+
+                var bitsVipPercentage = (double) totalBitsGiven / (double) config.BitsToVip;
+                var donationVipPercentage = (double) totalDonated / (double) config.DonationAmountToVip;
+
+                user.DonationOrBitsVipRequests = (int) Math.Floor(bitsVipPercentage + donationVipPercentage);
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public bool GiveDonationVips(string username, bool deferSave = false)
+        {
+            try
+            {
+                using (var context = contextFactory.Create())
+                {
+                    var user = FindUser(context, username);
+                    GiveDonationVipsDb(user);
+                    if (deferSave) return true;
+                    context.SaveChanges();
+                    return true;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
             }
         }
 

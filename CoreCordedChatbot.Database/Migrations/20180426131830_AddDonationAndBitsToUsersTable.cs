@@ -1,13 +1,22 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
+using System;
+using System.Collections.Generic;
 
 namespace CoreCodedChatbot.Database.Migrations
 {
-    public partial class AddTokenVipRequestsToUsers : Migration
+    public partial class AddDonationAndBitsToUsersTable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<int>(
-                name: "TokenVipRequests",
+                name: "TotalBitsDropped",
+                table: "Users",
+                type: "INTEGER",
+                nullable: false,
+                defaultValue: 0);
+
+            migrationBuilder.AddColumn<int>(
+                name: "TotalDonated",
                 table: "Users",
                 type: "INTEGER",
                 nullable: false,
@@ -17,7 +26,11 @@ namespace CoreCodedChatbot.Database.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "TokenVipRequests",
+                name: "TotalBitsDropped",
+                table: "Users");
+
+            migrationBuilder.DropColumn(
+                name: "TotalDonated",
                 table: "Users");
         }
     }
