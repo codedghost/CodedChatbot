@@ -7,9 +7,8 @@ using CoreCodedChatbot.Models.Data;
 using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Database.Context.Models;
 using CoreCodedChatbot.Helpers.Interfaces;
+using TwitchLib.Api.Models.v5.Subscriptions;
 
-using TwitchLib.Models.API.v5.Channels;
-using TwitchLib.Models.API.v5.Subscriptions;
 
 namespace CoreCodedChatbot.Helpers
 {
@@ -86,64 +85,6 @@ namespace CoreCodedChatbot.Helpers
 
                 return true;
             }
-        }
-
-        public bool GiveFollowVip(string username)
-        {
-            using (var context = this.contextFactory.Create())
-            {
-                var user = this.FindUser(context, username);
-                if (user == null) return false;
-
-                try
-                {
-                    user.FollowVipRequest = 1;
-                    context.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    return false;
-                }
-
-                return true;
-            }
-        }
-
-        public bool StartupFollowVips(List<ChannelFollow> follows)
-        {
-            using (var context = this.contextFactory.Create())
-            {
-                try
-                {
-                    var usernames = follows.Select(f => f.User.DisplayName.ToLower());
-                    var currentRecords = context.Users.Where(u => usernames.Contains(u.Username));
-                    foreach (var currentRecord in currentRecords)
-                    {
-                        if (currentRecord.FollowVipRequest != 1) currentRecord.FollowVipRequest = 1;
-                    }
-
-                    var otherRecords =
-                        usernames.Where(u => !currentRecords.Select(c => c.Username.ToLower()).Contains(u));
-                    var models = otherRecords.Select(or => new User
-                    {
-                        Username = or,
-                        ModGivenVipRequests = 0,
-                        FollowVipRequest = 1,
-                        DonationOrBitsVipRequests = 0,
-                        SubVipRequests = 0,
-                        UsedVipRequests = 0,
-                        TokenBytes = 0
-                    });
-
-                    context.Users.AddRange(models);
-                    context.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    return false;
-                }
-            }
-            return true;
         }
 
         public bool StartupSubVips(List<Subscription> subs)

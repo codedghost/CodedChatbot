@@ -7,13 +7,13 @@ using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Models.Data;
 
-using TwitchLib;
-using TwitchLib.Events.Client;
-using TwitchLib.Events.PubSub;
-using TwitchLib.Exceptions.API;
-using TwitchLib.Models.API.v5.Channels;
-using TwitchLib.Services;
-
+using TwitchLib.Client.Events;
+using TwitchLib.PubSub.Events;
+using TwitchLib.Api.Exceptions;
+using TwitchLib.Client;
+using TwitchLib.Api;
+using TwitchLib.PubSub;
+using TwitchLib.Api.Models.v5.Channels;
 
 namespace CoreCodedChatbot.Services
 {
@@ -23,9 +23,9 @@ namespace CoreCodedChatbot.Services
         private readonly TwitchClient client;
         private readonly TwitchAPI api;
         private readonly TwitchPubSub pubsub;
-        private readonly FollowerService followerService;
         private readonly VipHelper vipHelper;
         private readonly BytesHelper bytesHelper;
+        private readonly PlaylistHelper playlistHelper;
 
         private ChannelAuthed Channel { get; set; }
 
@@ -41,15 +41,15 @@ namespace CoreCodedChatbot.Services
 
         private static readonly HttpClient httpClient = new HttpClient();
 
-        public ChatbotService(CommandHelper commandHelper, TwitchClient client, TwitchAPI api, TwitchPubSub pubsub, FollowerService followerService, VipHelper vipHelper, BytesHelper bytesHelper, IConfigHelper configHelper)
+        public ChatbotService(CommandHelper commandHelper, TwitchClient client, TwitchAPI api, TwitchPubSub pubsub, VipHelper vipHelper, BytesHelper bytesHelper, PlaylistHelper playlistHelper, IConfigHelper configHelper)
         {
             this.commandHelper = commandHelper;
             this.client = client;
             this.api = api;
             this.pubsub = pubsub;
-            this.followerService = followerService;
             this.vipHelper = vipHelper;
             this.bytesHelper = bytesHelper;
+            this.playlistHelper = playlistHelper;
             this.config = configHelper.GetConfig();
 
             this.commandHelper.Init();
@@ -60,18 +60,20 @@ namespace CoreCodedChatbot.Services
             client.OnReSubscriber += onReSub;
             client.Connect();
 
+            pubsub.ListenToWhispers(config.ChannelId);
+            pubsub.ListenToBitsEvents(config.ChannelId);
+
             pubsub.OnPubSubServiceConnected += onPubSubConnected;
             pubsub.OnListenResponse += onListenResponse;
+            pubsub.OnWhisper += onWhisperResponse;
             pubsub.OnBitsReceived += onBitsReceived;
-
-            // followerService.OnNewFollowersDetected += onNewFollowers;
 
             pubsub.Connect();
         }
 
         private void onJoinedChannel(object sender, OnJoinedChannelArgs e)
         {
-            client.SendMessage($"BEEP BOOP: {config.ChatbotNick} online!");
+            client.SendMessage(config.StreamerChannel, $"BEEP BOOP: {config.ChatbotNick} online!");
         }
 
         private void onCommandReceived(object sender, OnChatCommandReceivedArgs e)
@@ -115,22 +117,22 @@ namespace CoreCodedChatbot.Services
             }
         }
 
-        private async void onPubSubConnected(object sender, object e)
+        private async void onPubSubConnected(object sender, EventArgs e)
         {
             try
             {
                 Console.Out.WriteLine("PubSub Connected!");
-                Channel = await api.Channels.v5.GetChannelAsync(config.ChatbotAccessToken);
-
-                followerService.SetChannelByChannelId(Channel.Id);
-                await followerService.StartService();
-
-                pubsub.ListenToBitsEvents(Channel.Id);
             }
             catch (Exception ex)
             {
                 Console.Out.WriteLine(ex.ToString());
             }
+        }
+
+
+        private void onWhisperResponse(object sender, OnWhisperArgs e)
+        {
+            Console.Out.WriteLine(e.Whisper.Data);
         }
 
         private void onListenResponse(object sender, OnListenResponseArgs e)
@@ -216,7 +218,7 @@ namespace CoreCodedChatbot.Services
                                 var chattersModel = JsonConvert.DeserializeObject<ChatViewersModel>(currentChattersJson);
                                 Console.Out.WriteLine(currentChattersJson);
                                 bytesHelper.GiveBytes(chattersModel);
-                                Console.Out.WriteLine(PlaylistHelper.GetEstimatedTime(chattersModel));
+                                Console.Out.WriteLine(playlistHelper.GetEstimatedTime(chattersModel));
                             }
                             catch (Exception ex)
                             {

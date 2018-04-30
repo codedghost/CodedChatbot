@@ -2,7 +2,9 @@
 using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Helpers;
+using CoreCodedChatbot.Models.Data;
 using TwitchLib;
+using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
 {
@@ -10,22 +12,24 @@ namespace CoreCodedChatbot.Commands
     public class ClosePlaylistCommand : ICommand
     {
         private readonly PlaylistHelper playlistHelper;
+        private readonly ConfigModel config;
 
-        public ClosePlaylistCommand(PlaylistHelper playlistHelper)
+        public ClosePlaylistCommand(PlaylistHelper playlistHelper, ConfigModel config)
         {
             this.playlistHelper = playlistHelper;
+            this.config = config;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            client.SendMessage(playlistHelper.ClosePlaylist() 
+            client.SendMessage(config.StreamerChannel, playlistHelper.ClosePlaylist() 
                 ? $"Hey @{username}, I have closed the playlist!" 
                 : $"Hey {username}, I can't seem to close the playlist for some reason :(");
         }
 
         public void ShowHelp(TwitchClient client, string username)
         {
-            client.SendMessage($"Hey @{username}, this command will close the playlist!");
+            client.SendMessage(config.StreamerChannel, $"Hey @{username}, this command will close the playlist!");
         }
     }
 }
