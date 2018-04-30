@@ -1,8 +1,12 @@
 ﻿using CoreCodedChatbot.Helpers.Interfaces;
 
+using System;
+using System.Threading.Tasks;
 using TwitchLib;
-using TwitchLib.Models.Client;
-using TwitchLib.Services;
+using TwitchLib.Api;
+using TwitchLib.Client;
+using TwitchLib.Client.Models;
+using TwitchLib.PubSub;
 
 using Unity;
 
@@ -18,17 +22,19 @@ namespace CoreCodedChatbot.Helpers
             var config = configHelper.GetConfig();
 
             var creds = new ConnectionCredentials(config.ChatbotNick, config.ChatbotPass);
-            var client = new TwitchClient(creds, config.StreamerChannel);
-            var api = new TwitchAPI(accessToken: config.ChatbotAccessToken);
-            var followerService = new FollowerService(api, 5);
+            var client = new TwitchClient();
+            client.Initialize(creds, config.StreamerChannel);
+            var api = new TwitchAPI();
+            api.InitializeAsync(accessToken: config.ChatbotAccessToken).Wait();
+
             var pubsub = new TwitchPubSub();
 
             container.RegisterInstance(api);
             container.RegisterInstance(client);
-            container.RegisterInstance(followerService);
             container.RegisterInstance(pubsub);
+            container.RegisterInstance(config);
 
-            var commandHelper = new CommandHelper(container);
+            var commandHelper = new CommandHelper(container, config);
             container.RegisterInstance(commandHelper);
 
             return container;

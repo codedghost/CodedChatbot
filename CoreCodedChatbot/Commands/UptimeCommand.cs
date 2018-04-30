@@ -4,7 +4,8 @@ using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Helpers.Interfaces;
 
-using TwitchLib;
+using TwitchLib.Api;
+using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
 {
@@ -23,19 +24,18 @@ namespace CoreCodedChatbot.Commands
         public async void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
             var config = configHelper.GetConfig();
-            var channel = await api.Channels.v5.GetChannelAsync(config.ChatbotAccessToken);
-
-            var Stream = await api.Streams.v5.GetStreamByUserAsync(channel.Id);
+            var Stream = await api.Streams.v5.GetStreamByUserAsync(config.ChannelId);
             var streamGoLiveTime = Stream.Stream.CreatedAt.ToUniversalTime();
 
             var timeLiveFor = DateTime.Now.ToUniversalTime().Subtract(streamGoLiveTime);
 
-            client.SendMessage($"Hey @{username}, {config.StreamerChannel} has been live for: {timeLiveFor.Hours} hours and {timeLiveFor.Minutes} minutes.");
+            client.SendMessage(config.StreamerChannel, $"Hey @{username}, {config.StreamerChannel} has been live for: {timeLiveFor.Hours} hours and {timeLiveFor.Minutes} minutes.");
         }
 
         public void ShowHelp(TwitchClient client, string username)
         {
-            client.SendMessage($"Hey @{username}, this command outputs how long the stream has been live!");
+            var config = configHelper.GetConfig();
+            client.SendMessage(config.StreamerChannel, $"Hey @{username}, this command outputs how long the stream has been live!");
         }
     }
 }

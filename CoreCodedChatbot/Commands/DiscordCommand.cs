@@ -1,7 +1,9 @@
 ﻿using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Interfaces;
+using CoreCodedChatbot.Models.Data;
 using TwitchLib;
+using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
 {
@@ -19,12 +21,13 @@ namespace CoreCodedChatbot.Commands
         {
             // load discord link from config
             var config = configHelper.GetConfig();
-            client.SendMessage($"Join us on discord: { config.DiscordLink }");
+            client.SendMessage(config.StreamerChannel, $"Join us on discord: { config.DiscordLink }");
         }
 
         public void ShowHelp(TwitchClient client, string username)
         {
-            client.SendMessage($"Hey @{username}, this command outputs the discord link from time to time.");
+            var config = configHelper.GetConfig();
+            client.SendMessage(config.StreamerChannel, $"Hey @{username}, this command outputs the discord link from time to time.");
         }
     }
 }
