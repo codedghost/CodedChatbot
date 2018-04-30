@@ -75,8 +75,6 @@ namespace CoreCodedChatbot.Helpers
 
             UpdatePlaylists();
 
-            isCurrentVip = !isCurrentVip;
-
             return (AddRequestResult.Success, songIndex);
         }
 
