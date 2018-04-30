@@ -201,8 +201,9 @@ namespace CoreCodedChatbot.Helpers
                 currentRequest.Played = true;
                 context.SaveChanges();
             }
-            
-            UpdatePlaylists(!isCurrentVip);
+
+            isCurrentVip = !isCurrentVip;
+            UpdatePlaylists();
         }
 
         public string GetUserRequests(string username)
@@ -492,12 +493,6 @@ namespace CoreCodedChatbot.Helpers
                     return string.Empty;
                 }
             }
-        }
-
-        private void UpdatePlaylists(bool isCurrentVip)
-        {
-            this.isCurrentVip = isCurrentVip;
-            UpdateObsPlaylist();
         }
 
         private void UpdatePlaylists()
