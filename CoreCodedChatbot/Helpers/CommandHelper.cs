@@ -1,14 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Reflection;
-using System.Net.Sockets;
-using System.Diagnostics;
-
-using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Commands;
+using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Models.Data;
 using Unity;
