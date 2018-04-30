@@ -4,7 +4,9 @@ using System.Linq;
 using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
+using CoreCodedChatbot.Models.Data;
 using TwitchLib;
+using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
 {
@@ -13,9 +15,12 @@ namespace CoreCodedChatbot.Commands
     {
         private readonly VipHelper vipHelper;
 
-        public GiveVipCommand(VipHelper vipHelper)
+        private readonly ConfigModel config;
+
+        public GiveVipCommand(VipHelper vipHelper, ConfigModel config)
         {
             this.vipHelper = vipHelper;
+            this.config = config;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
@@ -26,9 +31,10 @@ namespace CoreCodedChatbot.Commands
             {
                 if (splitCommandText.Length == 1)
                 {
-                    client.SendMessage(vipHelper.GiveVipRequest(commandText.TrimStart('@'))
-                        ? $"Hey @{username}, I have successfully given {commandText} a VIP request!"
-                        : $"Hey @{username}, sorry something seems to be wrong here. Please check your command usage. Type !help gvip for more detailed help");
+                    client.SendMessage(config.StreamerChannel,
+                        vipHelper.GiveVipRequest(commandText.TrimStart('@'))
+                            ? $"Hey @{username}, I have successfully given {commandText} a VIP request!"
+                            : $"Hey @{username}, sorry something seems to be wrong here. Please check your command usage. Type !help gvip for more detailed help");
                 } else if (splitCommandText.Length == 2)
                 {
                     var giveUser = splitCommandText.SingleOrDefault(x => x.Contains("@")).TrimStart('@');
@@ -38,17 +44,17 @@ namespace CoreCodedChatbot.Commands
                     {
                         if (!vipHelper.GiveVipRequest(giveUser))
                         {
-                            client.SendMessage($"Hey @{username}, sorry something seems to be wrong here. I managed to give {i} VIPs. Please check your command usage. Type !help gvip for more detailed help");
+                            client.SendMessage(config.StreamerChannel, $"Hey @{username}, sorry something seems to be wrong here. I managed to give {i} VIPs. Please check your command usage. Type !help gvip for more detailed help");
                         }
                     }
-                    client.SendMessage($"Hey @{username}, I have successfully given @{giveUser} {giveAmount} VIPs");
+                    client.SendMessage(config.StreamerChannel, $"Hey @{username}, I have successfully given @{giveUser} {giveAmount} VIPs");
                 }
             }
         }
 
         public void ShowHelp(TwitchClient client, string username)
         {
-            client.SendMessage($"Hey @{username}, this command is used by moderators to give out VIP requests. Hint: Ensure you use the '@'. Usage: !gvip <username> <optionalAmount>");
+            client.SendMessage(config.StreamerChannel, $"Hey @{username}, this command is used by moderators to give out VIP requests. Hint: Ensure you use the '@'. Usage: !gvip <username> <optionalAmount>");
         }
     }
 }

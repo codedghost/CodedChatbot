@@ -13,6 +13,7 @@ namespace CoreCodedChatbot.Models.Data
         public string ChatbotAccessToken;
         public string ObsPlaylistPath;
         public string StreamerChannel;
+        public string ChannelId;
         public string DiscordLink;
         public string TwitterLink;
         public string StreamLabsClientId;

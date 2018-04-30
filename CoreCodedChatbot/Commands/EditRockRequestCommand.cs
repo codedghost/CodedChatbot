@@ -2,7 +2,9 @@
 using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Helpers;
+using CoreCodedChatbot.Models.Data;
 using TwitchLib;
+using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
 {
@@ -10,10 +12,12 @@ namespace CoreCodedChatbot.Commands
     public class EditRockRequestCommand : ICommand
     {
         private readonly PlaylistHelper playlistHelper;
+        private readonly ConfigModel config;
 
-        public EditRockRequestCommand(PlaylistHelper playlistHelper)
+        public EditRockRequestCommand(PlaylistHelper playlistHelper, ConfigModel config)
         {
             this.playlistHelper = playlistHelper;
+            this.config = config;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
@@ -24,11 +28,11 @@ namespace CoreCodedChatbot.Commands
 
             if (success)
             {
-                client.SendMessage($"Hey @{username} I have successfully changed your request to: {songRequestText}");
+                client.SendMessage(config.StreamerChannel, $"Hey @{username} I have successfully changed your request to: {songRequestText}");
             }
             else
             {
-                client.SendMessage(
+                client.SendMessage(config.StreamerChannel,
                     syntaxError
                         ? $"Hey @{username} command usage: !err <SongNumber> <NewSongRequest>"
                         : $"Hey @{username} it doesn't look like that's your request");
@@ -37,7 +41,7 @@ namespace CoreCodedChatbot.Commands
 
         public void ShowHelp(TwitchClient client, string username)
         {
-            client.SendMessage(
+            client.SendMessage(config.StreamerChannel,
                 $"Hey @{username}, use this command to edit your request. Use !myrequests to check your SongRequestIndex. Usage: !editrequest <Optional SongNumber> <NewSongRequest>");
         }
     }
