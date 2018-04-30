@@ -1,17 +1,15 @@
 ﻿using System;
 using System.Net.Http;
-using System.Collections.Generic;
 using System.Threading;
 using Newtonsoft.Json;
 
 using CoreCodedChatbot.Helpers;
+using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Models.Data;
 
 using TwitchLib;
-using TwitchLib.Models.Client;
 using TwitchLib.Events.Client;
 using TwitchLib.Events.PubSub;
-using TwitchLib.Events.Services.FollowerService;
 using TwitchLib.Exceptions.API;
 using TwitchLib.Models.API.v5.Channels;
 using TwitchLib.Services;
@@ -39,11 +37,11 @@ namespace CoreCodedChatbot.Services
         private Timer BytesTimer { get; set; }
         private Timer DonationsTimer { get; set; }
 
-        private ConfigModel config = ConfigHelper.GetConfig();
+        private readonly ConfigModel config;
 
         private static readonly HttpClient httpClient = new HttpClient();
 
-        public ChatbotService(CommandHelper commandHelper, TwitchClient client, TwitchAPI api, TwitchPubSub pubsub, FollowerService followerService, VipHelper vipHelper, BytesHelper bytesHelper)
+        public ChatbotService(CommandHelper commandHelper, TwitchClient client, TwitchAPI api, TwitchPubSub pubsub, FollowerService followerService, VipHelper vipHelper, BytesHelper bytesHelper, IConfigHelper configHelper)
         {
             this.commandHelper = commandHelper;
             this.client = client;
@@ -52,6 +50,7 @@ namespace CoreCodedChatbot.Services
             this.followerService = followerService;
             this.vipHelper = vipHelper;
             this.bytesHelper = bytesHelper;
+            this.config = configHelper.GetConfig();
 
             this.commandHelper.Init();
 

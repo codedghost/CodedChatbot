@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Threading;
 
 using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Helpers;
+using CoreCodedChatbot.Helpers.Interfaces;
+
 using TwitchLib;
 
 namespace CoreCodedChatbot.Commands
@@ -11,16 +11,18 @@ namespace CoreCodedChatbot.Commands
     [ChatCommand(new[] { "uptime", "live" }, false)]
     public class UptimeCommand : ICommand
     {
+        private readonly IConfigHelper configHelper;
         private readonly TwitchAPI api;
 
-        public UptimeCommand(TwitchAPI api)
+        public UptimeCommand(TwitchAPI api, IConfigHelper configHelper)
         {
             this.api = api;
+            this.configHelper = configHelper;
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            var config = ConfigHelper.GetConfig();
+            var config = configHelper.GetConfig();
             var channel = await api.Channels.v5.GetChannelAsync(config.ChatbotAccessToken);
 
             var Stream = await api.Streams.v5.GetStreamByUserAsync(channel.Id);
