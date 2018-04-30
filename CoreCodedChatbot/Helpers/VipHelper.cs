@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Models.Data;
-using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Database.Context.Models;
+using CoreCodedChatbot.Helpers.Interfaces;
 using TwitchLib.Api.Models.v5.Subscriptions;
 
 
@@ -13,13 +13,13 @@ namespace CoreCodedChatbot.Helpers
 {
     public class VipHelper
     {
-        private readonly ChatbotContextFactory contextFactory;
+        private readonly IChatbotContextFactory contextFactory;
         private readonly ConfigModel config;
 
-        public VipHelper(ChatbotContextFactory contextFactory, ConfigModel config)
+        public VipHelper(IChatbotContextFactory contextFactory, IConfigHelper configHelper)
         {
             this.contextFactory = contextFactory;
-            this.config = config;
+            this.config = configHelper.GetConfig();
         }
 
         public User FindUser(IChatbotContext context, string username, bool deferSave = false)
@@ -57,7 +57,7 @@ namespace CoreCodedChatbot.Helpers
                 context.Users.Add(userModel);
                 if (!deferSave) context.SaveChanges();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return null;
             }
@@ -77,7 +77,7 @@ namespace CoreCodedChatbot.Helpers
                     user.ModGivenVipRequests++;
                     context.SaveChanges();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return false;
                 }
@@ -115,7 +115,7 @@ namespace CoreCodedChatbot.Helpers
                     context.Users.AddRange(models);
                     context.SaveChanges();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return false;
                 }
@@ -135,7 +135,7 @@ namespace CoreCodedChatbot.Helpers
                     user.SubVipRequests++;
                     context.SaveChanges();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return false;
                 }
@@ -156,7 +156,7 @@ namespace CoreCodedChatbot.Helpers
                     user.DonationOrBitsVipRequests = totalBitsToDate / config.BitsToVip;
                     context.SaveChanges();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return false;
                 }
@@ -174,7 +174,7 @@ namespace CoreCodedChatbot.Helpers
                 context.SaveChanges();
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -209,7 +209,7 @@ namespace CoreCodedChatbot.Helpers
                     user.UsedVipRequests++;
                     context.SaveChanges();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return false;
                 }

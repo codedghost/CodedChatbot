@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 
 using CoreCodedChatbot.Database.Context;
+using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Database.Context.Models;
 using CoreCodedChatbot.Extensions;
+using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Models.Data;
 
 namespace CoreCodedChatbot.Helpers
@@ -17,18 +18,19 @@ namespace CoreCodedChatbot.Helpers
     {
         private const int UserMaxSongCount = 1;
 
-        private ConfigModel config;
-
-        private readonly ChatbotContextFactory contextFactory;
+        private readonly ConfigModel config;
+        private readonly IChatbotContextFactory contextFactory;
 
         private string FormatRequest(SongRequest sr, int index) => $"{index + 1}{this.PrefixVip(sr)} - {sr.RequestText} - {sr.RequestUsername}";
 
         private string PrefixVip(SongRequest request) => request.VipRequestTime.HasValue ? " (VIP)" : string.Empty;
 
-        public PlaylistHelper(ChatbotContextFactory contextFactory, ConfigModel config)
+        private static bool isCurrentVip = false;
+
+        public PlaylistHelper(IChatbotContextFactory contextFactory, IConfigHelper configHelper)
         {
             this.contextFactory = contextFactory;
-            this.config = config;
+            this.config = configHelper.GetConfig();
         }
 
         public (AddRequestResult, int) AddRequest(string username, string commandText, bool vipRequest = false)
@@ -66,7 +68,7 @@ namespace CoreCodedChatbot.Helpers
                 context.SongRequests.Add(request);
                 context.SaveChanges();
 
-                songIndex = context.SongRequests.Where(sr => !sr.Played).OrderRequests().ToList()
+                songIndex = context.SongRequests.Where(sr => !sr.Played).OrderRequests(isCurrentVip).ToList()
                     .FindIndex(sr => sr == request) + 1;
             }
 
@@ -75,18 +77,12 @@ namespace CoreCodedChatbot.Helpers
             return (AddRequestResult.Success, songIndex);
         }
 
-
-        public (AddRequestResult, int) AddRequestSignalR(string username, string commandText, bool vipRequest = false)
-        {
-            return AddRequest(username, commandText, vipRequest);
-        }
-
         public int PromoteRequest(string username, int songIndex)
         {
             var newSongIndex = 0;
             using (var context = contextFactory.Create())
             {
-                var request = context.SongRequests.Where(sr => !sr.Played).OrderRequests()
+                var request = context.SongRequests.Where(sr => !sr.Played).OrderRequests(isCurrentVip)
                     .ToList().ElementAtOrDefault(songIndex);
 
                 if (request == null)
@@ -98,7 +94,7 @@ namespace CoreCodedChatbot.Helpers
                 request.VipRequestTime = DateTime.Now;
                 context.SaveChanges();
 
-                newSongIndex = context.SongRequests.Where(sr => !sr.Played).OrderRequests()
+                newSongIndex = context.SongRequests.Where(sr => !sr.Played).OrderRequests(isCurrentVip)
                     .ToList().FindIndex(sr => sr == request) + 1;
             }
 
@@ -111,6 +107,10 @@ namespace CoreCodedChatbot.Helpers
             using (var file = File.Open(config.ObsPlaylistPath,
                 File.Exists(config.ObsPlaylistPath) ? FileMode.Truncate : FileMode.OpenOrCreate, FileAccess.Write))
             {
+                if (file == null)
+                {
+                    return;
+                }
                 using (var sw = new StreamWriter(file))
                 {
                     string textToWrite;
@@ -119,7 +119,7 @@ namespace CoreCodedChatbot.Helpers
                     {
                         var requests = context.SongRequests
                             .Where(sr => !sr.Played)
-                            .OrderRequests()
+                            .OrderRequests(isCurrentVip)
                             .ToList();
 
                         textToWrite = string.Join('\n', requests.Take(5).Select(this.FormatRequest));
@@ -147,7 +147,7 @@ namespace CoreCodedChatbot.Helpers
             {
                 var requests = context.SongRequests
                     .Where(sr => !sr.Played)
-                    .OrderRequests()
+                    .OrderRequests(isCurrentVip)
                     .Take(5)
                     .ToList()
                     .Select(this.FormatRequest)
@@ -171,7 +171,7 @@ namespace CoreCodedChatbot.Helpers
             {
                 var requests = context.SongRequests
                     .Where(sr => !sr.Played)
-                    .OrderRequests()
+                    .OrderRequests(isCurrentVip)
                     .ToList()
                     .Select(this.FormatRequest)
                     .ToArray();
@@ -187,7 +187,7 @@ namespace CoreCodedChatbot.Helpers
             using (var context = contextFactory.Create())
             {
                 var currentRequest = context.SongRequests.Where(sr => !sr.Played)
-                    .OrderRequests()
+                    .OrderRequests(isCurrentVip)
                     .FirstOrDefault();
 
                 if (currentRequest == null)
@@ -197,6 +197,7 @@ namespace CoreCodedChatbot.Helpers
                 context.SaveChanges();
             }
 
+            isCurrentVip = !isCurrentVip;
             UpdatePlaylists();
         }
 
@@ -215,7 +216,7 @@ namespace CoreCodedChatbot.Helpers
             {
                 var userRequests = context.SongRequests
                     .Where(sr => !sr.Played)
-                    ?.OrderRequests().ToList()
+                    ?.OrderRequests(isCurrentVip).ToList()
                     ?.Select((sr, index) => new { Index = index + 1, SongRequest = sr })
                     ?.Where(x => x.SongRequest.RequestUsername == username)
                     ?.OrderBy(x => x.Index)
@@ -231,7 +232,7 @@ namespace CoreCodedChatbot.Helpers
             using (var context = contextFactory.Create())
             {
                 var requests = context.SongRequests.Where(sr => !sr.Played)
-                    .OrderRequests()
+                    .OrderRequests(isCurrentVip)
                     .Take(5)
                     .ToList()
                     .Select((sr, index) => $"{index + 1} - {sr.RequestText} - {sr.RequestUsername}")
@@ -245,7 +246,7 @@ namespace CoreCodedChatbot.Helpers
             using (var context = contextFactory.Create())
             {
                 var requests = context.SongRequests.Where(sr => !sr.Played)
-                    .OrderRequests()
+                    .OrderRequests(isCurrentVip)
                     .ToList()
                     .Select((sr, index) => $"{index + 1} - {sr.RequestText} - {sr.RequestUsername}")
                     .ToArray();
@@ -279,7 +280,7 @@ namespace CoreCodedChatbot.Helpers
             {
                 var userRequest = context.SongRequests
                     ?.Where(sr => !sr.Played)
-                    ?.OrderRequests().ToList()
+                    ?.OrderRequests(isCurrentVip).ToList()
                     ?.Select((sr, index) => new { Index = index + 1, SongRequest = sr })
                     ?.Where(x => (x.SongRequest.RequestUsername == username || isMod) && x.Index == playlistIndex)
                     .FirstOrDefault();
@@ -301,7 +302,7 @@ namespace CoreCodedChatbot.Helpers
             {
                 var userRequests = context.SongRequests
                     ?.Where(sr => !sr.Played)
-                    ?.OrderRequests().ToList()
+                    ?.OrderRequests(isCurrentVip).ToList()
                     ?.Select((sr, index) => new { Index = index + 1, SongRequest = sr });
 
                 if (userRequests == null)
@@ -420,7 +421,7 @@ namespace CoreCodedChatbot.Helpers
                     context.SaveChanges();
                     return true;
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     return false;
                 }
@@ -461,7 +462,7 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        public static string GetEstimatedTime(ChatViewersModel chattersModel)
+        public string GetEstimatedTime(ChatViewersModel chattersModel)
         {
             using (var context = new ChatbotContext())
             {
@@ -475,7 +476,7 @@ namespace CoreCodedChatbot.Helpers
                         .ToArray();
 
                     var requests = context.SongRequests.Where(sr => !sr.Played)
-                        .OrderRequests()
+                        .OrderRequests(isCurrentVip)
                         .Count(sr => allViewers.Contains(sr.RequestUsername));
 
                     var estimatedFinishTime = DateTime.Now.AddMinutes(requests * 6d).ToString("HH:mm:ss");

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Net.Http;
-using System.Collections.Generic;
 using System.Threading;
 using Newtonsoft.Json;
 
 using CoreCodedChatbot.Helpers;
+using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Models.Data;
 
 using TwitchLib.Client.Events;
@@ -25,6 +25,7 @@ namespace CoreCodedChatbot.Services
         private readonly TwitchPubSub pubsub;
         private readonly VipHelper vipHelper;
         private readonly BytesHelper bytesHelper;
+        private readonly PlaylistHelper playlistHelper;
 
         private ChannelAuthed Channel { get; set; }
 
@@ -36,11 +37,11 @@ namespace CoreCodedChatbot.Services
         private Timer BytesTimer { get; set; }
         private Timer DonationsTimer { get; set; }
 
-        private ConfigModel config;
+        private readonly ConfigModel config;
 
         private static readonly HttpClient httpClient = new HttpClient();
 
-        public ChatbotService(CommandHelper commandHelper, TwitchClient client, TwitchAPI api, TwitchPubSub pubsub, VipHelper vipHelper, BytesHelper bytesHelper, ConfigModel config)
+        public ChatbotService(CommandHelper commandHelper, TwitchClient client, TwitchAPI api, TwitchPubSub pubsub, VipHelper vipHelper, BytesHelper bytesHelper, PlaylistHelper playlistHelper, IConfigHelper configHelper)
         {
             this.commandHelper = commandHelper;
             this.client = client;
@@ -48,7 +49,8 @@ namespace CoreCodedChatbot.Services
             this.pubsub = pubsub;
             this.vipHelper = vipHelper;
             this.bytesHelper = bytesHelper;
-            this.config = config;
+            this.playlistHelper = playlistHelper;
+            this.config = configHelper.GetConfig();
 
             this.commandHelper.Init();
 
@@ -216,7 +218,7 @@ namespace CoreCodedChatbot.Services
                                 var chattersModel = JsonConvert.DeserializeObject<ChatViewersModel>(currentChattersJson);
                                 Console.Out.WriteLine(currentChattersJson);
                                 bytesHelper.GiveBytes(chattersModel);
-                                Console.Out.WriteLine(PlaylistHelper.GetEstimatedTime(chattersModel));
+                                Console.Out.WriteLine(playlistHelper.GetEstimatedTime(chattersModel));
                             }
                             catch (Exception ex)
                             {
