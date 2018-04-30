@@ -188,7 +188,7 @@ namespace CoreCodedChatbot.Helpers
         {
             try
             {
-                using (var context = new ChatbotContextFactory().Create())
+                using (var context = contextFactory.Create())
                 {
                     var user = FindUser(context, username);
                     GiveDonationVipsDb(user);
