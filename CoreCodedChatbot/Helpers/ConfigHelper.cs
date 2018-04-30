@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
+﻿using System.IO;
+
+using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Models.Data;
 using Newtonsoft.Json;
 
 namespace CoreCodedChatbot.Helpers
 {
-    public static class ConfigHelper
+    public class ConfigHelper : IConfigHelper
     {
-        public static ConfigModel GetConfig()
+        public ConfigModel GetConfig()
         {
             using (var sr = new StreamReader("config.json"))
             {

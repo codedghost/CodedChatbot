@@ -6,6 +6,7 @@ using System.Threading;
 using Newtonsoft.Json;
 
 using CoreCodedChatbot.Helpers;
+using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Models.Data;
 
 using TwitchLib.Client.Events;
@@ -40,12 +41,12 @@ namespace CoreCodedChatbot.Services
         private Timer BytesTimer { get; set; }
         private Timer DonationsTimer { get; set; }
 
-        private ConfigModel config;
+        private readonly ConfigModel config;
 
         private static readonly HttpClient httpClient = new HttpClient();
 
         public ChatbotService(CommandHelper commandHelper, TwitchClient client, TwitchAPI api, TwitchPubSub pubsub, LiveStreamMonitor liveStreamMonitor,
-            VipHelper vipHelper, BytesHelper bytesHelper, PlaylistHelper playlistHelper, StreamLabsHelper streamLabsHelper, ConfigModel config)
+            VipHelper vipHelper, BytesHelper bytesHelper, PlaylistHelper playlistHelper, StreamLabsHelper streamLabsHelper, IConfigHelper configHelper)
         {
             this.commandHelper = commandHelper;
             this.client = client;
@@ -55,8 +56,8 @@ namespace CoreCodedChatbot.Services
             this.vipHelper = vipHelper;
             this.bytesHelper = bytesHelper;
             this.playlistHelper = playlistHelper;
+            this.config = configHelper.GetConfig();
             this.streamLabsHelper = streamLabsHelper;
-            this.config = config;
 
             this.commandHelper.Init();
 

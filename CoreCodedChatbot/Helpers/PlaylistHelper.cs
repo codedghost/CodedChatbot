@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 
-using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 
 using CoreCodedChatbot.Database.Context;
+using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Database.Context.Models;
 using CoreCodedChatbot.Extensions;
+using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Models.Data;
 
 namespace CoreCodedChatbot.Helpers
@@ -17,21 +18,19 @@ namespace CoreCodedChatbot.Helpers
     {
         private const int UserMaxSongCount = 1;
 
-        private ConfigModel config;
-
-        private readonly ChatbotContextFactory contextFactory;
+        private readonly ConfigModel config;
+        private readonly IChatbotContextFactory contextFactory;
 
         private string FormatRequest(SongRequest sr, int index) => $"{index + 1}{this.PrefixVip(sr)} - {sr.RequestText} - {sr.RequestUsername}";
 
         private string PrefixVip(SongRequest request) => request.VipRequestTime.HasValue ? " (VIP)" : string.Empty;
 
-        private bool isCurrentVip { get; set; }
+        private static bool isCurrentVip = false;
 
-        public PlaylistHelper(ChatbotContextFactory contextFactory, ConfigModel config)
+        public PlaylistHelper(IChatbotContextFactory contextFactory, IConfigHelper configHelper)
         {
             this.contextFactory = contextFactory;
-            this.config = config;
-            this.isCurrentVip = false;
+            this.config = configHelper.GetConfig();
         }
 
         public (AddRequestResult, int) AddRequest(string username, string commandText, bool vipRequest = false)
@@ -108,6 +107,10 @@ namespace CoreCodedChatbot.Helpers
             using (var file = File.Open(config.ObsPlaylistPath,
                 File.Exists(config.ObsPlaylistPath) ? FileMode.Truncate : FileMode.OpenOrCreate, FileAccess.Write))
             {
+                if (file == null)
+                {
+                    return;
+                }
                 using (var sw = new StreamWriter(file))
                 {
                     string textToWrite;
