@@ -24,4 +24,5 @@
 /CoreCodedChatbot.Web/config.json
 /CoreCodedChatbot.Tests/obj
 /CoreCodedChatbot.Tests/bin
-/CoreCodedChatbot.Tests/CoreCodedChatbot.csproj.user
+/CoreCodedChatbot.Tests/CoreCodedChatbot.Tests.csproj.user
+/CoreCodedChatbot.Database/CoreCodedChatbot.Database.csproj.user
