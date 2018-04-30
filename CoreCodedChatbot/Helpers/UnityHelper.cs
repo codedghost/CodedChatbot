@@ -1,4 +1,6 @@
-﻿using CoreCodedChatbot.Helpers.Interfaces;
+﻿using CoreCodedChatbot.Database.Context;
+using CoreCodedChatbot.Database.Context.Interfaces;
+using CoreCodedChatbot.Helpers.Interfaces;
 
 using TwitchLib.Api;
 using TwitchLib.Client;
@@ -30,6 +32,10 @@ namespace CoreCodedChatbot.Helpers
             container.RegisterInstance(client);
             container.RegisterInstance(pubsub);
             container.RegisterInstance(config);
+
+            container.RegisterType<IChatbotContextFactory, ChatbotContextFactory>();
+            var contextFactory = new ChatbotContextFactory();
+            container.RegisterInstance(contextFactory);
 
             var commandHelper = new CommandHelper(container, config);
             container.RegisterInstance(commandHelper);
