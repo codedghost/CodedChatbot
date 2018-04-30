@@ -1,6 +1,7 @@
-﻿using System;
-using System.Threading.Tasks;
-using TwitchLib;
+﻿using CoreCodedChatbot.Database.Context;
+using CoreCodedChatbot.Database.Context.Interfaces;
+using CoreCodedChatbot.Helpers.Interfaces;
+
 using TwitchLib.Api;
 using TwitchLib.Api.Services;
 using TwitchLib.Client;
@@ -16,7 +17,9 @@ namespace CoreCodedChatbot.Helpers
         public static IUnityContainer Create()
         {
             var container = new UnityContainer();
-            var config = ConfigHelper.GetConfig();
+            container.RegisterType<IConfigHelper, ConfigHelper>();
+            var configHelper = container.Resolve<IConfigHelper>();
+            var config = configHelper.GetConfig();
 
             var creds = new ConnectionCredentials(config.ChatbotNick, config.ChatbotPass);
             var client = new TwitchClient();
@@ -33,6 +36,8 @@ namespace CoreCodedChatbot.Helpers
             container.RegisterInstance(pubsub);
             container.RegisterInstance(liveStreamMonitor);
             container.RegisterInstance(config);
+
+            container.RegisterType<IChatbotContextFactory, ChatbotContextFactory>();
 
             var commandHelper = new CommandHelper(container, config);
             container.RegisterInstance(commandHelper);
