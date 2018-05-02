@@ -171,7 +171,7 @@ namespace CoreCodedChatbot.Services
             {
                 client.SendMessage(e.Channel, $"Looks like @{e.Channel} has come online, better get to work!");
             }
-            ScheduleStreamTasks();
+            ScheduleStreamTasks(e.Stream.Game);
         }
 
         private void OnStreamOffline(object sender, OnStreamOfflineArgs e)
@@ -183,9 +183,8 @@ namespace CoreCodedChatbot.Services
             UnScheduleStreamTasks();
         }
 
-        private async void ScheduleStreamTasks()
+        private async void ScheduleStreamTasks(string streamGame = "Rocksmith 2014")
         {
-
             // Align database with any potentially missed or offline subs
             try
             {
@@ -200,16 +199,20 @@ namespace CoreCodedChatbot.Services
             }
 
             // Set threads for sending out stream info to the chat.
-            HowToRequestTimer = new Timer(
-                e => commandHelper.ProcessCommand("howtorequest", client, "Chatbot", string.Empty, true),
-                null,
-                TimeSpan.Zero,
-                TimeSpan.FromMinutes(25));
-            CustomsForgeTimer = new Timer(
-                e => commandHelper.ProcessCommand("customsforge", client, "Chatbot", string.Empty, true),
-                null,
-                TimeSpan.FromMinutes(5),
-                TimeSpan.FromMinutes(25));
+            if (streamGame == "Rocksmith 2014")
+            {
+                HowToRequestTimer = new Timer(
+                    e => commandHelper.ProcessCommand("howtorequest", client, "Chatbot", string.Empty, true),
+                    null,
+                    TimeSpan.Zero,
+                    TimeSpan.FromMinutes(25));
+                CustomsForgeTimer = new Timer(
+                    e => commandHelper.ProcessCommand("customsforge", client, "Chatbot", string.Empty, true),
+                    null,
+                    TimeSpan.FromMinutes(5),
+                    TimeSpan.FromMinutes(25));
+            }
+
             FollowTimer = new Timer(
                 e => commandHelper.ProcessCommand("followme", client, "Chatbot", string.Empty, true),
                 null,
