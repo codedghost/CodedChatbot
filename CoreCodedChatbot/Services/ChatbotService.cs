@@ -61,31 +61,31 @@ namespace CoreCodedChatbot.Services
 
             this.commandHelper.Init();
 
-            this.client.OnJoinedChannel += onJoinedChannel;
-            this.client.OnChatCommandReceived += onCommandReceived;
-            this.client.OnNewSubscriber += onNewSub;
-            this.client.OnReSubscriber += onReSub;
+            this.client.OnJoinedChannel += OnJoinedChannel;
+            this.client.OnChatCommandReceived += OnCommandReceived;
+            this.client.OnNewSubscriber += OnNewSub;
+            this.client.OnReSubscriber += OnReSub;
             this.client.Connect();
 
             this.liveStreamMonitor.SetStreamsByUserId(new List<string>{config.ChannelId});
-            this.liveStreamMonitor.OnStreamOnline += onStreamOnline;
-            this.liveStreamMonitor.OnStreamOffline += onStreamOffline;
+            this.liveStreamMonitor.OnStreamOnline += OnStreamOnline;
+            this.liveStreamMonitor.OnStreamOffline += OnStreamOffline;
 
             this.liveStreamMonitor.StartService();
 
-            this.pubsub.OnPubSubServiceConnected += onPubSubConnected;
-            this.pubsub.OnBitsReceived += onBitsReceived;
-            this.pubsub.OnListenResponse += onListenResponse;
+            this.pubsub.OnPubSubServiceConnected += OnPubSubConnected;
+            this.pubsub.OnBitsReceived += OnBitsReceived;
+            this.pubsub.OnListenResponse += OnListenResponse;
 
             this.pubsub.Connect();
         }
 
-        private void onJoinedChannel(object sender, OnJoinedChannelArgs e)
+        private void OnJoinedChannel(object sender, OnJoinedChannelArgs e)
         {
             client.SendMessage(config.StreamerChannel, $"BEEP BOOP: {config.ChatbotNick} online!");
         }
 
-        private void onCommandReceived(object sender, OnChatCommandReceivedArgs e)
+        private void OnCommandReceived(object sender, OnChatCommandReceivedArgs e)
         {
             try
             {
@@ -98,7 +98,7 @@ namespace CoreCodedChatbot.Services
             }
         }
 
-        private void onNewSub(object sender, OnNewSubscriberArgs e)
+        private void OnNewSub(object sender, OnNewSubscriberArgs e)
         {
             try
             {
@@ -112,7 +112,7 @@ namespace CoreCodedChatbot.Services
             }
         }
 
-        private void onReSub(object sender, OnReSubscriberArgs e)
+        private void OnReSub(object sender, OnReSubscriberArgs e)
         {
             try
             {
@@ -126,7 +126,7 @@ namespace CoreCodedChatbot.Services
             }
         }
 
-        private void onPubSubConnected(object sender, EventArgs e)
+        private void OnPubSubConnected(object sender, EventArgs e)
         {
             try
             {
@@ -142,14 +142,14 @@ namespace CoreCodedChatbot.Services
             }
         }
 
-        private void onListenResponse(object sender, OnListenResponseArgs e)
+        private void OnListenResponse(object sender, OnListenResponseArgs e)
         {
             Console.Out.WriteLine(e.Successful
                 ? $"Successfully verified listening to topic: {e.Topic}"
                 : $"Failed to listen! {e.Topic} - Error: {e.Response.Error}");
         }
 
-        private void onBitsReceived(object sender, OnBitsReceivedArgs e)
+        private void OnBitsReceived(object sender, OnBitsReceivedArgs e)
         {
             try
             {
@@ -163,6 +163,24 @@ namespace CoreCodedChatbot.Services
             {
                 Console.Out.WriteLine(ex.ToString());
             }
+        }
+
+        private void OnStreamOnline(object sender, OnStreamOnlineArgs e)
+        {
+            if (client.IsConnected)
+            {
+                client.SendMessage(e.Channel, $"Looks like @{e.Channel} has come online, better get to work!");
+            }
+            ScheduleStreamTasks();
+        }
+
+        private void OnStreamOffline(object sender, OnStreamOfflineArgs e)
+        {
+            if (client.IsConnected)
+            {
+                client.SendMessage(e.Channel, $"Looks like @{e.Channel} has gone offline, *yawn* powering down");
+            }
+            UnScheduleStreamTasks();
         }
 
         private async void ScheduleStreamTasks()
@@ -264,24 +282,6 @@ namespace CoreCodedChatbot.Services
             TwitterTimer.Dispose();
             BytesTimer.Dispose();
             DonationsTimer.Dispose();
-        }
-
-        private void onStreamOnline(object sender, OnStreamOnlineArgs e)
-        {
-            if (client.IsConnected)
-            {
-                client.SendMessage(e.Channel, $"Looks like @{e.Channel} has come online, better get to work!");
-            }
-            ScheduleStreamTasks();
-        }
-
-        private void onStreamOffline(object sender, OnStreamOfflineArgs e)
-        {
-            if (client.IsConnected)
-            {
-                client.SendMessage(e.Channel, $"Looks like @{e.Channel} has gone offline, *yawn* powering down");
-            }
-            UnScheduleStreamTasks();
         }
 
         public void Main()
