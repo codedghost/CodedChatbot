@@ -268,19 +268,24 @@ namespace CoreCodedChatbot.Services
 
         private void onStreamOnline(object sender, OnStreamOnlineArgs e)
         {
-            //client.SendMessage(e.Channel, $"Looks like @{e.Channel} has come online, better get to work!");
+            if (client.IsConnected)
+            {
+                client.SendMessage(e.Channel, $"Looks like @{e.Channel} has come online, better get to work!");
+            }
             ScheduleStreamTasks();
         }
 
         private void onStreamOffline(object sender, OnStreamOfflineArgs e)
         {
-            client.SendMessage(e.Channel, $"Looks like @{e.Channel} has gone offline, *yawn* powering down");
+            if (client.IsConnected)
+            {
+                client.SendMessage(e.Channel, $"Looks like @{e.Channel} has gone offline, *yawn* powering down");
+            }
             UnScheduleStreamTasks();
         }
 
         public void Main()
         {
-            ScheduleStreamTasks();
         }
     }
 }
