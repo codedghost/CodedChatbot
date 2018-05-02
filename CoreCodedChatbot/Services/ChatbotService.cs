@@ -8,7 +8,7 @@ using Newtonsoft.Json;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Models.Data;
-
+using Microsoft.EntityFrameworkCore.Internal;
 using TwitchLib.Client.Events;
 using TwitchLib.PubSub.Events;
 using TwitchLib.Api.Exceptions;
@@ -66,10 +66,12 @@ namespace CoreCodedChatbot.Services
             this.client.OnNewSubscriber += OnNewSub;
             this.client.OnReSubscriber += OnReSub;
             this.client.Connect();
-
-            this.liveStreamMonitor.SetStreamsByUserId(new List<string>{config.ChannelId});
+            
+            this.liveStreamMonitor.SetStreamsByUsername(new List<string>{config.StreamerChannel});
             this.liveStreamMonitor.OnStreamOnline += OnStreamOnline;
             this.liveStreamMonitor.OnStreamOffline += OnStreamOffline;
+            this.liveStreamMonitor.OnStreamMonitorStarted += OnStreamMonitorStarted;
+            this.liveStreamMonitor.OnStreamUpdate += OnStreamUpdate;
 
             this.liveStreamMonitor.StartService();
 
@@ -167,6 +169,7 @@ namespace CoreCodedChatbot.Services
 
         private void OnStreamOnline(object sender, OnStreamOnlineArgs e)
         {
+            Console.Out.WriteLine("Streamer is online");
             if (client.IsConnected)
             {
                 client.SendMessage(e.Channel, $"Looks like @{e.Channel} has come online, better get to work!");
@@ -176,11 +179,25 @@ namespace CoreCodedChatbot.Services
 
         private void OnStreamOffline(object sender, OnStreamOfflineArgs e)
         {
+            Console.Out.WriteLine("Streamer is offline");
             if (client.IsConnected)
             {
                 client.SendMessage(e.Channel, $"Looks like @{e.Channel} has gone offline, *yawn* powering down");
             }
             UnScheduleStreamTasks();
+        }
+
+        private void OnStreamMonitorStarted(object sender, OnStreamMonitorStartedArgs e)
+        {
+            Console.Out.WriteLine("Stream Monitor Started");
+            Console.Out.WriteLine($"Monitoring Channels: {e.Channels.Select(c => c.Key).Join()}");
+        }
+
+        private void OnStreamUpdate(object sender, OnStreamUpdateArgs e)
+        {
+            Console.Out.WriteLine("Assuming stream category or title has updated, rescheduling tasks");
+            UnScheduleStreamTasks();
+            ScheduleStreamTasks(e.Stream.Game);
         }
 
         private async void ScheduleStreamTasks(string streamGame = "Rocksmith 2014")
