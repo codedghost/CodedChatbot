@@ -27,7 +27,8 @@ namespace CoreCodedChatbot.Web
             services.AddMvc();
 
             services.AddSingleton<ChatbotContextFactory>();
-            services.AddSingleton(ConfigHelper.GetConfig());
+            var configHelper = new ConfigHelper();
+            services.AddSingleton(configHelper.GetConfig());
             services.AddSingleton<PlaylistHelper>();
         }
 
