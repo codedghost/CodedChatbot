@@ -1,7 +1,7 @@
-﻿using System;
-using System.Linq;
-using CoreCodedChatbot.Database.Context;
+﻿using CoreCodedChatbot.Database.Context;
+using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Helpers;
+using CoreCodedChatbot.Helpers.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -26,8 +26,8 @@ namespace CoreCodedChatbot.Web
             services.AddSignalR();
             services.AddMvc();
 
-            services.AddSingleton<ChatbotContextFactory>();
-            services.AddSingleton(ConfigHelper.GetConfig());
+            services.AddSingleton<IChatbotContextFactory, ChatbotContextFactory>();
+            services.AddSingleton<IConfigHelper, ConfigHelper>();
             services.AddSingleton<PlaylistHelper>();
         }
 
