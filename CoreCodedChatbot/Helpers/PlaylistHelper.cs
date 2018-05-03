@@ -497,9 +497,9 @@ namespace CoreCodedChatbot.Helpers
 
         private void UpdatePlaylists()
         {
-            //UpdateWebPlaylist();
-            //UpdateFullPlaylist();
-            UpdateObsPlaylist();
+            UpdateWebPlaylist();
+            UpdateFullPlaylist();
+            //UpdateObsPlaylist();
         }
     }
 
