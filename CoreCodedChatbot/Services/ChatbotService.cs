@@ -71,7 +71,7 @@ namespace CoreCodedChatbot.Services
             this.liveStreamMonitor.OnStreamOnline += OnStreamOnline;
             this.liveStreamMonitor.OnStreamOffline += OnStreamOffline;
             this.liveStreamMonitor.OnStreamMonitorStarted += OnStreamMonitorStarted;
-            this.liveStreamMonitor.OnStreamUpdate += OnStreamUpdate;
+            //this.liveStreamMonitor.OnStreamUpdate += OnStreamUpdate;
 
             this.liveStreamMonitor.StartService();
 
