@@ -1,23 +1,30 @@
-﻿using System.Threading;
-using CoreCodedChatbot.CustomAttributes;
-using CoreCodedChatbot.Helpers;
+﻿using CoreCodedChatbot.CustomAttributes;
+using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Interfaces;
-using TwitchLib;
+using CoreCodedChatbot.Models.Data;
+
+using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
 {
     [ChatCommand(new[] { "twitter" }, false)]
     public class TwitterCommand : ICommand
     {
+        private readonly ConfigModel config;
+
+        public TwitterCommand(IConfigHelper configHelper)
+        {
+            this.config = configHelper.GetConfig();
+        }
+
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            var config = ConfigHelper.GetConfig();
-            client.SendMessage($"Follow me on twitter too: {config.TwitterLink}");
+            client.SendMessage(config.StreamerChannel, $"Follow me on twitter too: {config.TwitterLink}");
         }
 
         public void ShowHelp(TwitchClient client, string username)
         {
-            client.SendMessage($"Hey @{username}, this command outputs the twitter link from time to time.");
+            client.SendMessage(config.StreamerChannel, $"Hey @{username}, this command outputs the twitter link from time to time.");
         }
     }
 }

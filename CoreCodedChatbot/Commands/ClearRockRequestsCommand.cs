@@ -1,9 +1,9 @@
-﻿using System.Net.Sockets;
-using System.Threading;
-using CoreCodedChatbot.CustomAttributes;
+﻿using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Helpers;
-using TwitchLib;
+using CoreCodedChatbot.Models.Data;
+
+using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
 {
@@ -12,21 +12,24 @@ namespace CoreCodedChatbot.Commands
     {
         private readonly PlaylistHelper playlistHelper;
 
-        public ClearRockRequestsCommand(PlaylistHelper playlistHelper)
+        private readonly ConfigModel config;
+
+        public ClearRockRequestsCommand(PlaylistHelper playlistHelper, ConfigModel config)
         {
             this.playlistHelper = playlistHelper;
+            this.config = config;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
             playlistHelper.ClearRockRequests();
 
-            client.SendMessage($"@{username} Hey, I've cleared all requests for you!");
+            client.SendMessage(config.StreamerChannel, $"@{username} Hey, I've cleared all requests for you!");
         }
 
         public void ShowHelp(TwitchClient client, string username)
         {
-            client.SendMessage($"Hey @{username}, this command will clear all requests from the queue.");
+            client.SendMessage(config.StreamerChannel, $"Hey @{username}, this command will clear all requests from the queue.");
         }
     }
 }

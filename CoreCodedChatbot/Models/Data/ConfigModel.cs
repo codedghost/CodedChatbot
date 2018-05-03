@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CoreCodedChatbot.Models.Data
+﻿namespace CoreCodedChatbot.Models.Data
 {
     public class ConfigModel
     {
@@ -13,6 +9,7 @@ namespace CoreCodedChatbot.Models.Data
         public string ChatbotAccessToken;
         public string ObsPlaylistPath;
         public string StreamerChannel;
+        public string ChannelId;
         public string DiscordLink;
         public string TwitterLink;
         public string StreamLabsClientId;
@@ -22,5 +19,8 @@ namespace CoreCodedChatbot.Models.Data
         public string WebPlaylistUrl;
         public int BitsToVip;
         public int BytesToVip;
+        public int DonationAmountToVip;
+        public string DonationCurrency;
+        public string SignalRKey;
     }
 }

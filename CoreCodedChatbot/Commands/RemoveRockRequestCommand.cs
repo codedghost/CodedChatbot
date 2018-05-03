@@ -1,8 +1,9 @@
-﻿using System.Threading;
-using CoreCodedChatbot.CustomAttributes;
+﻿using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Helpers;
-using TwitchLib;
+using CoreCodedChatbot.Models.Data;
+
+using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
 {
@@ -11,23 +12,26 @@ namespace CoreCodedChatbot.Commands
     {
         private readonly PlaylistHelper playlistHelper;
 
-        public RemoveRockRequestCommand(PlaylistHelper playlistHelper)
+        private readonly ConfigModel config;
+
+        public RemoveRockRequestCommand(PlaylistHelper playlistHelper, ConfigModel config)
         {
             this.playlistHelper = playlistHelper;
+            this.config = config;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
             var success = playlistHelper.RemoveRockRequests(username, commandText, isMod);
 
-            client.SendMessage(success
+            client.SendMessage(config.StreamerChannel, success
                 ? $"Hi @{username}, I have removed number: {commandText} from the queue."
                 : $"Hi @{username}, I can't do that. Please use the command as follows: !removerequest <playlist index>. If your usage is correct you may not own the request or the playlist order has recently changed");
         }
 
         public void ShowHelp(TwitchClient client, string username)
         {
-            client.SendMessage(
+            client.SendMessage(config.StreamerChannel,
                 $"Hey @{username}, this command is used to remove one of your requests from the queue. Use !mrr to check your SongRequestIndex. Usage: !removerequest <SongRequestIndex>");
         }
     }

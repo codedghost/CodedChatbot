@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using CoreCodedChatbot.Database.Context;
+using CoreCodedChatbot.Database.Context.Interfaces;
+using CoreCodedChatbot.Helpers;
+using CoreCodedChatbot.Helpers.Interfaces;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +25,10 @@ namespace CoreCodedChatbot.Web
         {
             services.AddSignalR();
             services.AddMvc();
+
+            services.AddSingleton<IChatbotContextFactory, ChatbotContextFactory>();
+            services.AddSingleton<IConfigHelper, ConfigHelper>();
+            services.AddSingleton<PlaylistHelper>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

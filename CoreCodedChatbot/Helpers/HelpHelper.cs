@@ -1,18 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
-using TwitchLib;
+using CoreCodedChatbot.Models.Data;
+
+using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Helpers
 {
-    static class HelpHelper
+    public class HelpHelper
     {
-        public static void ProcessHelp(TwitchClient client, string commandName, string username)
+        private readonly TwitchClient client;
+        private readonly ConfigModel config;
+
+        public HelpHelper(TwitchClient client, ConfigModel config)
+        {
+            this.client = client;
+            this.config = config;
+        }
+
+        public void ProcessHelp(string commandName, string username)
         {
             var types = Assembly.GetEntryAssembly().GetTypes()
                 .Where(t => String.Equals(t.Namespace, "CoreCodedChatbot.Commands", StringComparison.Ordinal) &&
@@ -24,7 +33,7 @@ namespace CoreCodedChatbot.Helpers
 
             if (command == null)
             {
-                client.SendMessage("Sorry, I can't help with that :(");
+                client.SendMessage(config.StreamerChannel, "Sorry, I can't help with that :(");
             }
 
             command.ShowHelp(client, username);

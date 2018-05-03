@@ -1,24 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Linq;
 
-using CoreCodedChatbot.Database.Context;
+using CoreCodedChatbot.Database.Context.Interfaces;
+using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Models.Data;
 
 namespace CoreCodedChatbot.Helpers
 {
     public class BytesHelper
     {
-        private readonly ChatbotContextFactory contextFactory;
+        private readonly IChatbotContextFactory contextFactory;
 
         private readonly VipHelper vipHelper;
-        private readonly ConfigModel config = ConfigHelper.GetConfig();
+        private readonly ConfigModel config;
 
-        public BytesHelper(ChatbotContextFactory contextFactory, VipHelper vipHelper)
+        public BytesHelper(IChatbotContextFactory contextFactory, VipHelper vipHelper, IConfigHelper configHelper)
         {
             this.contextFactory = contextFactory;
             this.vipHelper = vipHelper;
+            this.config = configHelper.GetConfig();
         }
 
         public void GiveBytes(ChatViewersModel chatViewersModel)
@@ -93,7 +93,7 @@ namespace CoreCodedChatbot.Helpers
                     }
                     return false;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     return false;
                 }

@@ -1,8 +1,9 @@
-﻿using System.Threading;
-using CoreCodedChatbot.CustomAttributes;
+﻿using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Helpers;
-using TwitchLib;
+using CoreCodedChatbot.Models.Data;
+
+using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
 {
@@ -11,21 +12,24 @@ namespace CoreCodedChatbot.Commands
     {
         private readonly PlaylistHelper playlistHelper;
 
-        public RemoveCurrentRequestCommand(PlaylistHelper playlistHelper)
+        private readonly ConfigModel config;
+
+        public RemoveCurrentRequestCommand(PlaylistHelper playlistHelper, ConfigModel config)
         {
             this.playlistHelper = playlistHelper;
+            this.config = config;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
             playlistHelper.ArchiveCurrentRequest();
 
-            client.SendMessage($"Hey @{username}, the current request has been removed");
+            client.SendMessage(config.StreamerChannel, $"Hey @{username}, the current request has been removed");
         }
 
         public void ShowHelp(TwitchClient client, string username)
         {
-            client.SendMessage($"Hey @{username}, this command will remove the current request from the queue.");
+            client.SendMessage(config.StreamerChannel, $"Hey @{username}, this command will remove the current request from the queue.");
         }
     }
 }
