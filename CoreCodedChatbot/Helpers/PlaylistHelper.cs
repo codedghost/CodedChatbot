@@ -130,8 +130,6 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-
-
         private async void UpdateWebPlaylist()
         {
             var psk = config.SignalRKey;
