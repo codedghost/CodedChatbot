@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Models.Data;
 using CoreCodedChatbot.Web.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -11,9 +12,9 @@ namespace CoreCodedChatbot.Web.SignalRHubs
     {
         private ConfigModel config { get; set; }
 
-        public SongList(ConfigModel config)
+        public SongList(IConfigHelper configHelper)
         {
-            this.config = config;
+            this.config = configHelper.GetConfig();
         }
 
         public async Task Send(SongListHubModel data)
