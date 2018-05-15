@@ -1,4 +1,6 @@
-﻿using CoreCodedChatbot.Database.Context;
+﻿using System;
+using System.Threading;
+using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Helpers.Interfaces;
@@ -8,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using CoreCodedChatbot.Web.SignalRHubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace CoreCodedChatbot.Web
 {
@@ -19,6 +22,7 @@ namespace CoreCodedChatbot.Web
         }
 
         public IConfiguration Configuration { get; }
+        private Timer signalRHeartbeat;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -32,7 +36,7 @@ namespace CoreCodedChatbot.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IServiceProvider serviceProvider)
         {
             if (env.IsDevelopment())
             {
@@ -50,6 +54,13 @@ namespace CoreCodedChatbot.Web
             {
                 routes.MapHub<SongList>("SongList");
             });
+
+            signalRHeartbeat =
+                new Timer(
+                    async (x) =>
+                    {
+                        await serviceProvider.GetService<IHubContext<SongList>>().Clients.All.InvokeAsync("Heartbeat");
+                    }, null, TimeSpan.Zero, TimeSpan.FromSeconds(20));
 
             app.UseMvc(routes =>
             {

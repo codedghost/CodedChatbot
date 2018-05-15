@@ -1,4 +1,5 @@
 ﻿using CoreCodedChatbot.CustomAttributes;
+using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Models.Data;
 
@@ -6,19 +7,22 @@ using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
 {
-    [ChatCommand(new []{ "songlist", "playlist", "requests", "list", "songs" }, true)]
+    [ChatCommand(new []{ "songlist", "playlist", "requests", "list", "songs" }, false)]
     public class SongListCommand: ICommand
     {
         private readonly ConfigModel config;
 
-        public SongListCommand(ConfigModel config)
+        public SongListCommand(IConfigHelper configHelper)
         {
-            this.config = config;
+            this.config = configHelper.GetConfig();
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            client.SendMessage(config.StreamerChannel, $"Hey @{username}, the full playlist can be found at: http://localhost:49420/playlist");
+            client.SendMessage(config.StreamerChannel,
+                username == "Chatbot"
+                    ? $"The full playlist can be found at: {config.WebPlaylistUrl}/Chatbot/List"
+                    : $"Hey @{username}, the full playlist can be found at: {config.WebPlaylistUrl}/Chatbot/List");
         }
 
         public void ShowHelp(TwitchClient client, string username)

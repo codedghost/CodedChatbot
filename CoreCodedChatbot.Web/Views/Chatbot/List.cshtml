@@ -32,9 +32,12 @@
     chatConnection.onClosed = e => {
         console.log('connection closed');
     };
+    chatConnection.on('Heartbeat',
+        () => {
+            console.log('ping');
+        });
     // This needs to have the currentList populated correctly
     chatConnection.on('SendAll', (data) => {
-        debugger;
         $("#messageArea").empty();
         var currentList = $("#messageArea").html();
         for (var i = 0; i < data.length; i++) {
