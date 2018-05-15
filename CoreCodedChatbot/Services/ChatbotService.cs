@@ -40,6 +40,7 @@ namespace CoreCodedChatbot.Services
         private Timer FollowTimer { get; set; }
         private Timer BytesTimer { get; set; }
         private Timer DonationsTimer { get; set; }
+        private Timer PlaylistTimer { get; set; }
 
         private readonly ConfigModel config;
 
@@ -228,23 +229,28 @@ namespace CoreCodedChatbot.Services
                     null,
                     TimeSpan.FromMinutes(5),
                     TimeSpan.FromMinutes(25));
+                PlaylistTimer = new Timer(
+                    e => commandHelper.ProcessCommand("list", client, "Chatbot", string.Empty, true),
+                    null,
+                    TimeSpan.FromMinutes(10),
+                    TimeSpan.FromMinutes(30));
             }
 
             FollowTimer = new Timer(
                 e => commandHelper.ProcessCommand("followme", client, "Chatbot", string.Empty, true),
                 null,
-                TimeSpan.FromMinutes(10),
-                TimeSpan.FromMinutes(25));
+                TimeSpan.FromMinutes(15),
+                TimeSpan.FromMinutes(30));
             DiscordTimer = new Timer(
                 e => commandHelper.ProcessCommand("discord", client, "Chatbot", string.Empty, true),
                 null,
-                TimeSpan.FromMinutes(15),
-                TimeSpan.FromMinutes(25));
+                TimeSpan.FromMinutes(20),
+                TimeSpan.FromMinutes(30));
             TwitterTimer = new Timer(
                 e => commandHelper.ProcessCommand("twitter", client, "Chatbot", string.Empty, true),
                 null,
-                TimeSpan.FromMinutes(20),
-                TimeSpan.FromMinutes(25));
+                TimeSpan.FromMinutes(25),
+                TimeSpan.FromMinutes(30));
 
             // Set thread for checking viewers in chat and giving out Bytes.
 
@@ -297,6 +303,7 @@ namespace CoreCodedChatbot.Services
         {
             HowToRequestTimer.Dispose();
             CustomsForgeTimer.Dispose();
+            PlaylistTimer.Dispose();
             FollowTimer.Dispose();
             DiscordTimer.Dispose();
             TwitterTimer.Dispose();
