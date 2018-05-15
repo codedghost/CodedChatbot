@@ -141,18 +141,10 @@ namespace CoreCodedChatbot.Helpers
 
             await connection.StartAsync();
 
-            using (var context = contextFactory.Create())
-            {
-                var requests = context.SongRequests
-                    .Where(sr => !sr.Played)
-                    .OrderRequests(isCurrentVip)
-                    .Take(5)
-                    .ToList()
-                    .Select(this.FormatRequest)
-                    .ToArray();
+            var requests = GetTopSongs();
 
-                await connection.InvokeAsync("Send", new { psk, requests });
-            }
+            await connection.InvokeAsync("Send", new {psk, requests});
+
             await connection.DisposeAsync();
         }
 
@@ -167,17 +159,9 @@ namespace CoreCodedChatbot.Helpers
 
             await connection.StartAsync();
 
-            using (var context = contextFactory.Create())
-            {
-                var requests = context.SongRequests
-                    .Where(sr => !sr.Played)
-                    .OrderRequests(isCurrentVip)
-                    .ToList()
-                    .Select(this.FormatRequest)
-                    .ToArray();
+            var requests = GetAllSongs();
 
-                await connection.InvokeAsync("SendAll", new { psk, requests });
-            }
+            await connection.InvokeAsync("SendAll", new {psk, requests});
 
             await connection.DisposeAsync();
         }
@@ -238,7 +222,7 @@ namespace CoreCodedChatbot.Helpers
                     .OrderRequests(isCurrentVip)
                     .Take(5)
                     .ToList()
-                    .Select((sr, index) => $"{index + 1} - {sr.RequestText} - {sr.RequestUsername}")
+                    .Select(FormatRequest)
                     .ToArray();
                 return requests;
             }
@@ -251,7 +235,7 @@ namespace CoreCodedChatbot.Helpers
                 var requests = context.SongRequests.Where(sr => !sr.Played)
                     .OrderRequests(isCurrentVip)
                     .ToList()
-                    .Select((sr, index) => $"{index + 1} - {sr.RequestText} - {sr.RequestUsername}")
+                    .Select(FormatRequest)
                     .ToArray();
                 return requests;
             }
