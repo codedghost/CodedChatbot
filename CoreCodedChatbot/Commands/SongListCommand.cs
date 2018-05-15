@@ -19,8 +19,10 @@ namespace CoreCodedChatbot.Commands
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-
-            client.SendMessage(config.StreamerChannel, $"Hey @{username}, the full playlist can be found at: {config.WebPlaylistUrl}/Chatbot/List");
+            client.SendMessage(config.StreamerChannel,
+                username == "Chatbot"
+                    ? $"The full playlist can be found at: {config.WebPlaylistUrl}/Chatbot/List"
+                    : $"Hey @{username}, the full playlist can be found at: {config.WebPlaylistUrl}/Chatbot/List");
         }
 
         public void ShowHelp(TwitchClient client, string username)
