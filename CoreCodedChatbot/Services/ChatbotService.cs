@@ -223,12 +223,12 @@ namespace CoreCodedChatbot.Services
                     e => commandHelper.ProcessCommand("howtorequest", client, "Chatbot", string.Empty, true),
                     null,
                     TimeSpan.Zero,
-                    TimeSpan.FromMinutes(25));
+                    TimeSpan.FromMinutes(30));
                 CustomsForgeTimer = new Timer(
                     e => commandHelper.ProcessCommand("customsforge", client, "Chatbot", string.Empty, true),
                     null,
                     TimeSpan.FromMinutes(5),
-                    TimeSpan.FromMinutes(25));
+                    TimeSpan.FromMinutes(30));
                 PlaylistTimer = new Timer(
                     e => commandHelper.ProcessCommand("list", client, "Chatbot", string.Empty, true),
                     null,
