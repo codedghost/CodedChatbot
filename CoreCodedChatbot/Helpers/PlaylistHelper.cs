@@ -51,7 +51,7 @@ namespace CoreCodedChatbot.Helpers
                     var status = context.Settings
                         .SingleOrDefault(set => set.SettingName == "PlaylistStatus");
                     var playlistLength = context.SongRequests.Count(sr => !sr.Played);
-                    var userSongCount = context.SongRequests.Count(sr => !sr.Played && sr.RequestUsername == username);
+                    var userSongCount = context.SongRequests.Count(sr => !sr.Played && sr.RequestUsername == username && sr.VipRequestTime == null);
                     Console.Out.WriteLine($"Not a vip request: {playlistLength}, {userSongCount}");
                     if (status != null)
                     {
