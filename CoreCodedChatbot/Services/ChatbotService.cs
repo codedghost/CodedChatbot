@@ -276,7 +276,6 @@ namespace CoreCodedChatbot.Services
                 TimeSpan.FromMinutes(1));
 
             // Set thread for checking for any new Donations from streamlabs and synchronise with the db.
-            // Commenting out so bot can be used.
             
             DonationsTimer = new System.Threading.Timer(
                 e =>
@@ -284,10 +283,7 @@ namespace CoreCodedChatbot.Services
                     try
                     {
                         var success = streamLabsHelper.CheckDonationVips();
-
-                        // NOTES TO SELF. Add &after=<donationId> to end of donations call. 
-                        // This can start at any number (for initialising db) after this it will get anything past whichever donation_id we pass
-                        // This will ideally always be the latest one, we can then check for empty strings and such to reduce overhead.
+                        
                     }
                     catch (Exception ex)
                     {
