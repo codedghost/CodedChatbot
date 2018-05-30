@@ -41,6 +41,10 @@ namespace CoreCodedChatbot.Services
         private Timer BytesTimer { get; set; }
         private Timer DonationsTimer { get; set; }
         private Timer PlaylistTimer { get; set; }
+        private Timer YoutubeTimer { get; set; }
+
+        private int MaxTimerMinutesRocksmith { get; set; }
+        private int MaxTimerMinutesGaming { get; set; }
 
         private readonly ConfigModel config;
 
@@ -203,6 +207,10 @@ namespace CoreCodedChatbot.Services
 
         private async void ScheduleStreamTasks(string streamGame = "Rocksmith 2014")
         {
+            var isStreamingRocksmith = streamGame == "Rocksmith 2014";
+            var maxTimerMinutes =
+                TimeSpan.FromMinutes(isStreamingRocksmith ? MaxTimerMinutesRocksmith : MaxTimerMinutesGaming);
+
             // Align database with any potentially missed or offline subs
             try
             {
@@ -217,40 +225,38 @@ namespace CoreCodedChatbot.Services
             }
 
             // Set threads for sending out stream info to the chat.
-            if (streamGame == "Rocksmith 2014")
+            if (isStreamingRocksmith)
             {
                 HowToRequestTimer = new Timer(
                     e => commandHelper.ProcessCommand("howtorequest", client, "Chatbot", string.Empty, true),
                     null,
-                    TimeSpan.Zero,
-                    TimeSpan.FromMinutes(30));
+                    TimeSpan.Zero, maxTimerMinutes);
                 CustomsForgeTimer = new Timer(
                     e => commandHelper.ProcessCommand("customsforge", client, "Chatbot", string.Empty, true),
                     null,
-                    TimeSpan.FromMinutes(5),
-                    TimeSpan.FromMinutes(30));
+                    TimeSpan.FromMinutes(7), maxTimerMinutes);
                 PlaylistTimer = new Timer(
                     e => commandHelper.ProcessCommand("list", client, "Chatbot", string.Empty, true),
                     null,
-                    TimeSpan.FromMinutes(10),
-                    TimeSpan.FromMinutes(30));
+                    TimeSpan.FromMinutes(14), maxTimerMinutes);
             }
 
             FollowTimer = new Timer(
                 e => commandHelper.ProcessCommand("followme", client, "Chatbot", string.Empty, true),
                 null,
-                TimeSpan.FromMinutes(15),
-                TimeSpan.FromMinutes(30));
+                TimeSpan.FromMinutes(isStreamingRocksmith ? 21 : 0), maxTimerMinutes);
             DiscordTimer = new Timer(
                 e => commandHelper.ProcessCommand("discord", client, "Chatbot", string.Empty, true),
                 null,
-                TimeSpan.FromMinutes(20),
-                TimeSpan.FromMinutes(30));
+                TimeSpan.FromMinutes(isStreamingRocksmith ? 28 : 7), maxTimerMinutes);
             TwitterTimer = new Timer(
                 e => commandHelper.ProcessCommand("twitter", client, "Chatbot", string.Empty, true),
                 null,
-                TimeSpan.FromMinutes(25),
-                TimeSpan.FromMinutes(30));
+                TimeSpan.FromMinutes(isStreamingRocksmith ? 35 : 14), maxTimerMinutes);
+            YoutubeTimer = new Timer(
+                e => commandHelper.ProcessCommand("youtube", client, "Chatbot", string.Empty, true),
+                null,
+                TimeSpan.FromMinutes(isStreamingRocksmith ? 42 : 21), maxTimerMinutes);
 
             // Set thread for checking viewers in chat and giving out Bytes.
 
@@ -284,10 +290,6 @@ namespace CoreCodedChatbot.Services
                     try
                     {
                         var success = streamLabsHelper.CheckDonationVips();
-
-                        // NOTES TO SELF. Add &after=<donationId> to end of donations call. 
-                        // This can start at any number (for initialising db) after this it will get anything past whichever donation_id we pass
-                        // This will ideally always be the latest one, we can then check for empty strings and such to reduce overhead.
                     }
                     catch (Exception ex)
                     {
@@ -307,6 +309,7 @@ namespace CoreCodedChatbot.Services
             FollowTimer.Dispose();
             DiscordTimer.Dispose();
             TwitterTimer.Dispose();
+            YoutubeTimer.Dispose();
             BytesTimer.Dispose();
             DonationsTimer.Dispose();
         }
