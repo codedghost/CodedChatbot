@@ -12,6 +12,7 @@
         public string ChannelId;
         public string DiscordLink;
         public string TwitterLink;
+        public string YoutubeLink;
         public string StreamLabsClientId;
         public string StreamLabsClientSecret;
         public string StreamLabsCode;
