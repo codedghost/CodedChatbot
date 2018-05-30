@@ -36,6 +36,7 @@ namespace CoreCodedChatbot.Helpers
         public (AddRequestResult, int) AddRequest(string username, string commandText, bool vipRequest = false)
         {
             var songIndex = 0;
+            var isPlaylistOpen = IsPlaylistOpen();
             using (var context = contextFactory.Create())
             {
                 var request = new SongRequest
@@ -48,15 +49,14 @@ namespace CoreCodedChatbot.Helpers
 
                 if (!vipRequest)
                 {
-                    var status = context.Settings
-                        .SingleOrDefault(set => set.SettingName == "PlaylistStatus");
                     var playlistLength = context.SongRequests.Count(sr => !sr.Played);
                     var userSongCount = context.SongRequests.Count(sr => !sr.Played && sr.RequestUsername == username && sr.VipRequestTime == null);
                     Console.Out.WriteLine($"Not a vip request: {playlistLength}, {userSongCount}");
-                    if (status != null)
+                    if (!isPlaylistOpen)
                     {
-                        if (status?.SettingValue == null || status?.SettingValue == "Closed") return (AddRequestResult.PlaylistClosed, 0);
+                        return (AddRequestResult.PlaylistClosed, 0);
                     }
+
                     if (userSongCount >= UserMaxSongCount)
                     {
                         return (AddRequestResult.NoMultipleRequests, 0);
@@ -75,6 +75,16 @@ namespace CoreCodedChatbot.Helpers
             UpdatePlaylists();
 
             return (AddRequestResult.Success, songIndex);
+        }
+
+        public bool IsPlaylistOpen()
+        {
+            using (var context = contextFactory.Create())
+            {
+                var status = context.Settings
+                    .SingleOrDefault(set => set.SettingName == "PlaylistStatus");
+                return status?.SettingValue != null && status.SettingValue != "Closed";
+            }
         }
 
         public int PromoteRequest(string username, int songIndex)
