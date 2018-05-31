@@ -10,7 +10,7 @@ namespace CoreCodedChatbot.Extensions
     {
         public static List<SongRequest> OrderRequests(this IQueryable<SongRequest> requests)
         {
-            return requests.OrderBy(sr => sr.RequestTime).ThenBy(sr => sr.VipRequestTime ?? DateTime.MaxValue).ToList();
+            return requests.OrderBy(sr => sr.VipRequestTime ?? DateTime.MaxValue).ThenBy(sr => sr.RequestTime).ToList();
         }
     }
 }
