@@ -282,7 +282,6 @@ namespace CoreCodedChatbot.Services
                 TimeSpan.FromMinutes(1));
 
             // Set thread for checking for any new Donations from streamlabs and synchronise with the db.
-            // Commenting out so bot can be used.
             
             DonationsTimer = new System.Threading.Timer(
                 e =>
