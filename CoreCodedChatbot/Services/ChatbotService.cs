@@ -268,9 +268,7 @@ namespace CoreCodedChatbot.Services
                         var currentChattersJson = await httpClient.GetStringAsync($"https://tmi.twitch.tv/group/user/{config.StreamerChannel}/chatters");
                         // process json into username list.
                         var chattersModel = JsonConvert.DeserializeObject<ChatViewersModel>(currentChattersJson);
-                        Console.Out.WriteLine(currentChattersJson);
                         bytesHelper.GiveBytes(chattersModel);
-                        Console.Out.WriteLine(playlistHelper.GetEstimatedTime(chattersModel));
                     }
                     catch (Exception ex)
                     {
