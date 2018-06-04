@@ -337,6 +337,12 @@ namespace CoreCodedChatbot.Helpers
                 {
                     var userRequest = userRequests?.Where(x => x.Index == playlistIndex).FirstOrDefault();
 
+                    if (userRequest == null)
+                    {
+                        syntaxError = true;
+                        return false;
+                    }
+
                     userRequest.SongRequest.RequestText = songRequestText;
 
                     context.SongRequests.Update(userRequest.SongRequest);
