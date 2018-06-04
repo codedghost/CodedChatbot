@@ -43,8 +43,8 @@ namespace CoreCodedChatbot.Services
         private Timer PlaylistTimer { get; set; }
         private Timer YoutubeTimer { get; set; }
 
-        private int MaxTimerMinutesRocksmith { get; set; }
-        private int MaxTimerMinutesGaming { get; set; }
+        private int MaxTimerMinutesRocksmith = 49;
+        private int MaxTimerMinutesGaming = 28;
 
         private readonly ConfigModel config;
 
