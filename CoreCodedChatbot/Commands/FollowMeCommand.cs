@@ -18,7 +18,7 @@ namespace CoreCodedChatbot.Commands
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            client.SendMessage(config.StreamerChannel, $"Hope you like what you're hearing! Give that Follow button a quick click ;)");
+            client.SendMessage(config.StreamerChannel, $"Hope you like the stream! Go on... Give that Follow button a quick click ;)");
         }
 
         public void ShowHelp(TwitchClient client, string username)
