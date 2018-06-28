@@ -1,0 +1,11 @@
+C:\Code\CodedChatbot\CoreCodedChatbot.Discord\bin\Debug\netcoreapp2.0\CoreCodedChatbot.Discord.deps.json
+C:\Code\CodedChatbot\CoreCodedChatbot.Discord\bin\Debug\netcoreapp2.0\CoreCodedChatbot.Discord.runtimeconfig.json
+C:\Code\CodedChatbot\CoreCodedChatbot.Discord\bin\Debug\netcoreapp2.0\CoreCodedChatbot.Discord.runtimeconfig.dev.json
+C:\Code\CodedChatbot\CoreCodedChatbot.Discord\bin\Debug\netcoreapp2.0\CoreCodedChatbot.Discord.dll
+C:\Code\CodedChatbot\CoreCodedChatbot.Discord\obj\Debug\netcoreapp2.0\CoreCodedChatbot.Discord.csprojResolveAssemblyReference.cache
+C:\Code\CodedChatbot\CoreCodedChatbot.Discord\obj\Debug\netcoreapp2.0\CoreCodedChatbot.Discord.csproj.CoreCompileInputs.cache
+C:\Code\CodedChatbot\CoreCodedChatbot.Discord\obj\Debug\netcoreapp2.0\CoreCodedChatbot.Discord.AssemblyInfoInputs.cache
+C:\Code\CodedChatbot\CoreCodedChatbot.Discord\obj\Debug\netcoreapp2.0\CoreCodedChatbot.Discord.AssemblyInfo.cs
+C:\Code\CodedChatbot\CoreCodedChatbot.Discord\bin\Debug\netcoreapp2.0\CoreCodedChatbot.Discord.pdb
+C:\Code\CodedChatbot\CoreCodedChatbot.Discord\obj\Debug\netcoreapp2.0\CoreCodedChatbot.Discord.dll
+C:\Code\CodedChatbot\CoreCodedChatbot.Discord\obj\Debug\netcoreapp2.0\CoreCodedChatbot.Discord.pdb
