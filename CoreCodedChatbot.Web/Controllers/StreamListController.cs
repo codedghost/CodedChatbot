@@ -21,7 +21,7 @@ namespace CoreCodedChatbot.Web.Controllers
             var browserSourceModel = new PlaylistBrowserSource
             {
                 Songs = playlistHelper.GetTopSongs()
-        };
+            };
 
             return View(browserSourceModel);
         }
