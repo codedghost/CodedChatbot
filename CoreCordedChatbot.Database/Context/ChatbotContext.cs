@@ -40,7 +40,8 @@ namespace CoreCodedChatbot.Database.Context
             // Reconstructing path for platform independency
             var dbConn = Path.GetFullPath(ConfigRoot["LocalDbLocation"]);
 
-            optionsBuilder.UseSqlite($"FileName={dbConn}");
+            if (!optionsBuilder.IsConfigured)
+                optionsBuilder.UseSqlite($"FileName={dbConn}");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

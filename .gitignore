@@ -27,3 +27,4 @@
 /CoreCodedChatbot.Tests/CoreCodedChatbot.Tests.csproj.user
 /CoreCodedChatbot.Database/CoreCodedChatbot.Database.csproj.user
 /CoreCodedChatbot.Web/wwwroot/lib/
+/CoreCodedChatbot.Discord/config.json
