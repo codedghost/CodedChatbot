@@ -196,8 +196,6 @@ namespace CoreCodedChatbot.Services
         {
             Console.Out.WriteLine("Stream Monitor Started");
             Console.Out.WriteLine($"Monitoring Channels: {e.Channels.Select(c => c.Key).Join()}");
-
-            ScheduleStreamTasks();
         }
 
         private void OnStreamUpdate(object sender, OnStreamUpdateArgs e)
