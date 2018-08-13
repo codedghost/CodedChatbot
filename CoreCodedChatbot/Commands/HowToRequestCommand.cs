@@ -1,4 +1,5 @@
 ﻿using CoreCodedChatbot.CustomAttributes;
+using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Models.Data;
 
@@ -10,15 +11,21 @@ namespace CoreCodedChatbot.Commands
     public class HowToRequestCommand : ICommand
     {
         private readonly ConfigModel config;
+        private readonly PlaylistHelper playlistHelper;
 
-        public HowToRequestCommand(ConfigModel config)
+        public HowToRequestCommand(ConfigModel config, PlaylistHelper playlistHelper)
         {
             this.config = config;
+            this.playlistHelper = playlistHelper;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            client.SendMessage(config.StreamerChannel, $"To request a song just use: !request <SongArtist> - <SongTitle> - (Guitar or Bass)");
+            if (playlistHelper.IsPlaylistOpen() || username != "chatbot")
+            {
+                client.SendMessage(config.StreamerChannel,
+                    $"To request a song just use: !request <SongArtist> - <SongTitle> - (Guitar or Bass)");
+            }
         }
 
         public void ShowHelp(TwitchClient client, string username)
