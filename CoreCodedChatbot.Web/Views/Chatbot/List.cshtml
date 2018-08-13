@@ -16,43 +16,53 @@
     <script src="~/lib/jquery/dist/jquery.js"></script>
 </head>
 <body>
-<div id="messageArea">
-    @foreach (var item in Model.Songs)
+    @if (User.Identity.IsAuthenticated)
     {
-        <h1>@item</h1>
-    }
-</div>
-<script>
-
-    var transportType = signalR.TransportType.WebSockets;
-    var logger = new signalR.ConsoleLogger(signalR.LogLevel.Information);
-    var songListHub = new signalR.HttpConnection('http://' + document.location.host + '/SongList', { transport: transportType, logger: logger });
-    var chatConnection = new signalR.HubConnection(songListHub, logger);
-
-    chatConnection.onClosed = e => {
-        console.log('connection closed');
-    };
-    chatConnection.on('Heartbeat',
-        () => {
-            console.log('ping');
-        });
-    // This needs to have the currentList populated correctly
-    chatConnection.on('SendAll', (data) => {
-        $("#messageArea").empty();
-        var currentList = $("#messageArea").html();
-        for (var i = 0; i < data.length; i++) {
-            $("#messageArea").html(currentList + "<h1>" + data[i] + "</h1>");
-            currentList = $("#messageArea").html();
+        <h3>Welcome @Model.TwitchUser.Username!</h3>
+        if (Model.TwitchUser.IsMod)
+        {
+            <h4>Looks like you're a mod! You'll have some features coming soon :D</h4>
         }
+    }
+    <div id="messageArea">
+        @foreach (var item in Model.Songs)
+        {
+            <h1>@item</h1>
+        }
+    </div>
+    <script>
 
-        console.log('received message');
-    });
+        var transportType = signalR.TransportType.WebSockets;
+        var logger = new signalR.ConsoleLogger(signalR.LogLevel.Information);
+        var songListHub = new signalR.HttpConnection('http://' + document.location.host + '/SongList',
+            { transport: transportType, logger: logger });
+        var chatConnection = new signalR.HubConnection(songListHub, logger);
 
-    chatConnection.start().catch(err => {
-        console.log('connection error');
-    });
+        chatConnection.onClosed = e => {
+            console.log('connection closed');
+        };
+        chatConnection.on('Heartbeat',
+            () => {
+                console.log('ping');
+            });
+        // This needs to have the currentList populated correctly
+        chatConnection.on('SendAll',
+            (data) => {
+                $("#messageArea").empty();
+                var currentList = $("#messageArea").html();
+                for (var i = 0; i < data.length; i++) {
+                    $("#messageArea").html(currentList + "<h1>" + data[i] + "</h1>");
+                    currentList = $("#messageArea").html();
+                }
 
-</script>
+                console.log('received message');
+            });
+
+        chatConnection.start().catch(err => {
+            console.log('connection error');
+        });
+
+    </script>
 </body>
 
 </html>
