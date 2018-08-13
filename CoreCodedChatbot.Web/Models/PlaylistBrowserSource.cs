@@ -3,5 +3,6 @@
     public class PlaylistBrowserSource
     {
         public string[] Songs { get; set; }
+        public LoggedInTwitchUser TwitchUser { get; set; }
     }
 }

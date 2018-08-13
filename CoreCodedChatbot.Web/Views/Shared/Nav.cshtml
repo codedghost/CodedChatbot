@@ -15,7 +15,14 @@
                 </li>
             </ul>
             <span class="navbar-text">
-                <button class="btn btn-primary" href="">Login with Twitch</button>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <button class="btn btn-primary" onclick="window.location.href = '@Url.Action("Logout", "Login")'">Logout</button>
+                }
+                else
+                {
+                <button class="btn btn-primary" onclick="window.location.href = '@Url.Action("Index", "Login")'">Login with Twitch</button>
+                }
             </span>
         </div>
     </div>
