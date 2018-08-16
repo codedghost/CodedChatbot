@@ -18,7 +18,8 @@
     <div id="messageArea">
         @foreach (var item in Model.Songs)
         {
-            <h1>@item</h1>
+            var style = item.isInChat ? string.Empty : "color:red";
+            <h1 style="@style">@item.songRequestText</h1>
         }
     </div>
     <script>
@@ -40,11 +41,18 @@
             $("#messageArea").empty();
             var currentList = $("#messageArea").html();
             for (var i = 0; i < data.length; i++) {
-                $("#messageArea").html(currentList + "<h1>" + data[i] + "</h1>");
+                var requestStyle = "";
+                if (!!data[i].isUserInChat) {
+                    requestStyle = "color:red";
+                    }
+                $("#messageArea").html(currentList + "<h1 style='" + requestStyle + "'>" + data[i].songRequestText + "</h1>");
                 currentList = $("#messageArea").html();
             }
 
             console.log('received message');
+        });
+        chatConnection.on('SendAll', (data) => {
+            // Not needed on this page
         });
 
         chatConnection.start().catch(err => {

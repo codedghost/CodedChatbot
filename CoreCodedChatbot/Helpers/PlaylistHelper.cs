@@ -219,7 +219,7 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        public string[] GetTopSongs()
+        public PlaylistItem[] GetTopSongs()
         {
             using (var context = contextFactory.Create())
             {
@@ -227,19 +227,38 @@ namespace CoreCodedChatbot.Helpers
                     .OrderRequests()
                     .Take(5)
                     .ToList()
-                    .Select(FormatRequest)
-                    .ToArray();
+                    .Select((sr, index) =>
+                    {
+                        return new PlaylistItem
+                        {
+                            songRequestText = FormatRequest(sr, index),
+                            isInChat = (context.Users.SingleOrDefault(u => u.Username == sr.RequestUsername)?.TimeLastInChat ?? DateTime.MinValue).AddMinutes(2) >= DateTime.UtcNow
+                        };
+                    }).ToArray();
+
+
                 return requests;
             }
         }
 
-        public string[] GetAllSongs()
+        public PlaylistItem[] GetAllSongs()
         {
             using (var context = contextFactory.Create())
             {
                 var requests = context.SongRequests.Where(sr => !sr.Played)
                     .OrderRequests()
-                    .Select(FormatRequest)
+                    .Select((sr, index) =>
+                    {
+                        return new PlaylistItem
+                        {
+                            songRequestText = FormatRequest(sr, index),
+                            isInChat = (context.Users.SingleOrDefault(u => u.Username == sr.RequestUsername)?.TimeLastInChat ?? DateTime.MinValue)
+                                       .ToUniversalTime()
+                                       .AddMinutes(2) >= DateTime.UtcNow ||
+                                       (sr.VipRequestTime ?? DateTime.MinValue).ToUniversalTime().AddMinutes(5) >= DateTime.UtcNow ||
+                                       sr.RequestTime.ToUniversalTime().AddMinutes(5) >= DateTime.UtcNow
+                        };
+                    })
                     .ToArray();
                 return requests;
             }
@@ -336,6 +355,12 @@ namespace CoreCodedChatbot.Helpers
                 if (isMod)
                 {
                     var userRequest = userRequests?.Where(x => x.Index == playlistIndex).FirstOrDefault();
+
+                    if (userRequest == null)
+                    {
+                        syntaxError = true;
+                        return false;
+                    }
 
                     userRequest.SongRequest.RequestText = songRequestText;
 

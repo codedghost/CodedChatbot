@@ -11,9 +11,10 @@ using System;
 namespace CoreCodedChatbot.Database.Migrations
 {
     [DbContext(typeof(ChatbotContext))]
-    partial class ChatbotContextModelSnapshot : ModelSnapshot
+    [Migration("20180806185013_AddingUserInChatTime")]
+    partial class AddingUserInChatTime
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

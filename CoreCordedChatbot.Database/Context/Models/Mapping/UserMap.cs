@@ -19,6 +19,7 @@ namespace CoreCodedChatbot.Database.Context.Models.Mapping
             builder.Property(t => t.DonationOrBitsVipRequests).HasColumnName("DonationOrBitsVipRequests").IsRequired();
             builder.Property(t => t.TotalBitsDropped).HasColumnName("TotalBitsDropped");
             builder.Property(t => t.TotalDonated).HasColumnName("TotalDonated");
+            builder.Property(t => t.TimeLastInChat).HasColumnName("TimeLastInChat");
         }
     }
 }

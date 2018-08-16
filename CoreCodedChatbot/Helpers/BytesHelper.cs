@@ -37,26 +37,31 @@ namespace CoreCodedChatbot.Helpers
                 {
                     var user = vipHelper.FindUser(context, mod);
                     user.TokenBytes++;
+                    user.TimeLastInChat = DateTime.Now;
                 }
                 foreach (var staff in chatViewersModel.chatters.staff)
                 {
                     var user = vipHelper.FindUser(context, staff);
                     user.TokenBytes++;
+                    user.TimeLastInChat = DateTime.Now;
                 }
                 foreach (var global_mod in chatViewersModel.chatters.global_mods)
                 {
                     var user = vipHelper.FindUser(context, global_mod);
                     user.TokenBytes++;
+                    user.TimeLastInChat = DateTime.Now;
                 }
                 foreach (var admin in chatViewersModel.chatters.admins)
                 {
                     var user = vipHelper.FindUser(context, admin);
                     user.TokenBytes++;
+                    user.TimeLastInChat = DateTime.Now;
                 }
                 foreach (var viewer in chatViewersModel.chatters.viewers)
                 {
                     var user = vipHelper.FindUser(context, viewer);
                     user.TokenBytes++;
+                    user.TimeLastInChat = DateTime.Now;
                 }
 
                 context.SaveChanges();
@@ -79,7 +84,8 @@ namespace CoreCodedChatbot.Helpers
                 try
                 {
                     var user = vipHelper.FindUser(context, username);
-                    if ((user.TokenBytes * tokensToConvert) >= config.BytesToVip)
+                    if (tokensToConvert < 0) return false;
+                    if ((user.TokenBytes * tokensToConvert) >= config.BytesToVip * tokensToConvert)
                     {
                         for (int i = 0; i < tokensToConvert; i++)
                         {

@@ -26,7 +26,7 @@ namespace CoreCodedChatbot.Commands
                 ? bytesHelper.ConvertByte(username, numberOfTokens) 
                 : bytesHelper.ConvertByte(username);
 
-            client.SendMessage(config.StreamerChannel, giveTokenSuccess ? $"Hey @{username}, I've converted your Byte(s) to VIP(s) :D" : $"Hey @{username}, it looks like you don't have a full Byte yet. Stick around and you'll have one in no time!");
+            client.SendMessage(config.StreamerChannel, giveTokenSuccess ? $"Hey @{username}, I've converted your Byte(s) to VIP(s) :D" : $"Hey @{username}, it looks like you don't have enough byte(s) to do that. Stick around and you'll have enough in no time!");
         }
 
         public void ShowHelp(TwitchClient client, string username)
