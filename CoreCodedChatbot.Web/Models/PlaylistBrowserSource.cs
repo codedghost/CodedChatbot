@@ -1,8 +1,10 @@
-﻿namespace CoreCodedChatbot.Web.Models
+﻿using CoreCodedChatbot.Models.Data;
+
+namespace CoreCodedChatbot.Web.Models
 {
     public class PlaylistBrowserSource
     {
-        public string[] Songs { get; set; }
+        public PlaylistItem[] Songs { get; set; }
         public LoggedInTwitchUser TwitchUser { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CoreCodedChatbot.Database.Context.Models
@@ -16,5 +17,6 @@ namespace CoreCodedChatbot.Database.Context.Models
         public int TokenBytes { get; set; }
         public int TotalBitsDropped { get; set; }
         public int TotalDonated { get; set; }
+        public DateTime TimeLastInChat { get; set; }
     }
 }
