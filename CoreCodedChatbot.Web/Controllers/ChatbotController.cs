@@ -51,5 +51,10 @@ namespace CoreCodedChatbot.Web.Controllers
 
             return View(playlistModel);
         }
+
+        public IActionResult RenderList(PlaylistItem[] data)
+        {
+            return PartialView("Partials/List/Playlist", data);
+        }
     }
 }

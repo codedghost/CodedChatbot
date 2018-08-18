@@ -1,0 +1,6 @@
+﻿@model CoreCodedChatbot.Models.Data.PlaylistItem
+
+@{
+    var style = @Model.isInChat ? string.Empty : "color:red";
+    <h1 style="@style">@Model.songRequestText</h1>
+}

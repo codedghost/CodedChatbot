@@ -13,7 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreCodedChatbot.Tests", "CoreCodedChatbot.Tests\CoreCodedChatbot.Tests.csproj", "{893E67AA-9C90-4EAB-86B8-0FF4033F71F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreCodedChatbot.Tests", "CoreCodedChatbot.Tests\CoreCodedChatbot.Tests.csproj", "{893E67AA-9C90-4EAB-86B8-0FF4033F71F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

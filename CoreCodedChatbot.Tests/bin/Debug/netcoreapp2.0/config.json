@@ -1,0 +1,27 @@
+﻿{
+    "TwitchHost": "irc.chat.twitch.tv",
+    "TwitchPort": 6667,
+    "TwitchWebAppClientId": "g5931hoqnmee29mfh1nqoww8zn3gba",
+    "TwitchWebAppClientSecret": "azlugs3wf7yo9hw9a1zqfbbiuava0k",
+    "TwitchWebAppScopes": "user:read:email",
+    "TwitchWebAppCallbackPath": "/TwitchAuth",
+    "ChatbotNick": "codedchatbot", // Twitch username
+    "ChatbotPass": "oauth:0bm4wdu5xmejqzxtehqwmegpze37ov", // Twitch oauth token
+    "ChatbotAccessToken": "fg6zys2prehmrtkhkimdgw9r6bawzs", // Twitch access token
+    "ObsPlaylistPath": "C:\\Users\\Sean\\Documents\\ChatbotTextFiles\\RocksmithPlaylistObs.txt", // Path for playlist txt file when running locally
+    "StreamerChannel": "codedghost2", // Twitch channel the bot should join
+    "ChannelId": "144355327",
+    "DiscordLink": "https://discord.gg/VCuG5uZ", // Link to Discord server
+    "TwitterLink": "https://twitter.com/CodedGhost", // Link to Twitter handle
+    "YoutubeLink": "https://www.youtube.com/channel/UCBrZ21rNo99fmhAFNQ8Oqxg",
+    "WebsiteLink": "https://www.codedghost.com",
+    "StreamLabsClientId": "eexretxW5J12HC1stL3ahDFy4PIzoFh2UyFVFEF9", // Streamlabs login client id (temp)
+    "StreamLabsClientSecret": "z0LCoULE3wbKauRULkeMOev6bJABpRnuZTEDoiuD", // StreamLabs login client secret (temp)
+    "LocalDbLocation": "C:\\ChatbotDb\\chatbot.db", // Local path for chatbot database (sqlite)
+    "WebPlaylistUrl": "http://localhost:49420", // URL of playlist
+    "BitsToVip": 300,
+    "DonationAmountToVip": 300,
+    "DonationCurrency": "GBP",
+    "BytesToVip": 450,
+    "SignalRKey": "ASDF1234"
+}
