@@ -66,10 +66,6 @@
 
                 console.log('received message');
             });
-        chatConnection.on('Send',
-            (data) => {
-                // Not needed on this page
-            });
 
         chatConnection.start().catch(err => {
             console.log('connection error');

@@ -137,24 +137,6 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        private async void UpdateWebPlaylist()
-        {
-            var psk = config.SignalRKey;
-
-            var connection = new HubConnectionBuilder()
-                .WithUrl($"{config.WebPlaylistUrl}/SongList")
-                .WithConsoleLogger()
-                .Build();
-
-            await connection.StartAsync();
-
-            var requests = GetTopSongs();
-
-            await connection.InvokeAsync("Send", new {psk, requests});
-
-            await connection.DisposeAsync();
-        }
-
         private async void UpdateFullPlaylist()
         {
             var psk = config.SignalRKey;
@@ -216,28 +198,6 @@ namespace CoreCodedChatbot.Helpers
                     ?.ToList();
 
                 return userRequests ?? new List<string>();
-            }
-        }
-
-        public PlaylistItem[] GetTopSongs()
-        {
-            using (var context = contextFactory.Create())
-            {
-                var requests = context.SongRequests.Where(sr => !sr.Played)
-                    .OrderRequests()
-                    .Take(5)
-                    .ToList()
-                    .Select((sr, index) =>
-                    {
-                        return new PlaylistItem
-                        {
-                            songRequestText = FormatRequest(sr, index),
-                            isInChat = (context.Users.SingleOrDefault(u => u.Username == sr.RequestUsername)?.TimeLastInChat ?? DateTime.MinValue).AddMinutes(2) >= DateTime.UtcNow
-                        };
-                    }).ToArray();
-
-
-                return requests;
             }
         }
 
@@ -508,7 +468,6 @@ namespace CoreCodedChatbot.Helpers
 
         private void UpdatePlaylists()
         {
-            UpdateWebPlaylist();
             UpdateFullPlaylist();
             //UpdateObsPlaylist();
         }
