@@ -5,16 +5,10 @@
     Layout = "_Layout";
 }
 
-<!DOCTYPE html>
-
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Index</title>
+@section Styles {
     <link rel="stylesheet" href="~/css/StreamList.css" />
-    <script src="~/lib/signalr-client/signalr-clientES5-1.0.0-alpha2-final.min.js"></script>
-    <script src="~/lib/jquery/dist/jquery.js"></script>
-</head>
+}
+
 <body>
     @if (User.Identity.IsAuthenticated)
     {
@@ -24,13 +18,18 @@
             <h4>Looks like you're a mod! You'll have some features coming soon :D</h4>
         }
     }
-    <div id="messageArea">
-        @foreach (var item in Model.Songs)
-        {
-            var style = item.isInChat ? string.Empty : "color:red";
-            <h1 style="@style">@item.songRequestText</h1>
-        }
-    </div>
+<div id="messageArea">
+    @foreach (var item in Model.Songs)
+    {
+        var style = item.isInChat ? string.Empty : "color:red";
+        <h1 style="@style">@item.songRequestText</h1>
+    }
+</div>
+
+@section scripts {
+
+    <script src="~/lib/signalr-client/signalr-clientES5-1.0.0-alpha2-final.min.js"></script>#
+
     <script>
 
         var transportType = signalR.TransportType.WebSockets;
@@ -39,37 +38,43 @@
             { transport: transportType, logger: logger });
         var chatConnection = new signalR.HubConnection(songListHub, logger);
 
-    chatConnection.onClosed = e => {
-        console.log('connection closed');
-    };
-    chatConnection.on('Heartbeat',
-        () => {
-            console.log('ping');
-        });
-    // This needs to have the currentList populated correctly
-    chatConnection.on('SendAll', (data) => {
-        $("#messageArea").empty();
-        var currentList = $("#messageArea").html();
-        for (var i = 0; i < data.length; i++) {
-            var requestStyle = "";
-            if (!!data[i].isUserInChat) {
-                requestStyle = "color:red";
+        chatConnection.onClosed = e => {
+            console.log('connection closed');
+        };
+        chatConnection.on('Heartbeat',
+            () => {
+                console.log('ping');
+            });
+        // This needs to have the currentList populated correctly
+        chatConnection.on('SendAll',
+            (data) => {
+                $("#messageArea").empty();
+                var currentList = $("#messageArea").html();
+                for (var i = 0; i < data.length; i++) {
+                    var requestStyle = "";
+                    if (!!data[i].isUserInChat) {
+                        requestStyle = "color:red";
+                    }
+                    $("#messageArea").html(currentList +
+                        "<h1 style='" +
+                        requestStyle +
+                        "'>" +
+                        data[i].songRequestText +
+                        "</h1>");
+                    currentList = $("#messageArea").html();
                 }
-            $("#messageArea").html(currentList + "<h1 style='" + requestStyle + "'>" + data[i].songRequestText + "</h1>");
-            currentList = $("#messageArea").html();
-        }
 
-        console.log('received message');
-    });
-    chatConnection.on('Send', (data) => {
-       // Not needed on this page
-    });
+                console.log('received message');
+            });
+        chatConnection.on('Send',
+            (data) => {
+                // Not needed on this page
+            });
 
         chatConnection.start().catch(err => {
             console.log('connection error');
         });
 
     </script>
+}
 </body>
-
-</html>
