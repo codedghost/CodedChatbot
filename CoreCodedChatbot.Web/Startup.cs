@@ -73,12 +73,12 @@ namespace CoreCodedChatbot.Web
 
             app.UseStaticFiles();
 
-            app.UseAuthentication();
-
             app.UseSignalR(routes =>
             {
                 routes.MapHub<SongList>("SongList");
             });
+
+            app.UseAuthentication();
 
             signalRHeartbeat =
                 new Timer(

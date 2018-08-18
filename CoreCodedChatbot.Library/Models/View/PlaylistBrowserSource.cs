@@ -1,6 +1,6 @@
-﻿using CoreCodedChatbot.Models.Data;
+﻿using CoreCodedChatbot.Library.Models.Data;
 
-namespace CoreCodedChatbot.Web.Models
+namespace CoreCodedChatbot.Library.Models.View
 {
     public class PlaylistBrowserSource
     {
