@@ -9,68 +9,61 @@
     <link rel="stylesheet" href="~/css/StreamList.css" />
 }
 
-<body>
-    @if (User.Identity.IsAuthenticated)
+@if (User.Identity.IsAuthenticated)
+{
+    <h3>Welcome @Model.TwitchUser.Username!</h3>
+    if (Model.TwitchUser.IsMod)
     {
-        <h3>Welcome @Model.TwitchUser.Username!</h3>
-        if (Model.TwitchUser.IsMod)
-        {
-            <h4>Looks like you're a mod! You'll have some features coming soon :D</h4>
-        }
+        <h4>Looks like you're a mod! You'll have some features coming soon :D</h4>
     }
+}
 <div id="messageArea">
-    @foreach (var item in Model.Songs)
-    {
-        var style = item.isInChat ? string.Empty : "color:red";
-        <h1 style="@style">@item.songRequestText</h1>
+    @{
+        Html.RenderPartial("Partials/List/Playlist", Model.Songs);
     }
 </div>
 
-@section scripts {
+<script>
 
-    <script src="~/lib/signalr-client/signalr-clientES5-1.0.0-alpha2-final.min.js"></script>
+    var transportType = signalR.TransportType.WebSockets;
+    var logger = new signalR.ConsoleLogger(signalR.LogLevel.Information);
+    var songListHub = new signalR.HttpConnection('http://' + document.location.host + '/SongList',
+        { transport: transportType, logger: logger });
+    var chatConnection = new signalR.HubConnection(songListHub, logger);
 
-    <script>
-
-        var transportType = signalR.TransportType.WebSockets;
-        var logger = new signalR.ConsoleLogger(signalR.LogLevel.Information);
-        var songListHub = new signalR.HttpConnection('http://' + document.location.host + '/SongList',
-            { transport: transportType, logger: logger });
-        var chatConnection = new signalR.HubConnection(songListHub, logger);
-
-        chatConnection.onClosed = e => {
-            console.log('connection closed');
-        };
-        chatConnection.on('Heartbeat',
-            () => {
-                console.log('ping');
-            });
-        // This needs to have the currentList populated correctly
-        chatConnection.on('SendAll',
-            (data) => {
-                $("#messageArea").empty();
-                var currentList = $("#messageArea").html();
-                for (var i = 0; i < data.length; i++) {
-                    var requestStyle = "";
-                    if (!!data[i].isUserInChat) {
-                        requestStyle = "color:red";
-                    }
-                    $("#messageArea").html(currentList +
-                        "<h1 style='" +
-                        requestStyle +
-                        "'>" +
-                        data[i].songRequestText +
-                        "</h1>");
-                    currentList = $("#messageArea").html();
+    chatConnection.onClosed = e => {
+        console.log('connection closed');
+    };
+    chatConnection.on('Heartbeat',
+        () => {
+            console.log('ping');
+        });
+    // This needs to have the currentList populated correctly
+    chatConnection.on('SendAll',
+        (data) => {
+            $("#messageArea").empty();
+            $("#messageArea").load('@Url.Action("RenderList", "Chatbot", new { data = "songdata" })'.replace('songdata', data));
+            /*
+            var currentList = $("#messageArea").html();
+            for (var i = 0; i < data.length; i++) {
+                var requestStyle = "";
+                if (!!data[i].isInChat) {
+                    requestStyle = "color:red";
                 }
+                $("#messageArea").html(currentList +
+                    "<h1 style='" +
+                    requestStyle +
+                    "'>" +
+                    data[i].songRequestText +
+                    "</h1>");
+                currentList = $("#messageArea").html();
+            }*/
 
-                console.log('received message');
-            });
-
-        chatConnection.start().catch(err => {
-            console.log('connection error');
+            console.log('received message');
         });
 
-    </script>
-}
-</body>
+    chatConnection.start().catch(err => {
+        console.log('connection error');
+    });
+
+</script>
