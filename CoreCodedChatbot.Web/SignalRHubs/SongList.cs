@@ -17,16 +17,6 @@ namespace CoreCodedChatbot.Web.SignalRHubs
             this.config = configHelper.GetConfig();
         }
 
-        public async Task Send(SongListHubModel data)
-        {
-            var psk = config.SignalRKey;
-
-            if (psk == data.psk)
-            {
-                await this.Clients.All.InvokeAsync("Send", new[] { data.requests });
-            }
-        }
-
         public async Task SendAll(SongListHubModel data)
         {
             var psk = config.SignalRKey;
