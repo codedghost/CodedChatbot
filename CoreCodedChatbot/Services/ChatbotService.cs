@@ -189,9 +189,6 @@ namespace CoreCodedChatbot.Services
             {
                 client.SendMessage(e.Channel, $"Looks like @{e.Channel} has gone offline, *yawn* powering down");
             }
-            //TODO: DELETE ME
-            ScheduleStreamTasks();
-            //
             UnScheduleStreamTasks();
         }
 
