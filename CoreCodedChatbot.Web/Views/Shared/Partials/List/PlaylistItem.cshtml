@@ -2,5 +2,6 @@
 
 @{
     var style = @Model.isInChat ? string.Empty : "color:red";
-    <h1 style="@style">@Model.songRequestText</h1>
+    
+    <h1 style="@style">@Model.songRequestText<span class="glyphicon glyphicon-remove"></span></h1>
 }

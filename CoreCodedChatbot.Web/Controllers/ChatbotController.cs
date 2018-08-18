@@ -45,16 +45,24 @@ namespace CoreCodedChatbot.Web.Controllers
 
             var playlistModel = new PlaylistBrowserSource
             {
-                Songs = playlistHelper.GetAllSongs(),
+                List = playlistHelper.GetAllSongs(),
                 TwitchUser = twitchUser
             };
 
             return View(playlistModel);
         }
 
-        public IActionResult RenderList(PlaylistItem[] data)
+        [HttpPost]
+        public IActionResult RenderList([FromBody]PlaylistItem[] data)
         {
-            return PartialView("Partials/List/Playlist", data);
+            try
+            {
+                return PartialView("Partials/List/Playlist", data);
+            }
+            catch (Exception e)
+            {
+                return Json(new {Success = false, Message = "Encountered an error"});
+            }
         }
     }
 }

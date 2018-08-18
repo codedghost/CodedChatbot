@@ -19,7 +19,7 @@
 }
 <div id="messageArea">
     @{
-        Html.RenderPartial("Partials/List/Playlist", Model.Songs);
+        Html.RenderPartial("Partials/List/Playlist", Model.List);
     }
 </div>
 
@@ -39,9 +39,18 @@
         });
     // This needs to have the currentList populated correctly
     chatConnection.on('SendAll',
-        (data) => {
+        (playlistItems) => {
             $("#messageArea").empty();
-            $("#messageArea").load('@Url.Action("RenderList", "Chatbot", new { data = "songdata" })'.replace('songdata', data));
+            var data = JSON.stringify( playlistItems );
+            $.ajax({
+                url: '@Url.Action("RenderList", "Chatbot")',
+                type: "POST",
+                data: data,
+                contentType: "application/json",
+                success: function(html) {
+                    $("#messageArea").html(html);
+                }
+            });
             /*
             var currentList = $("#messageArea").html();
             for (var i = 0; i < data.length; i++) {

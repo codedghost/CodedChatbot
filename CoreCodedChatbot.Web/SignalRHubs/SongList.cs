@@ -23,7 +23,8 @@ namespace CoreCodedChatbot.Web.SignalRHubs
 
             if (psk == data.psk)
             {
-                await this.Clients.All.SendCoreAsync("SendAll", data.requests);
+                var dataObj = data.requests;
+                await this.Clients.All.SendCoreAsync("SendAll", new object[] { dataObj });
             }
         }
 
