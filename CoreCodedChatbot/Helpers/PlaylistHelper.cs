@@ -111,47 +111,24 @@ namespace CoreCodedChatbot.Helpers
             return newSongIndex;
         }
 
-        private void UpdateObsPlaylist()
-        {
-            using (var file = File.Open(config.ObsPlaylistPath,
-                File.Exists(config.ObsPlaylistPath) ? FileMode.Truncate : FileMode.OpenOrCreate, FileAccess.Write))
-            {
-                if (file == null)
-                {
-                    return;
-                }
-                using (var sw = new StreamWriter(file))
-                {
-                    string textToWrite;
-
-                    using (var context = contextFactory.Create())
-                    {
-                        var requests = context.SongRequests
-                            .Where(sr => !sr.Played)
-                            .OrderRequests();
-
-                        textToWrite = string.Join('\n', requests.Take(5).Select(this.FormatRequest));
-                    }
-
-                    sw.Write(textToWrite);
-                }
-            }
-        }
-
         private async void UpdateFullPlaylist()
         {
             var psk = config.SignalRKey;
 
             var connection = new HubConnectionBuilder()
                 .WithUrl($"{config.WebPlaylistUrl}/SongList")
-                .WithConsoleLogger()
                 .Build();
 
             await connection.StartAsync();
 
             var requests = GetAllSongs();
 
-            await connection.InvokeAsync<SongListHubModel>("SendAll", new {psk, requests});
+            await connection.InvokeAsync<SongListHubModel>("SendAll",
+                new SongListHubModel
+                {
+                    psk = psk,
+                    requests = requests
+                });
 
             await connection.DisposeAsync();
         }
