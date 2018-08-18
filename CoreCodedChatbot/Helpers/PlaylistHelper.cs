@@ -10,7 +10,8 @@ using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Database.Context.Models;
 using CoreCodedChatbot.Extensions;
 using CoreCodedChatbot.Helpers.Interfaces;
-using CoreCodedChatbot.Models.Data;
+using CoreCodedChatbot.Library.Models.Data;
+using CoreCodedChatbot.Library.Models.SignalR;
 
 namespace CoreCodedChatbot.Helpers
 {
@@ -150,7 +151,7 @@ namespace CoreCodedChatbot.Helpers
 
             var requests = GetAllSongs();
 
-            await connection.InvokeAsync("SendAll", new {psk, requests});
+            await connection.InvokeAsync<SongListHubModel>("SendAll", new {psk, requests});
 
             await connection.DisposeAsync();
         }

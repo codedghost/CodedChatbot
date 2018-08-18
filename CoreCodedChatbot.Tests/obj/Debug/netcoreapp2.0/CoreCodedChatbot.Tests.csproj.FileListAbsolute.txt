@@ -38,3 +38,5 @@ C:\Code\CodedChatbot\CoreCodedChatbot.Tests\obj\Debug\netcoreapp2.0\CoreCodedCha
 C:\Code\CodedChatbot\CoreCodedChatbot.Tests\obj\Debug\netcoreapp2.0\CoreCodedChatbot.Tests.csproj.CopyComplete
 C:\Code\CodedChatbot\CoreCodedChatbot.Tests\obj\Debug\netcoreapp2.0\CoreCodedChatbot.Tests.dll
 C:\Code\CodedChatbot\CoreCodedChatbot.Tests\obj\Debug\netcoreapp2.0\CoreCodedChatbot.Tests.pdb
+C:\Code\CodedChatbot\CoreCodedChatbot.Tests\bin\Debug\netcoreapp2.0\CoreCodedChatbot.Library.dll
+C:\Code\CodedChatbot\CoreCodedChatbot.Tests\bin\Debug\netcoreapp2.0\CoreCodedChatbot.Library.pdb

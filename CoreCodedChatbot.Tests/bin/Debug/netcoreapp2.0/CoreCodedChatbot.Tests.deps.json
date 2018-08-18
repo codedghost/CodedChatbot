@@ -2271,6 +2271,7 @@
       "CoreCodedChatbot/1.0.0": {
         "dependencies": {
           "CoreCodedChatbot.Database": "1.0.0",
+          "CoreCodedChatbot.Library": "1.0.0",
           "Microsoft.AspNetCore.SignalR": "1.0.0-alpha2-final",
           "Microsoft.AspNetCore.SignalR.Client": "1.0.0-alpha2-final",
           "Microsoft.EntityFrameworkCore": "2.0.2",
@@ -2302,6 +2303,14 @@
         },
         "runtime": {
           "CoreCodedChatbot.Database.dll": {}
+        }
+      },
+      "CoreCodedChatbot.Library/1.0.0": {
+        "dependencies": {
+          "CoreCodedChatbot.Database": "1.0.0"
+        },
+        "runtime": {
+          "CoreCodedChatbot.Library.dll": {}
         }
       }
     }
@@ -2742,7 +2751,7 @@
     "Microsoft.Win32.Registry/4.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-q+eLtROUAQ3OxYA5mpQrgyFgzLQxIyrfT2eLpYX5IEPlHmIio2nh4F5bgOaQoGOV865kFKZZso9Oq9RlazvXtg==",
+      "sha512": "sha512-Sk+ewaxqgD/lyyKqsbqZozIaaRYTyA7ZU+aWQ0jw8RBpzfwu2n7wwzU6S8TpE14B2xS6DQz/mH3gbHoQcB6W7g==",
       "path": "microsoft.win32.registry/4.0.0",
       "hashPath": "microsoft.win32.registry.4.0.0.nupkg.sha512"
     },
@@ -3064,7 +3073,7 @@
     "System.Diagnostics.Contracts/4.0.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-HvQQjy712vnlpPxaloZYkuE78Gn353L0SJLJVeLcNASeg9c4qla2a1Xq8I7B3jZoDzKPtHTkyVO7AZ5tpeQGuA==",
+      "sha512": "sha512-1gSGCOD96tjIUYdWIabl6gGLuFkJdPbhchKJ8Pk4nrdMqmiJ7PsuCgIRPZCbwlZIj/N6TmJcIb3TdN6PhP9Tig==",
       "path": "system.diagnostics.contracts/4.0.1",
       "hashPath": "system.diagnostics.contracts.4.0.1.nupkg.sha512"
     },
@@ -3085,7 +3094,7 @@
     "System.Diagnostics.Process/4.1.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-mpVZ5bnlSs3tTeJ6jYyDJEIa6tavhAd88lxq1zbYhkkCu0Pno2+gHXcvZcoygq2d8JxW3gojXqNJMTAshduqZA==",
+      "sha512": "sha512-C+2PWqxnGrM2zcGshca4uP6qKh5yV5uEuHf8qo6piHjhjUrO8yRo+sDuizfoQJkB+jvceNjVb8Ygm9ilDFG3NA==",
       "path": "system.diagnostics.process/4.1.0",
       "hashPath": "system.diagnostics.process.4.1.0.nupkg.sha512"
     },
@@ -3309,7 +3318,7 @@
     "System.Reflection.Metadata/1.3.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-jMSCxA4LSyKBGRDm/WtfkO03FkcgRzHxwvQRib1bm2GZ8ifKM1MX1al6breGCEQK280mdl9uQS7JNPXRYk90jw==",
+      "sha512": "sha512-AV2eBsj2+pPzRnGQTykPSfcFuV+Sx/qjvx02UQFF6a+1+zJ0H4iYWGGhSD2k9JuAmXV4jA4i7pE4WYXto2Vquw==",
       "path": "system.reflection.metadata/1.3.0",
       "hashPath": "system.reflection.metadata.1.3.0.nupkg.sha512"
     },
@@ -3379,7 +3388,7 @@
     "System.Runtime.Loader/4.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-4UN78GOVU/mbDFcXkEWtetJT/sJ0yic2gGk1HSlSpWI0TDf421xnrZTDZnwNBapk1GQeYN7U1lTj/aQB1by6ow==",
+      "sha512": "sha512-tGh3/KXyUrVscFnWX9MtoX9BVdt1CB7gZjiyMsKi+LI/21x5uzywl118Bh78JCsgYqY9IbQqDXE3Uc/O6yUlRw==",
       "path": "system.runtime.loader/4.0.0",
       "hashPath": "system.runtime.loader.4.0.0.nupkg.sha512"
     },
@@ -3533,7 +3542,7 @@
     "System.Threading.Thread/4.0.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-gIdJqDXlOr5W9zeqFErLw3dsOsiShSCYtF9SEHitACycmvNvY8odf9kiKvp6V7aibc8C4HzzNBkWXjyfn7plbQ==",
+      "sha512": "sha512-LuGcne5CI3ji7vKF0vwF9vm8W9k+pXN4ItFunA+4ciF2DRnzkHdA045GfwuXCA04ZKOzgvn0Ab9H6W/apl1jFw==",
       "path": "system.threading.thread/4.0.0",
       "hashPath": "system.threading.thread.4.0.0.nupkg.sha512"
     },
@@ -3575,7 +3584,7 @@
     "System.Xml.XPath/4.0.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-UWd1H+1IJ9Wlq5nognZ/XJdyj8qPE4XufBUkAW59ijsCPjZkZe0MUzKKJFBr+ZWBe5Wq1u1d5f2CYgE93uH7DA==",
+      "sha512": "sha512-N+kkP27FN0MHAWiHz2dGbqRIZd6n1UzN9EP4BAaQYrqB3z2hdKRXiOJF5kt4SnJoL2Lgnu8CCi0W8aa6z1Zf7g==",
       "path": "system.xml.xpath/4.0.1",
       "hashPath": "system.xml.xpath.4.0.1.nupkg.sha512"
     },
@@ -3690,6 +3699,11 @@
       "sha512": ""
     },
     "CoreCodedChatbot.Database/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "CoreCodedChatbot.Library/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

@@ -1,4 +1,4 @@
-﻿namespace CoreCodedChatbot.Models.Data
+﻿namespace CoreCodedChatbot.Library.Models.Data
 {
     public class TokenJsonModel
     {

@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CoreCodedChatbot.Library\CoreCodedChatbot.Library.csproj" />
     <ProjectReference Include="..\CoreCodedChatbot\CoreCodedChatbot.csproj" />
     <ProjectReference Include="..\CoreCordedChatbot.Database\CoreCodedChatbot.Database.csproj" />
   </ItemGroup>
@@ -37,6 +38,10 @@
     <Content Update="config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\" />
   </ItemGroup>
 
 </Project>
