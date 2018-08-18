@@ -25,11 +25,10 @@
 
 <script>
 
-    var transportType = signalR.TransportType.WebSockets;
-    var logger = new signalR.ConsoleLogger(signalR.LogLevel.Information);
-    var songListHub = new signalR.HttpConnection('http://' + document.location.host + '/SongList',
-        { transport: transportType, logger: logger });
-    var chatConnection = new signalR.HubConnection(songListHub, logger);
+    var chatConnection = new signalR.HubConnectionBuilder()
+        .withUrl("/SongList")
+        .configureLogging(signalR.LogLevel.Information)
+        .build();
 
     chatConnection.onClosed = e => {
         console.log('connection closed');
@@ -61,7 +60,7 @@
 
             console.log('received message');
         });
-
+    
     chatConnection.start().catch(err => {
         console.log('connection error');
     });

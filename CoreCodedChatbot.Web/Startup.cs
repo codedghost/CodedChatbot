@@ -7,6 +7,8 @@ using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Helpers.Interfaces;
+using CoreCodedChatbot.Web.Interfaces;
+using CoreCodedChatbot.Web.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -22,14 +24,6 @@ namespace CoreCodedChatbot.Web
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
-        private Timer signalRHeartbeat;
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
@@ -50,12 +44,13 @@ namespace CoreCodedChatbot.Web
                     options.CallbackPath = PathString.FromUriComponent(config.TwitchWebAppCallbackPath);
                 });
 
-            services.AddSignalR();
             services.AddMvc();
+            services.AddSignalR();
 
             services.AddSingleton<IChatbotContextFactory, ChatbotContextFactory>();
             services.AddSingleton<IConfigHelper, ConfigHelper>();
             services.AddSingleton<PlaylistHelper>();
+            services.AddSingleton(typeof(SignalRHeartbeatService), typeof(SignalRHeartbeatService));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -75,17 +70,12 @@ namespace CoreCodedChatbot.Web
 
             app.UseSignalR(routes =>
             {
-                routes.MapHub<SongList>("SongList");
+                routes.MapHub<SongList>("/SongList");
             });
 
-            app.UseAuthentication();
+            var heartbeatService = serviceProvider.GetService<SignalRHeartbeatService>();
 
-            signalRHeartbeat =
-                new Timer(
-                    async (x) =>
-                    {
-                        await serviceProvider.GetService<IHubContext<SongList>>().Clients.All.InvokeAsync("Heartbeat");
-                    }, null, TimeSpan.Zero, TimeSpan.FromSeconds(20));
+            app.UseAuthentication();
 
             app.UseMvc(routes =>
             {
