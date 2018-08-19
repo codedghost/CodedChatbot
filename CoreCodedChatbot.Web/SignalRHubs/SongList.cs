@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using CoreCodedChatbot.Helpers.Interfaces;
-using CoreCodedChatbot.Models.Data;
-using CoreCodedChatbot.Web.Models;
+using CoreCodedChatbot.Library.Models.Data;
+using CoreCodedChatbot.Library.Models.SignalR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
@@ -17,23 +17,14 @@ namespace CoreCodedChatbot.Web.SignalRHubs
             this.config = configHelper.GetConfig();
         }
 
-        public async Task Send(SongListHubModel data)
-        {
-            var psk = config.SignalRKey;
-
-            if (psk == data.psk)
-            {
-                await this.Clients.All.InvokeAsync("Send", new[] { data.requests });
-            }
-        }
-
         public async Task SendAll(SongListHubModel data)
         {
             var psk = config.SignalRKey;
 
             if (psk == data.psk)
             {
-                await this.Clients.All.InvokeAsync("SendAll", new[] {data.requests});
+                var dataObj = data.requests;
+                await this.Clients.All.SendCoreAsync("SendAll", new object[] { dataObj });
             }
         }
 

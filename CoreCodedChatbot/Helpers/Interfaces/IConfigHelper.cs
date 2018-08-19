@@ -1,4 +1,4 @@
-﻿using CoreCodedChatbot.Models.Data;
+﻿using CoreCodedChatbot.Library.Models.Data;
 
 namespace CoreCodedChatbot.Helpers.Interfaces
 {

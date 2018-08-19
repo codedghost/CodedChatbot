@@ -10,7 +10,8 @@ using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Database.Context.Models;
 using CoreCodedChatbot.Extensions;
 using CoreCodedChatbot.Helpers.Interfaces;
-using CoreCodedChatbot.Models.Data;
+using CoreCodedChatbot.Library.Models.Data;
+using CoreCodedChatbot.Library.Models.SignalR;
 
 namespace CoreCodedChatbot.Helpers
 {
@@ -23,12 +24,35 @@ namespace CoreCodedChatbot.Helpers
 
         private string FormatRequest(SongRequest sr, int index) => $"{index + 1}{this.PrefixVip(sr)} - {sr.RequestText} - {sr.RequestUsername}";
 
+        private string FormatRequestNoIndex(SongRequest sr) =>
+            $"{PrefixVip(sr)} - {sr.RequestText} - {sr.RequestUsername}";
+
         private string PrefixVip(SongRequest request) => request.VipRequestTime.HasValue ? " (VIP)" : string.Empty;
 
         public PlaylistHelper(IChatbotContextFactory contextFactory, IConfigHelper configHelper)
         {
             this.contextFactory = contextFactory;
             this.config = configHelper.GetConfig();
+        }
+
+        public PlaylistItem GetRequestById(int songId)
+        {
+            using (var context = contextFactory.Create())
+            {
+                var request = context.SongRequests.Find(songId);
+                return new PlaylistItem
+                {
+                    songRequestId = request.SongRequestId,
+                    songRequestText = FormatRequestNoIndex(request),
+                    isInChat = (context.Users.SingleOrDefault(u => u.Username == request.RequestUsername)
+                                    ?.TimeLastInChat ?? DateTime.MinValue)
+                               .ToUniversalTime()
+                               .AddMinutes(2) >= DateTime.UtcNow ||
+                               (request.VipRequestTime ?? DateTime.MinValue).ToUniversalTime().AddMinutes(2) >=
+                               DateTime.UtcNow ||
+                               request.RequestTime.ToUniversalTime().AddMinutes(5) >= DateTime.UtcNow
+                };
+            }
         }
 
         public (AddRequestResult, int) AddRequest(string username, string commandText, bool vipRequest = false)
@@ -110,65 +134,24 @@ namespace CoreCodedChatbot.Helpers
             return newSongIndex;
         }
 
-        private void UpdateObsPlaylist()
-        {
-            using (var file = File.Open(config.ObsPlaylistPath,
-                File.Exists(config.ObsPlaylistPath) ? FileMode.Truncate : FileMode.OpenOrCreate, FileAccess.Write))
-            {
-                if (file == null)
-                {
-                    return;
-                }
-                using (var sw = new StreamWriter(file))
-                {
-                    string textToWrite;
-
-                    using (var context = contextFactory.Create())
-                    {
-                        var requests = context.SongRequests
-                            .Where(sr => !sr.Played)
-                            .OrderRequests();
-
-                        textToWrite = string.Join('\n', requests.Take(5).Select(this.FormatRequest));
-                    }
-
-                    sw.Write(textToWrite);
-                }
-            }
-        }
-
-        private async void UpdateWebPlaylist()
-        {
-            var psk = config.SignalRKey;
-
-            var connection = new HubConnectionBuilder()
-                .WithUrl($"{config.WebPlaylistUrl}/SongList")
-                .WithConsoleLogger()
-                .Build();
-
-            await connection.StartAsync();
-
-            var requests = GetTopSongs();
-
-            await connection.InvokeAsync("Send", new {psk, requests});
-
-            await connection.DisposeAsync();
-        }
-
         private async void UpdateFullPlaylist()
         {
             var psk = config.SignalRKey;
 
             var connection = new HubConnectionBuilder()
                 .WithUrl($"{config.WebPlaylistUrl}/SongList")
-                .WithConsoleLogger()
                 .Build();
 
             await connection.StartAsync();
 
             var requests = GetAllSongs();
 
-            await connection.InvokeAsync("SendAll", new {psk, requests});
+            await connection.InvokeAsync<SongListHubModel>("SendAll",
+                new SongListHubModel
+                {
+                    psk = psk,
+                    requests = requests
+                });
 
             await connection.DisposeAsync();
         }
@@ -219,28 +202,6 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        public PlaylistItem[] GetTopSongs()
-        {
-            using (var context = contextFactory.Create())
-            {
-                var requests = context.SongRequests.Where(sr => !sr.Played)
-                    .OrderRequests()
-                    .Take(5)
-                    .ToList()
-                    .Select((sr, index) =>
-                    {
-                        return new PlaylistItem
-                        {
-                            songRequestText = FormatRequest(sr, index),
-                            isInChat = (context.Users.SingleOrDefault(u => u.Username == sr.RequestUsername)?.TimeLastInChat ?? DateTime.MinValue).AddMinutes(2) >= DateTime.UtcNow
-                        };
-                    }).ToArray();
-
-
-                return requests;
-            }
-        }
-
         public PlaylistItem[] GetAllSongs()
         {
             using (var context = contextFactory.Create())
@@ -251,11 +212,12 @@ namespace CoreCodedChatbot.Helpers
                     {
                         return new PlaylistItem
                         {
+                            songRequestId = sr.SongRequestId,
                             songRequestText = FormatRequest(sr, index),
                             isInChat = (context.Users.SingleOrDefault(u => u.Username == sr.RequestUsername)?.TimeLastInChat ?? DateTime.MinValue)
                                        .ToUniversalTime()
                                        .AddMinutes(2) >= DateTime.UtcNow ||
-                                       (sr.VipRequestTime ?? DateTime.MinValue).ToUniversalTime().AddMinutes(5) >= DateTime.UtcNow ||
+                                       (sr.VipRequestTime ?? DateTime.MinValue).ToUniversalTime().AddMinutes(2) >= DateTime.UtcNow ||
                                        sr.RequestTime.ToUniversalTime().AddMinutes(5) >= DateTime.UtcNow
                         };
                     })
@@ -478,9 +440,27 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
+        public bool ArchiveRequestById(int songId)
+        {
+            using (var context = contextFactory.Create())
+            {
+                var request = context.SongRequests.Find(songId);
+
+                if (request == null) return false;
+
+                request.Played = true;
+                context.SaveChanges();
+                
+                UpdatePlaylists();
+
+                return true;
+            }
+
+        }
+
         public string GetEstimatedTime(ChatViewersModel chattersModel)
         {
-            using (var context = new ChatbotContext())
+            using (var context = contextFactory.Create())
             {
                 try
                 {
@@ -508,7 +488,6 @@ namespace CoreCodedChatbot.Helpers
 
         private void UpdatePlaylists()
         {
-            UpdateWebPlaylist();
             UpdateFullPlaylist();
             //UpdateObsPlaylist();
         }

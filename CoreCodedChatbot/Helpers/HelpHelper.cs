@@ -4,7 +4,7 @@ using System.Reflection;
 
 using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Models.Data;
+using CoreCodedChatbot.Library.Models.Data;
 
 using TwitchLib.Client;
 

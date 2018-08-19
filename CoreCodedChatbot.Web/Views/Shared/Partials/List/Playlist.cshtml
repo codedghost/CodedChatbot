@@ -1,0 +1,7 @@
+﻿@model CoreCodedChatbot.Library.Models.Data.PlaylistItem[]
+
+
+@foreach (var item in Model)
+{
+    Html.RenderPartial("Partials/List/PlaylistItem", @item);
+}

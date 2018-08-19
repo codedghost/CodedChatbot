@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CoreCodedChatbot.Models.Data;
+using CoreCodedChatbot.Library.Models.Data;
 
-namespace CoreCodedChatbot.Web.Models
+namespace CoreCodedChatbot.Library.Models.SignalR
 {
     public class SongListHubModel
     {

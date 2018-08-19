@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Helpers.Interfaces;
-using CoreCodedChatbot.Models.Data;
+using CoreCodedChatbot.Library.Models.Data;
 using Microsoft.EntityFrameworkCore.Internal;
 using TwitchLib.Client.Events;
 using TwitchLib.PubSub.Events;

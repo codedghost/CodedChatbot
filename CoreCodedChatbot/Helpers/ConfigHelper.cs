@@ -1,7 +1,7 @@
 ﻿using System.IO;
 
 using CoreCodedChatbot.Helpers.Interfaces;
-using CoreCodedChatbot.Models.Data;
+using CoreCodedChatbot.Library.Models.Data;
 using Newtonsoft.Json;
 
 namespace CoreCodedChatbot.Helpers

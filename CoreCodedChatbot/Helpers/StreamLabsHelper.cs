@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Text;
 using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Database.Context.Models;
-using CoreCodedChatbot.Models.Data;
+using CoreCodedChatbot.Library.Models.Data;
 using Newtonsoft.Json;
 
 namespace CoreCodedChatbot.Helpers
