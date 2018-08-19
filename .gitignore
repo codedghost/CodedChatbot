@@ -29,4 +29,4 @@
 /CoreCodedChatbot.Web/wwwroot/lib/
 /CoreCodedChatbot.Discord/config.json
 /CoreCodedChatbot.Library/obj/
-/CoreCodedChatbot.Library/bin/
+/CoreCodedChatbot.Library/bin/CoreCodedChatbot.Tests/bin
