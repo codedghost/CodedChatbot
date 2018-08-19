@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="~/css/StreamList.css" />
 }
 
+<div id="modalContainer"></div>
+
 @if (User.Identity.IsAuthenticated)
 {
     <h3>Welcome @Model.TwitchUser.Username!</h3>
@@ -37,7 +39,7 @@
         () => {
             console.log('ping');
         });
-    // This needs to have the currentList populated correctly
+
     chatConnection.on('SendAll',
         (playlistItems) => {
             $("#messageArea").empty();
@@ -51,27 +53,27 @@
                     $("#messageArea").html(html);
                 }
             });
-            /*
-            var currentList = $("#messageArea").html();
-            for (var i = 0; i < data.length; i++) {
-                var requestStyle = "";
-                if (!!data[i].isInChat) {
-                    requestStyle = "color:red";
-                }
-                $("#messageArea").html(currentList +
-                    "<h1 style='" +
-                    requestStyle +
-                    "'>" +
-                    data[i].songRequestText +
-                    "</h1>");
-                currentList = $("#messageArea").html();
-            }*/
 
             console.log('received message');
         });
-    
+
     chatConnection.start().catch(err => {
         console.log('connection error');
     });
+
+    function showDeleteModal(context) {
+        $("#modalContainer").empty();
+        var songId = JSON.stringify(event.target.id);
+        $.ajax({
+            url: '@Url.Action("RenderModal", "Chatbot")',
+            type: "POST",
+            data: songId,
+            contentType: "application/json",
+            success: function(html) {
+                $("#modalContainer").html(html);
+                $("#deleteModal").modal('show');
+            }
+        });
+    }
 
 </script>

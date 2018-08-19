@@ -1,7 +1,12 @@
 ﻿@model CoreCodedChatbot.Library.Models.Data.PlaylistItem
 
+
 @{
     var style = @Model.isInChat ? string.Empty : "color:red";
-    
-    <h1 style="@style">@Model.songRequestText<span class="glyphicon glyphicon-remove"></span></h1>
+    <h1 style="@style">@Model.songRequestText 
+        @if (ViewContext.ViewBag.UserIsMod)
+        {
+            <i id="@Model.songRequestId" class="fas fa-times delete" onclick="showDeleteModal()"></i>
+        }
+        </h1>
 }

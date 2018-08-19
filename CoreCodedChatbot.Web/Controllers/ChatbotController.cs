@@ -8,6 +8,9 @@ using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Library.Models.View;
+using CoreCodedChatbot.Web.Interfaces;
+using CoreCodedChatbot.Web.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using TwitchLib.Api;
@@ -17,12 +20,14 @@ namespace CoreCodedChatbot.Web.Controllers
     public class ChatbotController : Controller
     {
         private readonly PlaylistHelper playlistHelper;
-        private readonly ConfigModel config;
 
-        public ChatbotController(PlaylistHelper playlistHelper, IConfigHelper configHelper)
+        private readonly IChatterService chatterService;
+
+        public ChatbotController(PlaylistHelper playlistHelper, IChatterService chatterService)
         {
             this.playlistHelper = playlistHelper;
-            this.config = configHelper.GetConfig();
+
+            this.chatterService = chatterService;
         }
 
         public ActionResult Index()
@@ -30,12 +35,9 @@ namespace CoreCodedChatbot.Web.Controllers
             return View();
         }
 
-        public async Task<IActionResult> List()
+        public IActionResult List()
         {
-            var httpClient = new HttpClient();
-            var currentChattersJson = await httpClient.GetStringAsync($"https://tmi.twitch.tv/group/user/{config.StreamerChannel}/chatters");
-            // process json into username list.
-            var chattersModel = JsonConvert.DeserializeObject<ChatViewersModel>(currentChattersJson);
+            var chattersModel = chatterService.GetCurrentChatters();
 
             var twitchUser = User.Identity.IsAuthenticated ? new LoggedInTwitchUser
             {
@@ -49,6 +51,9 @@ namespace CoreCodedChatbot.Web.Controllers
                 TwitchUser = twitchUser
             };
 
+
+            ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
+
             return View(playlistModel);
         }
 
@@ -57,12 +62,54 @@ namespace CoreCodedChatbot.Web.Controllers
         {
             try
             {
+                var chattersModel = chatterService.GetCurrentChatters();
+
+                var twitchUser = User.Identity.IsAuthenticated ? new LoggedInTwitchUser
+                {
+                    Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)?.Value,
+                    IsMod = chattersModel.chatters.moderators.Any(mod => string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase))
+                } : null;
+
+                ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
                 return PartialView("Partials/List/Playlist", data);
             }
             catch (Exception e)
             {
                 return Json(new {Success = false, Message = "Encountered an error"});
             }
+        }
+
+        [HttpPost]
+        public IActionResult RenderModal([FromBody] int songId)
+        {
+            var requestToDelete = playlistHelper.GetRequestById(songId);
+
+            try
+            {
+                return PartialView("Partials/List/DeleteModal", requestToDelete);
+            }
+            catch (Exception e)
+            {
+                return Json(new {Success = false, Message = "Encountered an error"});
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RemoveSong([FromBody] int songId)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var chattersModel = chatterService.GetCurrentChatters();
+
+                if (chattersModel.chatters.moderators.Any(mod =>
+                    string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)))
+                {
+                    if (playlistHelper.ArchiveRequestById(songId))
+                        return Ok();
+                }
+            }
+
+            return Json(new {Success = false, Message = "Encountered an error, or you are not a moderator" });
         }
     }
 }

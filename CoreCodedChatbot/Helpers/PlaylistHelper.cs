@@ -24,12 +24,35 @@ namespace CoreCodedChatbot.Helpers
 
         private string FormatRequest(SongRequest sr, int index) => $"{index + 1}{this.PrefixVip(sr)} - {sr.RequestText} - {sr.RequestUsername}";
 
+        private string FormatRequestNoIndex(SongRequest sr) =>
+            $"{PrefixVip(sr)} - {sr.RequestText} - {sr.RequestUsername}";
+
         private string PrefixVip(SongRequest request) => request.VipRequestTime.HasValue ? " (VIP)" : string.Empty;
 
         public PlaylistHelper(IChatbotContextFactory contextFactory, IConfigHelper configHelper)
         {
             this.contextFactory = contextFactory;
             this.config = configHelper.GetConfig();
+        }
+
+        public PlaylistItem GetRequestById(int songId)
+        {
+            using (var context = contextFactory.Create())
+            {
+                var request = context.SongRequests.Find(songId);
+                return new PlaylistItem
+                {
+                    songRequestId = request.SongRequestId,
+                    songRequestText = FormatRequestNoIndex(request),
+                    isInChat = (context.Users.SingleOrDefault(u => u.Username == request.RequestUsername)
+                                    ?.TimeLastInChat ?? DateTime.MinValue)
+                               .ToUniversalTime()
+                               .AddMinutes(2) >= DateTime.UtcNow ||
+                               (request.VipRequestTime ?? DateTime.MinValue).ToUniversalTime().AddMinutes(2) >=
+                               DateTime.UtcNow ||
+                               request.RequestTime.ToUniversalTime().AddMinutes(5) >= DateTime.UtcNow
+                };
+            }
         }
 
         public (AddRequestResult, int) AddRequest(string username, string commandText, bool vipRequest = false)
@@ -189,11 +212,12 @@ namespace CoreCodedChatbot.Helpers
                     {
                         return new PlaylistItem
                         {
+                            songRequestId = sr.SongRequestId,
                             songRequestText = FormatRequest(sr, index),
                             isInChat = (context.Users.SingleOrDefault(u => u.Username == sr.RequestUsername)?.TimeLastInChat ?? DateTime.MinValue)
                                        .ToUniversalTime()
                                        .AddMinutes(2) >= DateTime.UtcNow ||
-                                       (sr.VipRequestTime ?? DateTime.MinValue).ToUniversalTime().AddMinutes(5) >= DateTime.UtcNow ||
+                                       (sr.VipRequestTime ?? DateTime.MinValue).ToUniversalTime().AddMinutes(2) >= DateTime.UtcNow ||
                                        sr.RequestTime.ToUniversalTime().AddMinutes(5) >= DateTime.UtcNow
                         };
                     })
@@ -416,9 +440,27 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
+        public bool ArchiveRequestById(int songId)
+        {
+            using (var context = contextFactory.Create())
+            {
+                var request = context.SongRequests.Find(songId);
+
+                if (request == null) return false;
+
+                request.Played = true;
+                context.SaveChanges();
+                
+                UpdatePlaylists();
+
+                return true;
+            }
+
+        }
+
         public string GetEstimatedTime(ChatViewersModel chattersModel)
         {
-            using (var context = new ChatbotContext())
+            using (var context = contextFactory.Create())
             {
                 try
                 {
