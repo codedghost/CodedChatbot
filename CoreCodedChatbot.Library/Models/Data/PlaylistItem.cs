@@ -8,6 +8,7 @@ namespace CoreCodedChatbot.Library.Models.Data
 {
     public class PlaylistItem
     {
+        public int songRequestId { get; set; }
         public string songRequestText { get; set; }
         public bool isInChat { get; set; }
     }

@@ -178,3 +178,8 @@ h1 {
     -webkit-animation: bounce-bottom 0.9s both;
     animation: bounce-bottom 0.9s both;
 }
+
+.delete {
+    color: red;
+    float: right;
+}

@@ -51,6 +51,7 @@ namespace CoreCodedChatbot.Web
             services.AddSingleton<IConfigHelper, ConfigHelper>();
             services.AddSingleton<PlaylistHelper>();
             services.AddSingleton(typeof(SignalRHeartbeatService), typeof(SignalRHeartbeatService));
+            services.AddSingleton<IChatterService, ChatterService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -74,6 +75,7 @@ namespace CoreCodedChatbot.Web
             });
 
             var heartbeatService = serviceProvider.GetService<SignalRHeartbeatService>();
+            var chatterService = serviceProvider.GetService<IChatterService>();
 
             app.UseAuthentication();
 
