@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using CoreCodedChatbot.Database.Context.Interfaces;
-using CoreCodedChatbot.Models.Data;
+using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Database.Context.Models;
 using CoreCodedChatbot.Helpers.Interfaces;
 using TwitchLib.Api.Models.v5.Subscriptions;

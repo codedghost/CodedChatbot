@@ -1,0 +1,14 @@
+﻿@model CoreCodedChatbot.Library.Models.View.PlaylistBrowserSource
+
+
+<div id="vipQueue" class="vipQueue">
+    @{
+        Html.RenderPartial("Partials/List/VipList", Model.VipList);
+    }
+</div>
+
+<div id="regularQueue" class="regularQueue">
+    @{
+        Html.RenderPartial("Partials/List/RegularList", Model.RegularList);
+    }
+</div>

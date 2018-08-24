@@ -2,7 +2,10 @@
 using CoreCodedChatbot.Database.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore.Storage.Internal;
 using System;
 
 namespace CoreCodedChatbot.Database.Migrations
@@ -97,6 +100,9 @@ namespace CoreCodedChatbot.Database.Migrations
 
                     b.Property<int>("SubVipRequests")
                         .HasColumnName("SubVipRequests");
+
+                    b.Property<DateTime>("TimeLastInChat")
+                        .HasColumnName("TimeLastInChat");
 
                     b.Property<int>("TokenBytes");
 

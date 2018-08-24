@@ -1,33 +1,36 @@
-﻿@model CoreCodedChatbot.Web.Models.PlaylistBrowserSource
+﻿@model CoreCodedChatbot.Library.Models.View.PlaylistBrowserSource
 
 @{
     ViewBag.Title = "Current Playlist";
     Layout = "_Layout";
 }
 
-<!DOCTYPE html>
-
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Index</title>
+@section Styles {
     <link rel="stylesheet" href="~/css/StreamList.css" />
-    <script src="~/lib/signalr-client/signalr-clientES5-1.0.0-alpha2-final.min.js"></script>
-    <script src="~/lib/jquery/dist/jquery.js"></script>
-</head>
-<body>
-<div id="messageArea">
-    @foreach (var item in Model.Songs)
+}
+
+<div id="modalContainer"></div>
+
+@if (User.Identity.IsAuthenticated)
+{
+    <h3>Welcome @Model.TwitchUser.Username!</h3>
+    if (Model.TwitchUser.IsMod)
     {
-        <h1>@item</h1>
+        <h4>Looks like you're a mod! You'll have some features coming soon :D</h4>
+    }
+}
+<div class="queueWrapper">
+    @{
+        Html.RenderPartial("Partials/List/Playlist", Model);
     }
 </div>
+
 <script>
 
-    var transportType = signalR.TransportType.WebSockets;
-    var logger = new signalR.ConsoleLogger(signalR.LogLevel.Information);
-    var songListHub = new signalR.HttpConnection('http://' + document.location.host + '/SongList', { transport: transportType, logger: logger });
-    var chatConnection = new signalR.HubConnection(songListHub, logger);
+    var chatConnection = new signalR.HubConnectionBuilder()
+        .withUrl("/SongList")
+        .configureLogging(signalR.LogLevel.Information)
+        .build();
 
     chatConnection.onClosed = e => {
         console.log('connection closed');
@@ -36,23 +39,53 @@
         () => {
             console.log('ping');
         });
-    // This needs to have the currentList populated correctly
-    chatConnection.on('SendAll', (data) => {
-        $("#messageArea").empty();
-        var currentList = $("#messageArea").html();
-        for (var i = 0; i < data.length; i++) {
-            $("#messageArea").html(currentList + "<h1>" + data[i] + "</h1>");
-            currentList = $("#messageArea").html();
-        }
 
-        console.log('received message');
-    });
+    chatConnection.on('SendAll',
+        (regularList, vipList) => {
+            $("#regularQueue").empty();
+            var data = JSON.stringify( regularList );
+            $.ajax({
+                url: '@Url.Action("RenderRegularList", "Chatbot")',
+                type: "POST",
+                data: data,
+                contentType: "application/json",
+                success: function(html) {
+                    $("#regularQueue").html(html);
+                }
+            });
+
+            $("#vipQueue").empty();
+            data = JSON.stringify(vipList);
+            $.ajax({
+                url: '@Url.Action("RenderVipList", "Chatbot")',
+                type: "POST",
+                data: data,
+                contentType: "application/json",
+                success: function(html) {
+                    $("#vipQueue").html(html);
+                }
+            });
+
+            console.log('received message');
+        });
 
     chatConnection.start().catch(err => {
         console.log('connection error');
     });
 
-</script>
-</body>
+    function showDeleteModal(context) {
+        $("#modalContainer").empty();
+        var songId = JSON.stringify(event.target.id);
+        $.ajax({
+            url: '@Url.Action("RenderModal", "Chatbot")',
+            type: "POST",
+            data: songId,
+            contentType: "application/json",
+            success: function(html) {
+                $("#modalContainer").html(html);
+                $("#deleteModal").modal('show');
+            }
+        });
+    }
 
-</html>
+</script>
