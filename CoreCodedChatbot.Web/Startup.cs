@@ -41,7 +41,7 @@ namespace CoreCodedChatbot.Web
                     options.ClientId = config.TwitchWebAppClientId;
                     options.ClientSecret = config.TwitchWebAppClientSecret;
                     options.Scope.Add(config.TwitchWebAppScopes);
-                    options.CallbackPath = PathString.FromUriComponent($"{config.WebsiteLink}{config.TwitchWebAppCallbackPath}");
+                    options.CallbackPath = PathString.FromUriComponent(config.TwitchWebAppCallbackPath);
                 });
 
             services.AddMvc();
