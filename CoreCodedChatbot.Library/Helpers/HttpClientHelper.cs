@@ -18,7 +18,5 @@ namespace CoreCodedChatbot.Library.Helpers
 
             return byteContent;
         }
-
-        public static Task<T> DeSerializeJsonResponse(T )
     }
 }

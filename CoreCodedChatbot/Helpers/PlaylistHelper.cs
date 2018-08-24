@@ -151,7 +151,8 @@ namespace CoreCodedChatbot.Helpers
                 new SongListHubModel
                 {
                     psk = psk,
-                    requests = requests
+                    regularRequests = requests.RegularList,
+                    vipRequests = requests.VipList
                 });
 
             await connection.DisposeAsync();
