@@ -5,7 +5,7 @@ using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Library.Models.Data;
-
+using Newtonsoft.Json;
 using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
