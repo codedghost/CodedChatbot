@@ -1,0 +1,17 @@
+﻿@model CoreCodedChatbot.Library.Models.Data.PlaylistItem
+
+
+@{
+    <div class="request odd">
+        <div class="requestData">
+            <b class="vipText">Request:</b> @Model.songRequestText
+        </div>
+        <div class="requestBadges">
+            <br />
+            @{
+                var badges = ViewContext.ViewBag.UserIsMod ? "moderatorBadge" : "";
+                <span id="@Model.songRequestId" class="requestBadge @badges" onclick="showDeleteModal()"></span>
+            }
+        </div>
+    </div>
+}
