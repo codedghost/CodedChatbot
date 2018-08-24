@@ -1,0 +1,10 @@
+﻿@model CoreCodedChatbot.Library.Models.Data.PlaylistItem[]
+
+<div class="request even">
+    <div class="requestHeader"><b class="vipText">VIP</b><b> Song Requests</b></div>
+</div>
+
+@for (var i = 0; i < Model.Length; i++)
+{
+    Html.RenderPartial(i % 2 == 0 ? "Partials/List/OddVipPlaylistItem" : "Partials/List/EvenVipPlaylistItem", Model[i]);
+}

@@ -19,9 +19,9 @@
         <h4>Looks like you're a mod! You'll have some features coming soon :D</h4>
     }
 }
-<div id="messageArea">
+<div class="queueWrapper">
     @{
-        Html.RenderPartial("Partials/List/Playlist", Model.List);
+        Html.RenderPartial("Partials/List/Playlist", Model);
     }
 </div>
 
@@ -41,16 +41,28 @@
         });
 
     chatConnection.on('SendAll',
-        (playlistItems) => {
-            $("#messageArea").empty();
-            var data = JSON.stringify( playlistItems );
+        (regularList, vipList) => {
+            $("#regularQueue").empty();
+            var data = JSON.stringify( regularList );
             $.ajax({
-                url: '@Url.Action("RenderList", "Chatbot")',
+                url: '@Url.Action("RenderRegularList", "Chatbot")',
                 type: "POST",
                 data: data,
                 contentType: "application/json",
                 success: function(html) {
-                    $("#messageArea").html(html);
+                    $("#regularQueue").html(html);
+                }
+            });
+
+            $("#vipQueue").empty();
+            data = JSON.stringify(vipList);
+            $.ajax({
+                url: '@Url.Action("RenderVipList", "Chatbot")',
+                type: "POST",
+                data: data,
+                contentType: "application/json",
+                success: function(html) {
+                    $("#vipQueue").html(html);
                 }
             });
 

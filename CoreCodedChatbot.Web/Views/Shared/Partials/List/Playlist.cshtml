@@ -1,7 +1,14 @@
-﻿@model CoreCodedChatbot.Library.Models.Data.PlaylistItem[]
+﻿@model CoreCodedChatbot.Library.Models.View.PlaylistBrowserSource
 
 
-@foreach (var item in Model)
-{
-    Html.RenderPartial("Partials/List/PlaylistItem", @item);
-}
+<div id="vipQueue" class="vipQueue">
+    @{
+        Html.RenderPartial("Partials/List/VipList", Model.VipList);
+    }
+</div>
+
+<div id="regularQueue" class="regularQueue">
+    @{
+        Html.RenderPartial("Partials/List/RegularList", Model.RegularList);
+    }
+</div>
