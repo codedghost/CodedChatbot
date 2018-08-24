@@ -12,6 +12,7 @@ using CoreCodedChatbot.Extensions;
 using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Library.Models.SignalR;
+using CoreCodedChatbot.Library.Models.View;
 
 namespace CoreCodedChatbot.Helpers
 {
@@ -150,7 +151,8 @@ namespace CoreCodedChatbot.Helpers
                 new SongListHubModel
                 {
                     psk = psk,
-                    requests = requests
+                    regularRequests = requests.RegularList,
+                    vipRequests = requests.VipList
                 });
 
             await connection.DisposeAsync();
@@ -202,11 +204,12 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        public PlaylistItem[] GetAllSongs()
+
+        public PlaylistBrowserSource GetAllSongs(LoggedInTwitchUser twitchUser = null)
         {
             using (var context = contextFactory.Create())
             {
-                var requests = context.SongRequests.Where(sr => !sr.Played)
+                var vipRequests = context.SongRequests.Where(sr => !sr.Played && sr.VipRequestTime != null)
                     .OrderRequests()
                     .Select((sr, index) =>
                     {
@@ -217,12 +220,33 @@ namespace CoreCodedChatbot.Helpers
                             isInChat = (context.Users.SingleOrDefault(u => u.Username == sr.RequestUsername)?.TimeLastInChat ?? DateTime.MinValue)
                                        .ToUniversalTime()
                                        .AddMinutes(2) >= DateTime.UtcNow ||
-                                       (sr.VipRequestTime ?? DateTime.MinValue).ToUniversalTime().AddMinutes(2) >= DateTime.UtcNow ||
-                                       sr.RequestTime.ToUniversalTime().AddMinutes(5) >= DateTime.UtcNow
+                                       (sr.VipRequestTime ?? DateTime.MinValue).ToUniversalTime().AddMinutes(5) >= DateTime.UtcNow
                         };
                     })
                     .ToArray();
-                return requests;
+
+                var regularRequests = context.SongRequests.Where(sr => !sr.Played && sr.VipRequestTime == null)
+                    .OrderRequests()
+                    .Select((sr, index) =>
+                    {
+                        return new PlaylistItem
+                        {
+                            songRequestId = sr.SongRequestId,
+                            songRequestText = FormatRequest(sr, index),
+                            isInChat = (context.Users.SingleOrDefault(u => u.Username == sr.RequestUsername)
+                                            ?.TimeLastInChat ?? DateTime.MinValue)
+                                       .ToUniversalTime()
+                                       .AddMinutes(2) >= DateTime.UtcNow ||
+                                       sr.RequestTime.ToUniversalTime().AddMinutes(5) >= DateTime.UtcNow
+                        };
+                    }).ToArray();
+
+                return new PlaylistBrowserSource
+                {
+                    RegularList = regularRequests,
+                    VipList = vipRequests,
+                    TwitchUser = twitchUser
+                };
             }
         }
 
