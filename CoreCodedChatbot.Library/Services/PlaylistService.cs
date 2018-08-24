@@ -1,22 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.IO;
-
-using Microsoft.AspNetCore.SignalR.Client;
-
-using CoreCodedChatbot.Database.Context;
+using System.Text;
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Database.Context.Models;
-using CoreCodedChatbot.Extensions;
-using CoreCodedChatbot.Helpers.Interfaces;
+using CoreCodedChatbot.Library.Extensions;
+using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
+using CoreCodedChatbot.Library.Models.Enums;
 using CoreCodedChatbot.Library.Models.SignalR;
 using CoreCodedChatbot.Library.Models.View;
+using Microsoft.AspNetCore.SignalR.Client;
 
-namespace CoreCodedChatbot.Helpers
+namespace CoreCodedChatbot.Library.Services
 {
-    public class PlaylistHelper
+    public class PlaylistService : IPlaylistService
     {
         private const int UserMaxSongCount = 1;
 
@@ -30,7 +28,8 @@ namespace CoreCodedChatbot.Helpers
 
         private string PrefixVip(SongRequest request) => request.VipRequestTime.HasValue ? " (VIP)" : string.Empty;
 
-        public PlaylistHelper(IChatbotContextFactory contextFactory, IConfigHelper configHelper)
+
+        public PlaylistService(IChatbotContextFactory contextFactory, IConfigService configHelper)
         {
             this.contextFactory = contextFactory;
             this.config = configHelper.GetConfig();
@@ -92,7 +91,7 @@ namespace CoreCodedChatbot.Helpers
                 context.SaveChanges();
 
                 songIndex = context.SongRequests.Where(sr => !sr.Played).OrderRequests()
-                    .FindIndex(sr => sr == request) + 1;
+                                .FindIndex(sr => sr == request) + 1;
             }
 
             UpdatePlaylists();
@@ -128,14 +127,14 @@ namespace CoreCodedChatbot.Helpers
                 context.SaveChanges();
 
                 newSongIndex = context.SongRequests.Where(sr => !sr.Played).OrderRequests()
-                    .FindIndex(sr => sr == request) + 1;
+                                   .FindIndex(sr => sr == request) + 1;
             }
 
             UpdatePlaylists();
             return newSongIndex;
         }
 
-        private async void UpdateFullPlaylist()
+        public async void UpdateFullPlaylist()
         {
             var psk = config.SignalRKey;
 
@@ -151,7 +150,8 @@ namespace CoreCodedChatbot.Helpers
                 new SongListHubModel
                 {
                     psk = psk,
-                    requests = requests
+                    regularRequests = requests.RegularList,
+                    vipRequests = requests.VipList
                 });
 
             await connection.DisposeAsync();
@@ -164,7 +164,7 @@ namespace CoreCodedChatbot.Helpers
                 var currentRequest = context.SongRequests.Where(sr => !sr.Played)
                     .OrderRequests()
                     .FirstOrDefault();
-                
+
                 if (currentRequest == null)
                     return;
 
@@ -173,7 +173,7 @@ namespace CoreCodedChatbot.Helpers
                 currentRequest.Played = true;
                 context.SaveChanges();
             }
-            
+
             UpdatePlaylists();
         }
 
@@ -182,18 +182,18 @@ namespace CoreCodedChatbot.Helpers
             var relevantItems = GetUserRelevantRequests(username);
 
             return relevantItems.Any()
-                    ? string.Join(", ", relevantItems)
-                    : "Looks like you don't have any songs in the queue, get requestin' dude! <!rr>";
+                ? string.Join(", ", relevantItems)
+                : "Looks like you don't have any songs in the queue, get requestin' dude! <!rr>";
         }
 
-        private List<string> GetUserRelevantRequests(string username)
+        public List<string> GetUserRelevantRequests(string username)
         {
             using (var context = contextFactory.Create())
             {
                 var userRequests = context.SongRequests
                     .Where(sr => !sr.Played)
                     ?.OrderRequests()
-                    ?.Select((sr, index) => new { Index = index + 1, SongRequest = sr })
+                    ?.Select((sr, index) => new {Index = index + 1, SongRequest = sr})
                     ?.Where(x => x.SongRequest.RequestUsername == username)
                     ?.OrderBy(x => x.Index)
                     ?.Select(x => $"{x.Index} - {x.SongRequest.RequestText}")
@@ -472,12 +472,11 @@ namespace CoreCodedChatbot.Helpers
 
                 request.Played = true;
                 context.SaveChanges();
-                
+
                 UpdatePlaylists();
 
                 return true;
             }
-
         }
 
         public string GetEstimatedTime(ChatViewersModel chattersModel)
@@ -511,16 +510,6 @@ namespace CoreCodedChatbot.Helpers
         private void UpdatePlaylists()
         {
             UpdateFullPlaylist();
-            //UpdateObsPlaylist();
         }
-    }
-
-    public enum AddRequestResult
-    {
-        PlaylistClosed,
-
-        NoMultipleRequests,
-
-        Success
     }
 }
