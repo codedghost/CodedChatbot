@@ -9,8 +9,15 @@
         <div class="requestBadges">
             <br />
             @{
-                var badges = ViewContext.ViewBag.UserIsMod ? "moderatorBadge" : "";
-                <span id="@Model.songRequestId" class="requestBadge @badges" onclick="showDeleteModal()"></span>
+                if (ViewContext.ViewBag.UserIsMod)
+                {
+                    <span id="@Model.songRequestId" class="requestBadge moderatorBadge" onclick="showDeleteModal()"></span>
+                }
+                if (!Model.isInChat)
+                {
+                    <span class="requestBadge leftBadge"></span>
+                }
+
             }
         </div>
     </div>
