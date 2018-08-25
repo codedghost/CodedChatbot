@@ -39,12 +39,12 @@ namespace CoreCodedChatbot.Commands
 
             if (result.IsCompletedSuccessfully)
             {
-                client.SendMessage(config.StreamerChannel, $"Hey @{username} I have successfully changed your request to: {response.songRequestText}");
+                client.SendMessage(config.StreamerChannel, $"Hey @{username} I have successfully changed your request to: {response.SongRequestText}");
             }
             else
             {
                 client.SendMessage(config.StreamerChannel,
-                    response.syntaxError
+                    response.SyntaxError
                         ? $"Hey @{username} command usage: !err <SongNumber> <NewSongRequest>"
                         : $"Hey @{username} it doesn't look like that's your request");
             }

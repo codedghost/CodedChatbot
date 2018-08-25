@@ -4,9 +4,8 @@ using System.Text;
 
 namespace CoreCodedChatbot.Library.Models.ApiResponse.Playlist
 {
-    public class EditRequestResponse
+    public class GetUserRequestsResponse
     {
-        public string SongRequestText { get; set; }
-        public bool SyntaxError { get; set; }
+        public string UserRequests { get; set; }
     }
 }

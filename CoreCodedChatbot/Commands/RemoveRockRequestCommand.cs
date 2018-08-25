@@ -1,6 +1,10 @@
-﻿using CoreCodedChatbot.CustomAttributes;
+﻿using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Helpers;
+using CoreCodedChatbot.Library.Helpers;
 using CoreCodedChatbot.Library.Models.Data;
 
 using TwitchLib.Client;
@@ -10,19 +14,27 @@ namespace CoreCodedChatbot.Commands
     [ChatCommand(new[] { "removerequest", "rrr", "removerockrequest", "removesong", "rs", "removerequest" }, false)]
     public class RemoveRockRequestCommand : ICommand
     {
-        private readonly PlaylistHelper playlistHelper;
-
+        private HttpClient playlistClient;
         private readonly ConfigModel config;
 
-        public RemoveRockRequestCommand(PlaylistHelper playlistHelper, ConfigModel config)
+        public RemoveRockRequestCommand(ConfigModel config)
         {
-            this.playlistHelper = playlistHelper;
+            this.playlistClient = new HttpClient
+            {
+                BaseAddress = new Uri(config.PlaylistApiUrl),
+                DefaultRequestHeaders =
+                {
+                    Authorization = new AuthenticationHeaderValue("Bearer", config.JwtTokenString)
+                }
+            };
             this.config = config;
         }
 
-        public void Process(TwitchClient client, string username, string commandText, bool isMod)
+        public async void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            var success = playlistHelper.RemoveRockRequests(username, commandText, isMod);
+            var request = await playlistClient.PostAsync("RemoveRockRequests",
+                HttpClientHelper.GetJsonData(new {username, commandText, isMod}));
+            var success = request.IsSuccessStatusCode;
 
             client.SendMessage(config.StreamerChannel, success
                 ? $"Hi @{username}, I have removed number: {commandText} from the queue."

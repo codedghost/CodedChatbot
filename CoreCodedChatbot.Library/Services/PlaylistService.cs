@@ -21,7 +21,7 @@ namespace CoreCodedChatbot.Library.Services
         private readonly ConfigModel config;
         private readonly IChatbotContextFactory contextFactory;
 
-        private string FormatRequest(SongRequest sr, int index) => $"{index + 1}{this.PrefixVip(sr)} - {sr.RequestText} - {sr.RequestUsername}";
+        private string FormatRequest(SongRequest sr, int index) => $"{index + 1} - {sr.RequestText} - {sr.RequestUsername}";
 
         private string FormatRequestNoIndex(SongRequest sr) =>
             $"{PrefixVip(sr)} - {sr.RequestText} - {sr.RequestUsername}";
@@ -29,10 +29,10 @@ namespace CoreCodedChatbot.Library.Services
         private string PrefixVip(SongRequest request) => request.VipRequestTime.HasValue ? " (VIP)" : string.Empty;
 
 
-        public PlaylistService(IChatbotContextFactory contextFactory, IConfigService configHelper)
+        public PlaylistService(IChatbotContextFactory contextFactory, IConfigService configService)
         {
             this.contextFactory = contextFactory;
-            this.config = configHelper.GetConfig();
+            this.config = configService.GetConfig();
         }
 
         public PlaylistItem GetRequestById(int songId)
@@ -230,7 +230,7 @@ namespace CoreCodedChatbot.Library.Services
                         return new PlaylistItem
                         {
                             songRequestId = sr.SongRequestId,
-                            songRequestText = FormatRequest(sr, index),
+                            songRequestText = FormatRequest(sr, index + vipRequests.Length),
                             isInChat = (context.Users.SingleOrDefault(u => u.Username == sr.RequestUsername)
                                             ?.TimeLastInChat ?? DateTime.MinValue)
                                        .ToUniversalTime()
