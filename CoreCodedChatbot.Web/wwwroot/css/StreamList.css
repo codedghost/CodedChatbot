@@ -89,3 +89,6 @@
 .moderatorBadge {
 	background-image: url("/images/axe-18.png");
 }
+.leftBadge {
+    background-image: url("/images/exit.png");
+}
