@@ -1,8 +1,14 @@
-﻿using CoreCodedChatbot.CustomAttributes;
+﻿using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Helpers;
+using CoreCodedChatbot.Library.Helpers;
+using CoreCodedChatbot.Library.Models.ApiResponse.Playlist;
 using CoreCodedChatbot.Library.Models.Data;
-
+using Newtonsoft.Json;
 using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
@@ -10,29 +16,35 @@ namespace CoreCodedChatbot.Commands
     [ChatCommand(new[] { "editrequest", "err", "editrockrequest", "editsong", "edit" }, false)]
     public class EditRockRequestCommand : ICommand
     {
-        private readonly PlaylistHelper playlistHelper;
         private readonly ConfigModel config;
+        private HttpClient playlistClient;
 
-        public EditRockRequestCommand(PlaylistHelper playlistHelper, ConfigModel config)
+        public EditRockRequestCommand(ConfigModel config)
         {
-            this.playlistHelper = playlistHelper;
+            this.playlistClient = new HttpClient
+            {
+                BaseAddress = new Uri(config.PlaylistApiUrl),
+                DefaultRequestHeaders =
+                {
+                    Authorization = new AuthenticationHeaderValue("Bearer", config.JwtTokenString)
+                }
+            };
             this.config = config;
         }
 
-        public void Process(TwitchClient client, string username, string commandText, bool isMod)
-        {
-            string songRequestText = string.Empty;
-            bool syntaxError = false;
-            var success = playlistHelper.EditRequest(username, commandText, isMod, out songRequestText, out syntaxError);
+        public async void Process(TwitchClient client, string username, string commandText, bool isMod)
+        {    
+            var result = playlistClient.PostAsync("EditRequest", HttpClientHelper.GetJsonData(new {username, commandText, isMod}));
+            var response = JsonConvert.DeserializeObject<EditRequestResponse>(await result.Result.Content.ReadAsStringAsync());
 
-            if (success)
+            if (result.IsCompletedSuccessfully)
             {
-                client.SendMessage(config.StreamerChannel, $"Hey @{username} I have successfully changed your request to: {songRequestText}");
+                client.SendMessage(config.StreamerChannel, $"Hey @{username} I have successfully changed your request to: {response.SongRequestText}");
             }
             else
             {
                 client.SendMessage(config.StreamerChannel,
-                    syntaxError
+                    response.SyntaxError
                         ? $"Hey @{username} command usage: !err <SongNumber> <NewSongRequest>"
                         : $"Hey @{username} it doesn't look like that's your request");
             }
