@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CoreCodedChatbot.Helpers.Interfaces;
+using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
@@ -13,9 +14,9 @@ namespace CoreCodedChatbot.Web.Controllers
     {
         private readonly ConfigModel config;
 
-        public LoginController(IConfigHelper configHelper)
+        public LoginController(IConfigService configService)
         {
-            this.config = configHelper.GetConfig();
+            this.config = configService.GetConfig();
         }
 
         public IActionResult Index()
