@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AspNet.Security.OAuth.Twitch;
 using CoreCodedChatbot.Helpers.Interfaces;
+using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Library.Models.View;
 using CoreCodedChatbot.Web.Interfaces;
@@ -21,9 +22,9 @@ namespace CoreCodedChatbot.Web.Services
 
         private ConfigModel config { get; set; }
 
-        public ChatterService(IConfigHelper configHelper)
+        public ChatterService(IConfigService configService)
         {
-            config = configHelper.GetConfig();
+            config = configService.GetConfig();
 
             chatterTimer = new Timer((x) => { UpdateChatters(); }, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
         }

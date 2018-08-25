@@ -1,4 +1,7 @@
-﻿using CoreCodedChatbot.CustomAttributes;
+﻿using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Library.Models.Data;
@@ -10,19 +13,26 @@ namespace CoreCodedChatbot.Commands
     [ChatCommand(new []{"clearrequests", "clearrockrequests" }, true)]
     public class ClearRockRequestsCommand : ICommand
     {
-        private readonly PlaylistHelper playlistHelper;
-
         private readonly ConfigModel config;
+        private HttpClient playlistClient;
 
-        public ClearRockRequestsCommand(PlaylistHelper playlistHelper, ConfigModel config)
+        public ClearRockRequestsCommand(ConfigModel config)
         {
-            this.playlistHelper = playlistHelper;
             this.config = config;
+
+            this.playlistClient = new HttpClient
+            {
+                BaseAddress = new Uri(config.PlaylistApiUrl),
+                DefaultRequestHeaders =
+                {
+                    Authorization = new AuthenticationHeaderValue("Bearer", config.JwtTokenString)
+                }
+            };
         }
 
-        public void Process(TwitchClient client, string username, string commandText, bool isMod)
+        public async void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            playlistHelper.ClearRockRequests();
+            await playlistClient.GetAsync("ClearRockRequests");
 
             client.SendMessage(config.StreamerChannel, $"@{username} Hey, I've cleared all requests for you!");
         }

@@ -1,8 +1,14 @@
-﻿using CoreCodedChatbot.CustomAttributes;
+﻿using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
+using CoreCodedChatbot.Library.Helpers;
+using CoreCodedChatbot.Library.Models.ApiResponse.Playlist;
 using CoreCodedChatbot.Library.Models.Data;
-
+using CoreCodedChatbot.Library.Models.Enums;
+using Newtonsoft.Json;
 using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
@@ -10,20 +16,27 @@ namespace CoreCodedChatbot.Commands
     [ChatCommand(new []{"vip", "viprequest"}, false)]
     public class VipCommand : ICommand
     {
-        private readonly PlaylistHelper playlistHelper;
-
+        private HttpClient playlistClient;
         private readonly VipHelper vipHelper;
 
         private readonly ConfigModel config;
 
-        public VipCommand(VipHelper vipHelper, PlaylistHelper playlistHelper, ConfigModel config)
+        public VipCommand(VipHelper vipHelper, ConfigModel config)
         {
             this.vipHelper = vipHelper;
-            this.playlistHelper = playlistHelper;
             this.config = config;
+
+            this.playlistClient = new HttpClient
+            {
+                BaseAddress = new Uri(config.PlaylistApiUrl),
+                DefaultRequestHeaders =
+                {
+                    Authorization = new AuthenticationHeaderValue("Bearer", config.JwtTokenString)
+                }
+            };
         }
 
-        public void Process(TwitchClient client, string username, string commandText, bool isMod)
+        public async void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
             if (string.IsNullOrWhiteSpace(commandText))
             {
@@ -37,7 +50,9 @@ namespace CoreCodedChatbot.Commands
                 var songIndex = 0;
                 if (int.TryParse(commandText.Trim('#'), out songIndex))
                 {
-                    playlistPosition = playlistHelper.PromoteRequest(username, songIndex-1);
+                    var request = await playlistClient.PostAsync("PromoteRequest",
+                        HttpClientHelper.GetJsonData(new {username, songIndex = songIndex - 1}));
+                    playlistPosition = JsonConvert.DeserializeObject<int>(await request.Content.ReadAsStringAsync());
                     client.SendMessage(config.StreamerChannel, playlistPosition == -1
                         ? $"Hey @{username}, I can't find a song at that position! Please check your requests with !myrequests"
                         : playlistPosition == -2
@@ -50,7 +65,13 @@ namespace CoreCodedChatbot.Commands
                     return;
                 }
 
-                (_, playlistPosition) = playlistHelper.AddRequest(username, commandText, true);
+                var addRequest = await playlistClient.PostAsync("AddRequest",
+                    HttpClientHelper.GetJsonData(new {username, commandText, isVipRequest = true}));
+
+                var addResult =
+                    JsonConvert.DeserializeObject<AddRequestResponse>(await addRequest.Content.ReadAsStringAsync());
+                playlistPosition = addResult.PlaylistPosition;
+
                 vipHelper.UseVipRequest(username);
                 client.SendMessage(config.StreamerChannel,
                     $"Hey @{username}, I have queued {commandText} for you, you're #{playlistPosition} in the queue!");

@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading;
 using Newtonsoft.Json;
 
@@ -29,7 +30,6 @@ namespace CoreCodedChatbot.Services
         private readonly TwitchPubSub pubsub;
         private readonly VipHelper vipHelper;
         private readonly BytesHelper bytesHelper;
-        private readonly PlaylistHelper playlistHelper;
         private readonly StreamLabsHelper streamLabsHelper;
         private readonly LiveStreamMonitor liveStreamMonitor;
 
@@ -51,7 +51,7 @@ namespace CoreCodedChatbot.Services
         private static readonly HttpClient httpClient = new HttpClient();
 
         public ChatbotService(CommandHelper commandHelper, TwitchClient client, TwitchAPI api, TwitchPubSub pubsub, LiveStreamMonitor liveStreamMonitor,
-            VipHelper vipHelper, BytesHelper bytesHelper, PlaylistHelper playlistHelper, StreamLabsHelper streamLabsHelper, IConfigHelper configHelper)
+            VipHelper vipHelper, BytesHelper bytesHelper, StreamLabsHelper streamLabsHelper, IConfigHelper configHelper)
         {
             this.commandHelper = commandHelper;
             this.client = client;
@@ -60,7 +60,6 @@ namespace CoreCodedChatbot.Services
             this.liveStreamMonitor = liveStreamMonitor;
             this.vipHelper = vipHelper;
             this.bytesHelper = bytesHelper;
-            this.playlistHelper = playlistHelper;
             this.config = configHelper.GetConfig();
             this.streamLabsHelper = streamLabsHelper;
 

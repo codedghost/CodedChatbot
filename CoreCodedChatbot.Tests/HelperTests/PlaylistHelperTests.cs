@@ -3,10 +3,10 @@
 using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Database.Context.Models;
-using CoreCodedChatbot.Helpers;
-using CoreCodedChatbot.Helpers.Interfaces;
+using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
-
+using CoreCodedChatbot.Library.Models.Enums;
+using CoreCodedChatbot.Library.Services;
 using Microsoft.EntityFrameworkCore;
 
 using NSubstitute;
@@ -28,12 +28,12 @@ namespace CoreCodedChatbot.Tests.HelperTests
             return contextFactory;
         }
 
-        private PlaylistHelper CreatePlaylistHelper(IChatbotContextFactory contextFactory)
+        private PlaylistService CreatePlaylistHelper(IChatbotContextFactory contextFactory)
         {
-            var configHelper = Substitute.For<IConfigHelper>();
-            configHelper.GetConfig().Returns(new ConfigModel { ObsPlaylistPath = "obsplaylist.txt" });
+            var configService = Substitute.For<IConfigService>();
+            configService.GetConfig().Returns(new ConfigModel { ObsPlaylistPath = "obsplaylist.txt" });
 
-            return new PlaylistHelper(contextFactory, configHelper);
+            return new PlaylistService(contextFactory, configService);
         }
 
         [Fact]
