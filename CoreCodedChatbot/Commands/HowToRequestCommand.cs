@@ -1,8 +1,12 @@
-﻿using CoreCodedChatbot.CustomAttributes;
+﻿using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
+using CoreCodedChatbot.Library.Helpers;
 using CoreCodedChatbot.Library.Models.Data;
-
+using Newtonsoft.Json;
 using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
@@ -11,17 +15,27 @@ namespace CoreCodedChatbot.Commands
     public class HowToRequestCommand : ICommand
     {
         private readonly ConfigModel config;
-        private readonly PlaylistHelper playlistHelper;
+        private readonly HttpClient playlistClient;
 
-        public HowToRequestCommand(ConfigModel config, PlaylistHelper playlistHelper)
+        public HowToRequestCommand(ConfigModel config)
         {
             this.config = config;
-            this.playlistHelper = playlistHelper;
+            this.playlistClient = new HttpClient
+            {
+                BaseAddress = new Uri(config.PlaylistApiUrl),
+                DefaultRequestHeaders =
+                {
+                    Authorization = new AuthenticationHeaderValue("Bearer", config.JwtTokenString)
+                }
+            };
         }
 
-        public void Process(TwitchClient client, string username, string commandText, bool isMod)
+        public async void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            if (playlistHelper.IsPlaylistOpen() || username != "chatbot")
+            var request = await playlistClient.GetAsync("IsPlaylistOpen");
+            var isOpen = JsonConvert.DeserializeObject<bool>(await request.Content.ReadAsStringAsync());
+
+            if (isOpen || username != "chatbot")
             {
                 client.SendMessage(config.StreamerChannel,
                     $"To request a song just use: !request <SongArtist> - <SongTitle> - (Guitar or Bass)");

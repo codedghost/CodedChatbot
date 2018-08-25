@@ -15,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreCodedChatbot.Tests", "CoreCodedChatbot.Tests\CoreCodedChatbot.Tests.csproj", "{893E67AA-9C90-4EAB-86B8-0FF4033F71F9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreCodedChatbot.Library", "CoreCodedChatbot.Library\CoreCodedChatbot.Library.csproj", "{E1476D93-373F-479E-8870-D07F6906F82E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreCodedChatbot.Library", "CoreCodedChatbot.Library\CoreCodedChatbot.Library.csproj", "{E1476D93-373F-479E-8870-D07F6906F82E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

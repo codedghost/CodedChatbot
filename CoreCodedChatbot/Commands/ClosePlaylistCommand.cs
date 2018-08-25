@@ -1,8 +1,11 @@
-﻿using CoreCodedChatbot.CustomAttributes;
+﻿using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Library.Models.Data;
-
+using Newtonsoft.Json;
 using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
@@ -10,18 +13,28 @@ namespace CoreCodedChatbot.Commands
     [ChatCommand(new[] { "cp", "closeplaylist", "sp", "shutplaylist" }, true)]
     public class ClosePlaylistCommand : ICommand
     {
-        private readonly PlaylistHelper playlistHelper;
+        private readonly HttpClient playlistClient;
         private readonly ConfigModel config;
 
-        public ClosePlaylistCommand(PlaylistHelper playlistHelper, ConfigModel config)
+        public ClosePlaylistCommand(ConfigModel config)
         {
-            this.playlistHelper = playlistHelper;
+            this.playlistClient = new HttpClient
+            {
+                BaseAddress = new Uri(config.PlaylistApiUrl),
+                DefaultRequestHeaders =
+                {
+                    Authorization = new AuthenticationHeaderValue("Bearer", config.JwtTokenString)
+                }
+            };
+
             this.config = config;
         }
 
-        public void Process(TwitchClient client, string username, string commandText, bool isMod)
+        public async void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            client.SendMessage(config.StreamerChannel, playlistHelper.ClosePlaylist() 
+            var response = await playlistClient.GetAsync("ClosePlaylist");
+
+            client.SendMessage(config.StreamerChannel, response.IsSuccessStatusCode
                 ? $"Hey @{username}, I have closed the playlist!" 
                 : $"Hey {username}, I can't seem to close the playlist for some reason :(");
         }

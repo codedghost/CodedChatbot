@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using AspNet.Security.OAuth.Twitch;
 using CoreCodedChatbot.Helpers;
+using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Library.Models.View;
 using CoreCodedChatbot.Web.Interfaces;
@@ -18,13 +19,13 @@ namespace CoreCodedChatbot.Web.Controllers
 {
     public class ChatbotController : Controller
     {
-        private readonly PlaylistHelper playlistHelper;
+        private readonly IPlaylistService playlistService;
 
         private readonly IChatterService chatterService;
 
-        public ChatbotController(PlaylistHelper playlistHelper, IChatterService chatterService)
+        public ChatbotController(IPlaylistService playlistService, IChatterService chatterService)
         {
-            this.playlistHelper = playlistHelper;
+            this.playlistService = playlistService;
 
             this.chatterService = chatterService;
         }
@@ -44,7 +45,7 @@ namespace CoreCodedChatbot.Web.Controllers
                 IsMod = chattersModel.chatters.moderators.Any(mod => string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase))
             } : null;
 
-            var playlistModel = playlistHelper.GetAllSongs(twitchUser);
+            var playlistModel = playlistService.GetAllSongs(twitchUser);
 
             ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
 
@@ -69,7 +70,7 @@ namespace CoreCodedChatbot.Web.Controllers
             }
             catch (Exception e)
             {
-                return Json(new {Success = false, Message = "Encountered an error"});
+                return Json(new { Success = false, Message = "Encountered an error" });
             }
         }
 
@@ -95,14 +96,14 @@ namespace CoreCodedChatbot.Web.Controllers
             }
             catch (Exception e)
             {
-                return Json(new {Success = false, Message = "Encountered an error"});
+                return Json(new { Success = false, Message = "Encountered an error" });
             }
         }
 
         [HttpPost]
         public IActionResult RenderModal([FromBody] int songId)
         {
-            var requestToDelete = playlistHelper.GetRequestById(songId);
+            var requestToDelete = playlistService.GetRequestById(songId);
 
             try
             {
@@ -110,7 +111,7 @@ namespace CoreCodedChatbot.Web.Controllers
             }
             catch (Exception e)
             {
-                return Json(new {Success = false, Message = "Encountered an error"});
+                return Json(new { Success = false, Message = "Encountered an error" });
             }
         }
 
@@ -124,12 +125,12 @@ namespace CoreCodedChatbot.Web.Controllers
                 if (chattersModel.chatters.moderators.Any(mod =>
                     string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)))
                 {
-                    if (playlistHelper.ArchiveRequestById(songId))
+                    if (playlistService.ArchiveRequestById(songId))
                         return Ok();
                 }
             }
 
-            return Json(new {Success = false, Message = "Encountered an error, or you are not a moderator" });
+            return Json(new { Success = false, Message = "Encountered an error, or you are not a moderator" });
         }
     }
 }

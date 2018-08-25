@@ -27,5 +27,10 @@
         public string DonationCurrency;
         public int BytesToVip;
         public string SignalRKey;
+        public string ApiSecretSymmetricKey;
+        public string ApiValidIssuer;
+        public string ApiValidAudience;
+        public string JwtTokenString;
+        public string PlaylistApiUrl;
     }
 }
