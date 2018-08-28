@@ -21,13 +21,7 @@ namespace CoreCodedChatbot.Library.Services
         private readonly ConfigModel config;
         private readonly IChatbotContextFactory contextFactory;
 
-        private string FormatRequest(SongRequest sr, int index) => $"{index + 1} - {sr.RequestText} - {sr.RequestUsername}";
-
-        private string FormatRequestNoIndex(SongRequest sr) =>
-            $"{PrefixVip(sr)} - {sr.RequestText} - {sr.RequestUsername}";
-
-        private string PrefixVip(SongRequest request) => request.VipRequestTime.HasValue ? " (VIP)" : string.Empty;
-
+        private PlaylistItem CurrentRequest;
 
         public PlaylistService(IChatbotContextFactory contextFactory, IConfigService configService)
         {
@@ -43,14 +37,16 @@ namespace CoreCodedChatbot.Library.Services
                 return new PlaylistItem
                 {
                     songRequestId = request.SongRequestId,
-                    songRequestText = FormatRequestNoIndex(request),
+                    songRequestText = request.RequestText,
+                    songRequester = request.RequestUsername,
                     isInChat = (context.Users.SingleOrDefault(u => u.Username == request.RequestUsername)
                                     ?.TimeLastInChat ?? DateTime.MinValue)
                                .ToUniversalTime()
                                .AddMinutes(2) >= DateTime.UtcNow ||
                                (request.VipRequestTime ?? DateTime.MinValue).ToUniversalTime().AddMinutes(2) >=
                                DateTime.UtcNow ||
-                               request.RequestTime.ToUniversalTime().AddMinutes(5) >= DateTime.UtcNow
+                               request.RequestTime.ToUniversalTime().AddMinutes(5) >= DateTime.UtcNow,
+                    isVip = request.VipRequestTime != null
                 };
             }
         }
@@ -214,11 +210,14 @@ namespace CoreCodedChatbot.Library.Services
                         return new PlaylistItem
                         {
                             songRequestId = sr.SongRequestId,
-                            songRequestText = FormatRequest(sr, index),
+                            songRequestText = sr.RequestText,
+                            songRequester = sr.RequestUsername,
                             isInChat = (context.Users.SingleOrDefault(u => u.Username == sr.RequestUsername)?.TimeLastInChat ?? DateTime.MinValue)
                                        .ToUniversalTime()
                                        .AddMinutes(2) >= DateTime.UtcNow ||
-                                       (sr.VipRequestTime ?? DateTime.MinValue).ToUniversalTime().AddMinutes(5) >= DateTime.UtcNow
+                                       (sr.VipRequestTime ?? DateTime.MinValue).ToUniversalTime().AddMinutes(5) >= DateTime.UtcNow,
+                            isVip = sr.VipRequestTime != null,
+                            isEvenIndex = index % 2 == 0
                         };
                     })
                     .ToArray();
@@ -230,12 +229,15 @@ namespace CoreCodedChatbot.Library.Services
                         return new PlaylistItem
                         {
                             songRequestId = sr.SongRequestId,
-                            songRequestText = FormatRequest(sr, index + vipRequests.Length),
+                            songRequestText = sr.RequestText,
+                            songRequester = sr.RequestUsername,
                             isInChat = (context.Users.SingleOrDefault(u => u.Username == sr.RequestUsername)
                                             ?.TimeLastInChat ?? DateTime.MinValue)
                                        .ToUniversalTime()
                                        .AddMinutes(2) >= DateTime.UtcNow ||
-                                       sr.RequestTime.ToUniversalTime().AddMinutes(5) >= DateTime.UtcNow
+                                       sr.RequestTime.ToUniversalTime().AddMinutes(5) >= DateTime.UtcNow,
+                            isVip = sr.VipRequestTime != null,
+                            isEvenIndex = index % 2 == 0
                         };
                     }).ToArray();
 
@@ -503,6 +505,33 @@ namespace CoreCodedChatbot.Library.Services
                 {
                     Console.Out.WriteLine(e);
                     return string.Empty;
+                }
+            }
+        }
+
+        private void UpdateCurrentSong(PlaylistItem[] regularRequests, PlaylistItem[] vipRequests)
+        {
+            if (!regularRequests.Any() && !vipRequests.Any())
+            {
+                CurrentRequest = null;
+                return;
+            }
+            if (CurrentRequest.isVip)
+            {
+                if (regularRequests.Any() || !vipRequests.Any())
+                {
+                    var rand = new Random();
+                    CurrentRequest = regularRequests[rand.Next(0, regularRequests.Length)];
+                    regularRequests = regularRequests.Where(r => r.songRequestId != CurrentRequest.songRequestId)
+                        .ToArray();
+                }
+            }
+            else
+            {
+                if (vipRequests.Any() || !regularRequests.Any())
+                {
+                    CurrentRequest = vipRequests.FirstOrDefault();
+                    vipRequests = vipRequests.Where(r => r.songRequestId != CurrentRequest.songRequestId).ToArray();
                 }
             }
         }

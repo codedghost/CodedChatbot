@@ -1,0 +1,17 @@
+﻿@model CoreCodedChatbot.Library.Models.Data.PlaylistItem
+
+<div class="request even">
+    <b class="vipText">Current Song</b><br/>
+    @if (Model.FormattedRequest == null)
+    {
+        <b class="vipText">Request:</b>
+        @Model.songRequestText
+    }
+    else
+    {
+        <b class="vipText">Song: </b>@Model.FormattedRequest.SongName<br />
+        <b class="vipText">Artist: </b>@Model.FormattedRequest.SongArtist<br />
+        <b class="vipText">Instrument: </b>@Model.FormattedRequest.InstrumentName<br />
+        <b class="vipText">Requested By: </b>@Model.songRequester
+    }
+</div>
