@@ -34,10 +34,10 @@ namespace CoreCodedChatbot.Commands
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod)
         {    
-            var result = playlistClient.PostAsync("EditRequest", HttpClientHelper.GetJsonData(new {username, commandText, isMod}));
-            var response = JsonConvert.DeserializeObject<EditRequestResponse>(await result.Result.Content.ReadAsStringAsync());
+            var result = await playlistClient.PostAsync("EditRequest", HttpClientHelper.GetJsonData(new {username, commandText, isMod}));
+            var response = JsonConvert.DeserializeObject<EditRequestResponse>(await result.Content.ReadAsStringAsync());
 
-            if (result.IsCompletedSuccessfully)
+            if (result.IsSuccessStatusCode)
             {
                 client.SendMessage(config.StreamerChannel, $"Hey @{username} I have successfully changed your request to: {response.SongRequestText}");
             }
