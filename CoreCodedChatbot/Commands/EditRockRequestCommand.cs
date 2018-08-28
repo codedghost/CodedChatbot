@@ -37,17 +37,10 @@ namespace CoreCodedChatbot.Commands
             var result = await playlistClient.PostAsync("EditRequest", HttpClientHelper.GetJsonData(new {username, commandText, isMod}));
             var response = JsonConvert.DeserializeObject<EditRequestResponse>(await result.Content.ReadAsStringAsync());
 
-            if (result.IsSuccessStatusCode)
-            {
-                client.SendMessage(config.StreamerChannel, $"Hey @{username} I have successfully changed your request to: {response.SongRequestText}");
-            }
-            else
-            {
-                client.SendMessage(config.StreamerChannel,
-                    response.SyntaxError
-                        ? $"Hey @{username} command usage: !err <SongNumber> <NewSongRequest>"
-                        : $"Hey @{username} it doesn't look like that's your request");
-            }
+            client.SendMessage(config.StreamerChannel,
+                result.IsSuccessStatusCode
+                    ? $"Hey @{username} I have successfully changed your request to: {response.SongRequestText}"
+                    : $"Hey @{username} command usage: !err <SongNumber> <NewSongRequest>");
         }
 
         public void ShowHelp(TwitchClient client, string username)
