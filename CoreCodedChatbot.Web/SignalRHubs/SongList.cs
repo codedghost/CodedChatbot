@@ -24,9 +24,10 @@ namespace CoreCodedChatbot.Web.SignalRHubs
 
             if (psk == data.psk)
             {
+                var currentSong = data.currentSong;
                 var regularRequests = data.regularRequests;
                 var vipRequests = data.vipRequests;
-                await this.Clients.All.SendCoreAsync("SendAll", new object[] { regularRequests, vipRequests });
+                await this.Clients.All.SendCoreAsync("SendAll", new object[] { currentSong, regularRequests, vipRequests });
             }
         }
 

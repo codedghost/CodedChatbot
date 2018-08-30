@@ -12,8 +12,8 @@ namespace CoreCodedChatbot.Library.Interfaces.Services
         PlaylistItem GetRequestById(int songId);
         (AddRequestResult, int) AddRequest(string username, string commandText, bool vipRequest = false);
         bool IsPlaylistOpen();
-        int PromoteRequest(string username, int songIndex);
-        void UpdateFullPlaylist();
+        int PromoteRequest(string username);
+        void UpdateFullPlaylist(bool updateCurrent = false);
         void ArchiveCurrentRequest();
         string GetUserRequests(string username);
         List<string> GetUserRelevantRequests(string username);
