@@ -42,9 +42,10 @@ namespace CoreCodedChatbot.Services
         private Timer DonationsTimer { get; set; }
         private Timer PlaylistTimer { get; set; }
         private Timer YoutubeTimer { get; set; }
+        private Timer MerchTimer { get; set; }
 
-        private int MaxTimerMinutesRocksmith = 49;
-        private int MaxTimerMinutesGaming = 28;
+        private int MaxTimerMinutesRocksmith = 56;
+        private int MaxTimerMinutesGaming = 35;
 
         private readonly ConfigModel config;
 
@@ -256,6 +257,11 @@ namespace CoreCodedChatbot.Services
                 e => commandHelper.ProcessCommand("youtube", client, "Chatbot", string.Empty, true),
                 null,
                 TimeSpan.FromMinutes(isStreamingRocksmith ? 42 : 21), maxTimerMinutes);
+            MerchTimer = new Timer(
+                e => commandHelper.ProcessCommand("merch", client, "Chatbot", string.Empty, true),
+                null,
+                TimeSpan.FromMinutes(isStreamingRocksmith ? 49 : 28), maxTimerMinutes);
+
 
             // Set thread for checking viewers in chat and giving out Bytes.
 
@@ -306,6 +312,7 @@ namespace CoreCodedChatbot.Services
             DiscordTimer.Dispose();
             TwitterTimer.Dispose();
             YoutubeTimer.Dispose();
+            MerchTimer.Dispose();
             BytesTimer.Dispose();
             DonationsTimer.Dispose();
         }

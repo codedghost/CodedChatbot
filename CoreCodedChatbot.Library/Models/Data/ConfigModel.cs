@@ -18,6 +18,7 @@
         public string TwitterLink;
         public string YoutubeLink;
         public string WebsiteLink;
+        public string MerchLink;
         public string StreamLabsClientId;
         public string StreamLabsClientSecret;
         public string LocalDbLocation;
