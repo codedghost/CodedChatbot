@@ -5,22 +5,8 @@
     var oddOrEvenStyle = Model.isEvenIndex ? "even" : "odd";
     var vipStyle = Model.isVip ? "vipText" : "";
     <div class="request @oddOrEvenStyle">
-        <div class="requestData">
-            @if (Model.FormattedRequest == null)
-            {
-                <b class="@vipStyle">Request:</b>
-                @Model.songRequestText
-            }
-            else
-            {
-                <b class="@vipStyle">Song: </b>@Model.FormattedRequest.SongName<br />
-                <b class="@vipStyle">Artist: </b>@Model.FormattedRequest.SongArtist<br />
-                <b class="@vipStyle">Instrument: </b>@Model.FormattedRequest.InstrumentName<br />
-                <b class="@vipStyle">Requested By: </b>@Model.songRequester
-            }
-        </div>
         <div class="requestBadges">
-            <br />
+            <br/>
             @{
                 if (ViewContext.ViewBag.UserIsMod)
                 {
@@ -30,6 +16,26 @@
                 {
                     <span class="requestBadge leftBadge"></span>
                 }
+            }
+        </div>
+        <div class="requestData">
+            @if (Model.FormattedRequest == null)
+            {
+                <b class="@vipStyle">Request: </b>
+                @Model.songRequestText<br/>
+                <b class="@vipStyle">Requested By: </b>
+                @Model.songRequester
+            }
+            else
+            {
+                <b class="@vipStyle">Song: </b>
+                @Model.FormattedRequest.SongName<br/>
+                <b class="@vipStyle">Artist: </b>
+                @Model.FormattedRequest.SongArtist<br/>
+                <b class="@vipStyle">Instrument: </b>
+                @Model.FormattedRequest.InstrumentName<br/>
+                <b class="@vipStyle">Requested By: </b>
+                @Model.songRequester
             }
         </div>
     </div>
