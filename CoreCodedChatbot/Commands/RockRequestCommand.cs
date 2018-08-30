@@ -54,7 +54,7 @@ namespace CoreCodedChatbot.Commands
             }
             else
             {
-                client.SendMessage(config.StreamerChannel, $"Hey @{username}, I have queued {commandText} for you, you're #{result.PlaylistPosition} in the queue!");
+                client.SendMessage(config.StreamerChannel, $"Hey @{username}, I have queued {commandText} for you!");
             }
         }
 

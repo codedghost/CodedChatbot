@@ -1,17 +1,49 @@
 ﻿@model CoreCodedChatbot.Library.Models.Data.PlaylistItem
 
 <div class="request even">
-    <b class="vipText">Current Song</b><br/>
-    @if (Model.FormattedRequest == null)
-    {
-        <b class="vipText">Request:</b>
-        @Model.songRequestText
-    }
-    else
-    {
-        <b class="vipText">Song: </b>@Model.FormattedRequest.SongName<br />
-        <b class="vipText">Artist: </b>@Model.FormattedRequest.SongArtist<br />
-        <b class="vipText">Instrument: </b>@Model.FormattedRequest.InstrumentName<br />
-        <b class="vipText">Requested By: </b>@Model.songRequester
-    }
+    <div class="requestHeader">
+        <b class="vipText">Current Song</b>
+    </div>
+</div>
+<div class="request even">
+    <div class="requestData">
+        @if (Model == null)
+        {
+            <b class="vipText">No current song! Request something!</b>
+        }
+        else
+        {
+            if (Model.FormattedRequest == null)
+            {
+                <b class="vipText">Request: </b>
+                @Model.songRequestText<br />
+                <b class="vipText">Requested By: </b>
+                @Model.songRequester
+            }
+            else
+            {
+                <b class="vipText">Song: </b>
+                @Model.FormattedRequest.SongName<br />
+                <b class="vipText">Artist: </b>
+                @Model.FormattedRequest.SongArtist<br />
+                <b class="vipText">Instrument: </b>
+                @Model.FormattedRequest.InstrumentName<br />
+                <b class="vipText">Requested By: </b>
+                @Model.songRequester
+            }
+        }
+    </div>
+    <div class="requestBadges">
+        <br />
+        @{
+            if (ViewContext.ViewBag.UserIsMod)
+            {
+                <span id="@Model.songRequestId" class="requestBadge moderatorBadge" onclick="showDeleteModal(true)"></span>
+            }
+            if (!Model.isInChat)
+            {
+                <span class="requestBadge leftBadge"></span>
+            }
+        }
+    </div>
 </div>
