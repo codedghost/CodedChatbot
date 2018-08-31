@@ -643,18 +643,27 @@ namespace CoreCodedChatbot.Library.Services
                 CurrentRequest = null;
                 return;
             }
+
             if (CurrentRequest.isVip)
             {
-                if (regularRequests.Any() || !vipRequests.Any())
+                if (regularRequests.Any())
                 {
                     CurrentRequest = regularRequests[rand.Next(0, regularRequests.Length)];
+                }
+                else if (vipRequests.Any())
+                {
+                    CurrentRequest = vipRequests.FirstOrDefault();
                 }
             }
             else
             {
-                if (vipRequests.Any() || !regularRequests.Any())
+                if (vipRequests.Any())
                 {
                     CurrentRequest = vipRequests.FirstOrDefault();
+                }
+                else if (regularRequests.Any())
+                {
+                    CurrentRequest = regularRequests[rand.Next(0, regularRequests.Length)];
                 }
             }
         }
