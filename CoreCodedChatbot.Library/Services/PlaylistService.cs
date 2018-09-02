@@ -219,7 +219,7 @@ namespace CoreCodedChatbot.Library.Services
                     ?.Where(x => x.SongRequest.RequestUsername == username)
                     ?.OrderBy(x => x.Index)
                     ?.Select(x =>
-                        x.SongRequest.VipRequestTime == null
+                        x.SongRequest.VipRequestTime != null
                             ? $"{x.Index} - {x.SongRequest.RequestText}"
                             : x.SongRequest.RequestText)
                     ?.ToList();
@@ -643,18 +643,27 @@ namespace CoreCodedChatbot.Library.Services
                 CurrentRequest = null;
                 return;
             }
+
             if (CurrentRequest.isVip)
             {
-                if (regularRequests.Any() || !vipRequests.Any())
+                if (regularRequests.Any())
                 {
                     CurrentRequest = regularRequests[rand.Next(0, regularRequests.Length)];
+                }
+                else if (vipRequests.Any())
+                {
+                    CurrentRequest = vipRequests.FirstOrDefault();
                 }
             }
             else
             {
-                if (vipRequests.Any() || !regularRequests.Any())
+                if (vipRequests.Any())
                 {
                     CurrentRequest = vipRequests.FirstOrDefault();
+                }
+                else if (regularRequests.Any())
+                {
+                    CurrentRequest = regularRequests[rand.Next(0, regularRequests.Length)];
                 }
             }
         }
