@@ -219,7 +219,7 @@ namespace CoreCodedChatbot.Library.Services
                     ?.Where(x => x.SongRequest.RequestUsername == username)
                     ?.OrderBy(x => x.Index)
                     ?.Select(x =>
-                        x.SongRequest.VipRequestTime == null
+                        x.SongRequest.VipRequestTime != null
                             ? $"{x.Index} - {x.SongRequest.RequestText}"
                             : x.SongRequest.RequestText)
                     ?.ToList();
