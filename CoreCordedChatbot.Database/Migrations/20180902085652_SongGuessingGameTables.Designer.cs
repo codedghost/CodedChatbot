@@ -11,9 +11,10 @@ using System;
 namespace CoreCodedChatbot.Database.Migrations
 {
     [DbContext(typeof(ChatbotContext))]
-    partial class ChatbotContextModelSnapshot : ModelSnapshot
+    [Migration("20180902085652_SongGuessingGameTables")]
+    partial class SongGuessingGameTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
