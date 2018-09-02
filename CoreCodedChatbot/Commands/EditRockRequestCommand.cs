@@ -39,14 +39,14 @@ namespace CoreCodedChatbot.Commands
 
             client.SendMessage(config.StreamerChannel,
                 result.IsSuccessStatusCode
-                    ? $"Hey @{username} I have successfully changed your request to: {response.SongRequestText}"
-                    : $"Hey @{username} command usage: !err <SongNumber> <NewSongRequest>");
+                    ? $"Hey @{username}, I have successfully changed your request to: {response.SongRequestText}"
+                    : $"Hey @{username}, if you want to edit a regular request just use !edit <NewSongRequest>, otherwise include the VIP number like this: !edit <SongNumber> <NewSongRequest>");
         }
 
         public void ShowHelp(TwitchClient client, string username)
         {
             client.SendMessage(config.StreamerChannel,
-                $"Hey @{username}, use this command to edit your request. Use !myrequests to check your SongRequestIndex. Usage: !editrequest <Optional SongNumber> <NewSongRequest>");
+                $"Hey @{username}, use this command to edit your request. Use !myrequests to check your SongRequestIndex. If you want to edit a regular request just use !edit <NewSongRequest>, otherwise include the VIP number like this: !edit <SongNumber> <NewSongRequest>");
         }
     }
 }

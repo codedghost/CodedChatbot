@@ -38,13 +38,13 @@ namespace CoreCodedChatbot.Commands
 
             client.SendMessage(config.StreamerChannel, success
                 ? $"Hi @{username}, I have removed number: {commandText} from the queue."
-                : $"Hi @{username}, I can't do that. Please use the command as follows: !removerequest <playlist index>. If your usage is correct you may not own the request or the playlist order has recently changed");
+                : $"Hi @{username}, I can't do that. If you are trying to remove a regular request just use !removerequest, if it's a VIP then include the playlist index: !removerequest <SongRequestIndex>");
         }
 
         public void ShowHelp(TwitchClient client, string username)
         {
             client.SendMessage(config.StreamerChannel,
-                $"Hey @{username}, this command is used to remove one of your requests from the queue. Use !mrr to check your SongRequestIndex. Usage: !removerequest <SongRequestIndex>");
+                $"Hey @{username}, this command is used to remove one of your requests from the queue.  If you are trying to remove a regular request just use !removerequest, if it's a VIP then include the playlist index: !removerequest <SongRequestIndex>");
         }
     }
 }
