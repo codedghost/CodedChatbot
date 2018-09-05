@@ -47,21 +47,20 @@
 	margin: 0px;
 }
 .requestData {
-	display: table-cell;
-	width: 80%;
-	float: left;
-	padding: 5px;
-	margin: 0px;
+    display: table-cell;
+    width: 80%;
+    float: left;
+    padding: 5px;
+    margin: 0px;
 }
-
 .requestBadges {
-	display: table-cell;
-	width: 20%;
-	float: right;
-	text-align: right;
-	padding: 0;
-	padding-right:5px;
-	margin: 0px;
+    display: table-cell;
+    width: 20%;
+    float: right;
+    text-align: right;
+    padding: 0;
+    padding-right: 5px;
+    margin: 0px;
 }
 
 .odd {
@@ -88,7 +87,22 @@
 }
 .moderatorBadge {
 	background-image: url("/images/axe-18.png");
+    cursor: pointer;
+
 }
 .leftBadge {
     background-image: url("/images/exit.png");
+}
+#currentSong {
+    display: table;
+    border-collapse: separate;
+    border-spacing: 5px;
+    padding: 0;
+    margin: 0;
+    width: 1200px;
+    float: left;
+}
+
+.legend {
+
 }

@@ -34,26 +34,19 @@ namespace CoreCodedChatbot.Commands
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod)
         {    
-            var result = playlistClient.PostAsync("EditRequest", HttpClientHelper.GetJsonData(new {username, commandText, isMod}));
-            var response = JsonConvert.DeserializeObject<EditRequestResponse>(await result.Result.Content.ReadAsStringAsync());
+            var result = await playlistClient.PostAsync("EditRequest", HttpClientHelper.GetJsonData(new {username, commandText, isMod}));
+            var response = JsonConvert.DeserializeObject<EditRequestResponse>(await result.Content.ReadAsStringAsync());
 
-            if (result.IsCompletedSuccessfully)
-            {
-                client.SendMessage(config.StreamerChannel, $"Hey @{username} I have successfully changed your request to: {response.SongRequestText}");
-            }
-            else
-            {
-                client.SendMessage(config.StreamerChannel,
-                    response.SyntaxError
-                        ? $"Hey @{username} command usage: !err <SongNumber> <NewSongRequest>"
-                        : $"Hey @{username} it doesn't look like that's your request");
-            }
+            client.SendMessage(config.StreamerChannel,
+                result.IsSuccessStatusCode
+                    ? $"Hey @{username}, I have successfully changed your request to: {response.SongRequestText}"
+                    : $"Hey @{username}, if you want to edit a regular request just use !edit <NewSongRequest>, otherwise include the VIP number like this: !edit <SongNumber> <NewSongRequest>");
         }
 
         public void ShowHelp(TwitchClient client, string username)
         {
             client.SendMessage(config.StreamerChannel,
-                $"Hey @{username}, use this command to edit your request. Use !myrequests to check your SongRequestIndex. Usage: !editrequest <Optional SongNumber> <NewSongRequest>");
+                $"Hey @{username}, use this command to edit your request. Use !myrequests to check your SongRequestIndex. If you want to edit a regular request just use !edit <NewSongRequest>, otherwise include the VIP number like this: !edit <SongNumber> <NewSongRequest>");
         }
     }
 }

@@ -120,7 +120,7 @@ namespace CoreCodedChatbot.Web.Controllers
         [HttpPost]
         public IActionResult PromoteRequest([FromBody] PromoteSongRequest promoteSongRequest)
         {
-            return new JsonResult(playlistService.PromoteRequest(promoteSongRequest.username, promoteSongRequest.songIndex));
+            return new JsonResult(playlistService.PromoteRequest(promoteSongRequest.username));
         }
     }
 }

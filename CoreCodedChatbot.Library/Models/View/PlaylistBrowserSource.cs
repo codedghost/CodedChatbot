@@ -4,6 +4,7 @@ namespace CoreCodedChatbot.Library.Models.View
 {
     public class PlaylistBrowserSource
     {
+        public PlaylistItem CurrentSong { get; set; }
         public PlaylistItem[] VipList { get; set; }
         public PlaylistItem[] RegularList { get; set; }
         public LoggedInTwitchUser TwitchUser { get; set; }

@@ -14,11 +14,13 @@
 @if (User.Identity.IsAuthenticated)
 {
     <h3>Welcome @Model.TwitchUser.Username!</h3>
-    if (Model.TwitchUser.IsMod)
-    {
-        <h4>Looks like you're a mod! You'll have some features coming soon :D</h4>
-    }
 }
+
+<div id="currentSong">
+    @{
+        Html.RenderPartial("Partials/List/CurrentSong", Model.CurrentSong);
+    }
+</div>
 <div class="queueWrapper">
     @{
         Html.RenderPartial("Partials/List/Playlist", Model);
@@ -41,9 +43,21 @@
         });
 
     chatConnection.on('SendAll',
-        (regularList, vipList) => {
+        (currentSong, regularList, vipList) => {
+            $("#currentSong").empty();
+            var data = JSON.stringify(currentSong);
+            $.ajax({
+                url: '@Url.Action("RenderCurrentSong", "Chatbot")',
+                type: "POST",
+                data: data,
+                contentType: "application/json",
+                success: function(html) {
+                    $("#currentSong").html(html);
+                }
+            });
+
             $("#regularQueue").empty();
-            var data = JSON.stringify( regularList );
+            data = JSON.stringify( regularList );
             $.ajax({
                 url: '@Url.Action("RenderRegularList", "Chatbot")',
                 type: "POST",
@@ -73,19 +87,32 @@
         console.log('connection error');
     });
 
-    function showDeleteModal(context) {
+    function showDeleteModal(isCurrentSong) {
         $("#modalContainer").empty();
         var songId = JSON.stringify(event.target.id);
-        $.ajax({
-            url: '@Url.Action("RenderModal", "Chatbot")',
-            type: "POST",
-            data: songId,
-            contentType: "application/json",
-            success: function(html) {
-                $("#modalContainer").html(html);
-                $("#deleteModal").modal('show');
-            }
-        });
+        if (isCurrentSong) {
+            $.ajax({
+                url: '@Url.Action("RenderRemoveCurrentSongModal", "Chatbot")',
+                type: "POST",
+                data: songId,
+                contentType: "application/json",
+                success: function(html) {
+                    $("#modalContainer").html(html);
+                    $("#deleteModal").modal('show');
+                }
+            });
+        } else {
+            $.ajax({
+                url: '@Url.Action("RenderRemoveSongModal", "Chatbot")',
+                type: "POST",
+                data: songId,
+                contentType: "application/json",
+                success: function(html) {
+                    $("#modalContainer").html(html);
+                    $("#deleteModal").modal('show');
+                }
+            });
+        }
     }
 
 </script>
