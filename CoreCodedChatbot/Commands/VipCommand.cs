@@ -51,13 +51,21 @@ namespace CoreCodedChatbot.Commands
                 var addRequest = await playlistClient.PostAsync("AddRequest",
                     HttpClientHelper.GetJsonData(new {username, commandText, isVipRequest = true}));
 
-                var addResult =
-                    JsonConvert.DeserializeObject<AddRequestResponse>(await addRequest.Content.ReadAsStringAsync());
-                playlistPosition = addResult.PlaylistPosition;
+                if (addRequest.IsSuccessStatusCode)
+                {
+                    var addResult =
+                        JsonConvert.DeserializeObject<AddRequestResponse>(await addRequest.Content.ReadAsStringAsync());
+                    playlistPosition = addResult.PlaylistPosition;
 
-                vipHelper.UseVipRequest(username);
+                    vipHelper.UseVipRequest(username);
+                    client.SendMessage(config.StreamerChannel,
+                        $"Hey @{username}, I have queued {commandText} for you, you're #{playlistPosition} in the queue!");
+
+                    return;
+                }
+
                 client.SendMessage(config.StreamerChannel,
-                    $"Hey @{username}, I have queued {commandText} for you, you're #{playlistPosition} in the queue!");
+                    $"Hey @{username}, I can't queue your VIP request right now, please try again in a sec");
             }
             else
             {
