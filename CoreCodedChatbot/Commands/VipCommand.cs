@@ -47,34 +47,25 @@ namespace CoreCodedChatbot.Commands
             if (vipHelper.CanUseVipRequest(username))
             {
                 var playlistPosition = 0;
-                var songIndex = 0;
-                if (int.TryParse(commandText.Trim('#'), out songIndex))
-                {
-                    var request = await playlistClient.PostAsync("PromoteRequest",
-                        HttpClientHelper.GetJsonData(new {username, songIndex = songIndex - 1}));
-                    playlistPosition = JsonConvert.DeserializeObject<int>(await request.Content.ReadAsStringAsync());
-                    client.SendMessage(config.StreamerChannel, playlistPosition == -1
-                        ? $"Hey @{username}, I can't find a song at that position! Please check your requests with !myrequests"
-                        : playlistPosition == -2
-                            ? $"Hey @{username}, I'm sorry but that request doesn't seem to belong to you. Please check your requests with !myrequests"
-                            : playlistPosition == 0
-                                ? $"Hey @{username}, something seems to have gone wrong. Please try again in a minute or two"
-                                : $"Hey @{username}, I have promoted #{commandText} to #{playlistPosition} for you!");
-
-                    if (playlistPosition > 0) vipHelper.UseVipRequest(username);
-                    return;
-                }
 
                 var addRequest = await playlistClient.PostAsync("AddRequest",
                     HttpClientHelper.GetJsonData(new {username, commandText, isVipRequest = true}));
 
-                var addResult =
-                    JsonConvert.DeserializeObject<AddRequestResponse>(await addRequest.Content.ReadAsStringAsync());
-                playlistPosition = addResult.PlaylistPosition;
+                if (addRequest.IsSuccessStatusCode)
+                {
+                    var addResult =
+                        JsonConvert.DeserializeObject<AddRequestResponse>(await addRequest.Content.ReadAsStringAsync());
+                    playlistPosition = addResult.PlaylistPosition;
 
-                vipHelper.UseVipRequest(username);
+                    vipHelper.UseVipRequest(username);
+                    client.SendMessage(config.StreamerChannel,
+                        $"Hey @{username}, I have queued {commandText} for you, you're #{playlistPosition} in the queue!");
+
+                    return;
+                }
+
                 client.SendMessage(config.StreamerChannel,
-                    $"Hey @{username}, I have queued {commandText} for you, you're #{playlistPosition} in the queue!");
+                    $"Hey @{username}, I can't queue your VIP request right now, please try again in a sec");
             }
             else
             {
@@ -86,7 +77,7 @@ namespace CoreCodedChatbot.Commands
         public void ShowHelp(TwitchClient client, string username)
         {
             client.SendMessage(config.StreamerChannel,
-                $"Hey @{username}, if you have a VIP request, this command will bump your song request right to the top of the queue. Usage: !vip <SongArtist> - <SongName> - (Guitar or Bass) OR !vip <SongNumber>");
+                $"Hey @{username}, if you have a VIP request, this command will bump your song request right to the top of the queue. Usage: !vip <SongArtist> - <SongName> - (Guitar or Bass)");
         }
     }
 }

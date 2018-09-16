@@ -46,6 +46,12 @@ namespace CoreCodedChatbot.Web.Controllers
             } : null;
 
             var playlistModel = playlistService.GetAllSongs(twitchUser);
+            playlistModel.RegularList =
+                playlistModel.RegularList.Where(r => r.songRequestId != playlistModel.CurrentSong.songRequestId)
+                    .ToArray();
+            playlistModel.VipList =
+                playlistModel.VipList.Where(r => r.songRequestId != playlistModel.CurrentSong.songRequestId)
+                    .ToArray();
 
             ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
 
@@ -101,7 +107,7 @@ namespace CoreCodedChatbot.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult RenderModal([FromBody] int songId)
+        public IActionResult RenderRemoveSongModal([FromBody] int songId)
         {
             var requestToDelete = playlistService.GetRequestById(songId);
 
@@ -112,6 +118,42 @@ namespace CoreCodedChatbot.Web.Controllers
             catch (Exception e)
             {
                 return Json(new { Success = false, Message = "Encountered an error" });
+            }
+        }
+
+        [HttpPost]
+        public IActionResult RenderRemoveCurrentSongModal([FromBody] int songId)
+        {
+            var requestToDelete = playlistService.GetRequestById(songId);
+            try
+            {
+                return PartialView("Partials/List/RemoveCurrentModal", requestToDelete);
+            }
+            catch (Exception e)
+            {
+                return Json(new {Success = false, Message = "Encountered an error"});
+            }
+        }
+
+        [HttpPost]
+        public IActionResult RenderCurrentSong([FromBody] PlaylistItem data)
+        {
+            try
+            {
+                var chattersModel = chatterService.GetCurrentChatters();
+
+                var twitchUser = User.Identity.IsAuthenticated ? new LoggedInTwitchUser
+                {
+                    Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)?.Value,
+                    IsMod = chattersModel.chatters.moderators.Any(mod => string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase))
+                } : null;
+
+                ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
+                return PartialView("Partials/List/CurrentSong", data);
+            }
+            catch (Exception e)
+            {
+                return Json(new {Success = false, Message = "Encountered an error"});
             }
         }
 
@@ -127,6 +169,31 @@ namespace CoreCodedChatbot.Web.Controllers
                 {
                     if (playlistService.ArchiveRequestById(songId))
                         return Ok();
+                }
+            }
+
+            return Json(new { Success = false, Message = "Encountered an error, or you are not a moderator" });
+        }
+
+        [HttpPost]
+        public IActionResult RemoveCurrentSong()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var chattersModel = chatterService.GetCurrentChatters();
+
+                if (chattersModel.chatters.moderators.Any(mod =>
+                    string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)))
+                {
+                    try
+                    {
+                        playlistService.ArchiveCurrentRequest();
+                        return Ok();
+                    }
+                    catch (Exception e)
+                    {
+                        return Json(new { Success = false, Message = "Encountered an error, or you are not a moderator" });
+                    }
                 }
             }
 
