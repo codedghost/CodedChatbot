@@ -33,5 +33,6 @@
         public string ApiValidAudience;
         public string JwtTokenString;
         public string PlaylistApiUrl;
+        public int ConcurrentRegularSongsToPlay;
     }
 }

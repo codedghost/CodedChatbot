@@ -23,12 +23,15 @@ namespace CoreCodedChatbot.Library.Services
 
         private PlaylistItem CurrentRequest;
         private int CurrentRegularRequestsPlayed;
+        private int ConcurrentRegularSongsToPlay;
         private Random rand = new Random();
 
         public PlaylistService(IChatbotContextFactory contextFactory, IConfigService configService)
         {
             this.contextFactory = contextFactory;
             this.config = configService.GetConfig();
+
+            this.ConcurrentRegularSongsToPlay = config.ConcurrentRegularSongsToPlay;
         }
 
         public PlaylistItem GetRequestById(int songId)
@@ -664,9 +667,11 @@ namespace CoreCodedChatbot.Library.Services
             }
             else
             {
-                if (CurrentRegularRequestsPlayed < 2 && regularRequests.Any())
+                CurrentRegularRequestsPlayed++;
+
+                if (CurrentRegularRequestsPlayed < ConcurrentRegularSongsToPlay 
+                    && regularRequests.Any())
                 {
-                    CurrentRegularRequestsPlayed++;
                     updateDecision = RequestTypes.Regular;
                 }
                 else if (vipRequests.Any())
@@ -676,8 +681,6 @@ namespace CoreCodedChatbot.Library.Services
                 }
                 else if (regularRequests.Any())
                 {
-                    // Ensures when a VIP request comes in, it will be picked next
-                    CurrentRegularRequestsPlayed++;
                     updateDecision = RequestTypes.Regular;
                 }
                 else
