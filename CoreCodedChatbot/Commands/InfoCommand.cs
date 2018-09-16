@@ -21,11 +21,13 @@ namespace CoreCodedChatbot.Commands
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            // Run all four info commands at once
+            // Run all stream info commands at once
             commandHelper.ProcessCommand("howtorequest", client, "Chatbot", string.Empty, true);
             commandHelper.ProcessCommand("customsforge", client, "Chatbot", string.Empty, true);
             commandHelper.ProcessCommand("discord", client, "Chatbot", string.Empty, true);
             commandHelper.ProcessCommand("twitter", client, "Chatbot", string.Empty, true);
+            commandHelper.ProcessCommand("merch", client, "Chatbot", string.Empty, true);
+            commandHelper.ProcessCommand("yt", client, "Chatbot", string.Empty, true);
         }
 
         public void ShowHelp(TwitchClient client, string username)
