@@ -22,6 +22,7 @@ namespace CoreCodedChatbot.Library.Services
         private readonly IChatbotContextFactory contextFactory;
 
         private PlaylistItem CurrentRequest;
+        private int CurrentRegularRequestsPlayed;
         private Random rand = new Random();
 
         public PlaylistService(IChatbotContextFactory contextFactory, IConfigService configService)
@@ -638,6 +639,8 @@ namespace CoreCodedChatbot.Library.Services
 
         private void UpdateCurrentSong(PlaylistItem[] regularRequests, PlaylistItem[] vipRequests)
         {
+            RequestTypes updateDecision;
+
             if (!regularRequests.Any() && !vipRequests.Any())
             {
                 CurrentRequest = null;
@@ -648,23 +651,54 @@ namespace CoreCodedChatbot.Library.Services
             {
                 if (regularRequests.Any())
                 {
-                    CurrentRequest = regularRequests[rand.Next(0, regularRequests.Length)];
+                    updateDecision = RequestTypes.Regular;
                 }
                 else if (vipRequests.Any())
                 {
-                    CurrentRequest = vipRequests.FirstOrDefault();
+                    updateDecision = RequestTypes.Vip;
+                }
+                else
+                {
+                    updateDecision = RequestTypes.Empty;
                 }
             }
             else
             {
-                if (vipRequests.Any())
+                if (CurrentRegularRequestsPlayed < 2 && regularRequests.Any())
                 {
-                    CurrentRequest = vipRequests.FirstOrDefault();
+                    CurrentRegularRequestsPlayed++;
+                    updateDecision = RequestTypes.Regular;
+                }
+                else if (vipRequests.Any())
+                {
+                    CurrentRegularRequestsPlayed = 0;
+                    updateDecision = RequestTypes.Vip;
                 }
                 else if (regularRequests.Any())
                 {
-                    CurrentRequest = regularRequests[rand.Next(0, regularRequests.Length)];
+                    // Ensures when a VIP request comes in, it will be picked next
+                    CurrentRegularRequestsPlayed++;
+                    updateDecision = RequestTypes.Regular;
                 }
+                else
+                {
+                    updateDecision = RequestTypes.Empty;
+                }
+            }
+
+            switch (updateDecision)
+            {
+                case RequestTypes.Regular:
+                    CurrentRequest = regularRequests[rand.Next(0, regularRequests.Length)];
+                    break;
+                case RequestTypes.Vip:
+                    CurrentRequest = vipRequests.FirstOrDefault();
+                    break;
+                case RequestTypes.Empty:
+                    CurrentRequest = null;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
 
