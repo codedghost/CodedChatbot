@@ -4,8 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.EntityFrameworkCore.Storage.Internal;
 using System;
 
 namespace CoreCodedChatbot.Database.Migrations
@@ -55,48 +53,6 @@ namespace CoreCodedChatbot.Database.Migrations
                     b.HasKey("SongId");
 
                     b.ToTable("Songs");
-                });
-
-            modelBuilder.Entity("CoreCodedChatbot.Database.Context.Models.SongGuessingRecord", b =>
-                {
-                    b.Property<int>("SongGuessingRecordId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("SongGuessingRecordId");
-
-                    b.Property<decimal>("FinalPercentage")
-                        .HasColumnName("FinalPercentage");
-
-                    b.Property<bool>("IsInProgress")
-                        .HasColumnName("IsInProgress");
-
-                    b.Property<string>("SongDetails")
-                        .IsRequired()
-                        .HasColumnName("SongDetails");
-
-                    b.Property<bool>("UsersCanGuess")
-                        .HasColumnName("UsersCanGuess");
-
-                    b.HasKey("SongGuessingRecordId");
-
-                    b.ToTable("SongGuessingRecord");
-                });
-
-            modelBuilder.Entity("CoreCodedChatbot.Database.Context.Models.SongPercentageGuess", b =>
-                {
-                    b.Property<int>("SongPercentageGuessId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("SongPercentageGuessId");
-
-                    b.Property<decimal>("Guess")
-                        .HasColumnName("Guess");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnName("Username");
-
-                    b.HasKey("SongPercentageGuessId");
-
-                    b.ToTable("SongPercentageGuess");
                 });
 
             modelBuilder.Entity("CoreCodedChatbot.Database.Context.Models.SongRequest", b =>
