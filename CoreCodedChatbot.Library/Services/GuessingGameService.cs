@@ -5,13 +5,14 @@ using System.Text;
 using System.Threading;
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Database.Context.Models;
+using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Library.Services
 {
-    public class GuessingGameService
+    public class GuessingGameService : IGuessingGameService
     {
         private readonly TwitchClient Client;
         private readonly ConfigModel Config;
@@ -171,6 +172,8 @@ namespace CoreCodedChatbot.Library.Services
                 using (var context = contextFactory.Create())
                 {
                     var currentGameId = GetRunningGameId(context);
+
+                    if (currentGameId == 0) return false;
 
                     var newGuess = new SongPercentageGuess
                     {
