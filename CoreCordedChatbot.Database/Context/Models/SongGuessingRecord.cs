@@ -14,5 +14,7 @@ namespace CoreCodedChatbot.Database.Context.Models
         public decimal FinalPercentage { get; set; }
         public bool UsersCanGuess { get; set; }
         public bool IsInProgress { get; set; }
+
+        public virtual ICollection<SongPercentageGuess> SongPercentageGuesses { get; set; }
     }
 }

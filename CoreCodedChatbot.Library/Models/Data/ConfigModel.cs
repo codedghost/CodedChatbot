@@ -34,5 +34,6 @@
         public string JwtTokenString;
         public string PlaylistApiUrl;
         public int ConcurrentRegularSongsToPlay;
+        public int SecondsForGuessingGame;
     }
 }
