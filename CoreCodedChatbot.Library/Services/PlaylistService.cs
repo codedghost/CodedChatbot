@@ -22,8 +22,8 @@ namespace CoreCodedChatbot.Library.Services
         private readonly IChatbotContextFactory contextFactory;
 
         private PlaylistItem CurrentRequest;
-        private int CurrentRegularRequestsPlayed;
-        private int ConcurrentRegularSongsToPlay;
+        private int CurrentVipRequestsPlayed;
+        private int ConcurrentVipSongsToPlay;
         private Random rand = new Random();
 
         public PlaylistService(IChatbotContextFactory contextFactory, IConfigService configService)
@@ -31,7 +31,7 @@ namespace CoreCodedChatbot.Library.Services
             this.contextFactory = contextFactory;
             this.config = configService.GetConfig();
 
-            this.ConcurrentRegularSongsToPlay = config.ConcurrentRegularSongsToPlay;
+            this.ConcurrentVipSongsToPlay = config.ConcurrentRegularSongsToPlay;
         }
 
         public PlaylistItem GetRequestById(int songId)
@@ -652,8 +652,15 @@ namespace CoreCodedChatbot.Library.Services
 
             if (CurrentRequest.isVip)
             {
-                if (regularRequests.Any())
+                CurrentVipRequestsPlayed++;
+                if (CurrentVipRequestsPlayed < ConcurrentVipSongsToPlay
+                    && vipRequests.Any())
                 {
+                    updateDecision = RequestTypes.Vip;
+                }
+                else if (regularRequests.Any())
+                {
+                    CurrentVipRequestsPlayed = 0;
                     updateDecision = RequestTypes.Regular;
                 }
                 else if (vipRequests.Any())
@@ -667,16 +674,8 @@ namespace CoreCodedChatbot.Library.Services
             }
             else
             {
-                CurrentRegularRequestsPlayed++;
-
-                if (CurrentRegularRequestsPlayed < ConcurrentRegularSongsToPlay 
-                    && regularRequests.Any())
+                if (vipRequests.Any())
                 {
-                    updateDecision = RequestTypes.Regular;
-                }
-                else if (vipRequests.Any())
-                {
-                    CurrentRegularRequestsPlayed = 0;
                     updateDecision = RequestTypes.Vip;
                 }
                 else if (regularRequests.Any())
