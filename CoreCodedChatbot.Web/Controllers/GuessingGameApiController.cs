@@ -42,5 +42,13 @@ namespace CoreCodedChatbot.Web.Controllers
 
             return Json(winner);
         }
+
+        [HttpPost]
+        public IActionResult SubmitGuess([FromBody] decimal guess)
+        {
+            // check if game in progress and submit guess
+
+            return Ok();
+        }
     }
 }

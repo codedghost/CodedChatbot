@@ -38,3 +38,4 @@
 /CoreCodedChatbot.Client/obj
 /CoreCodedChatbot.Client/bin/
 /CoreCodedChatbot.Client/appsettings.Development.json
+/CoreCodedChatbot.Client/config.json

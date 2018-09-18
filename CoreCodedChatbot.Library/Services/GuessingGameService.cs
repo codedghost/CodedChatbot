@@ -22,7 +22,7 @@ namespace CoreCodedChatbot.Library.Services
         private int SecondsElapsed = 0;
 
         public GuessingGameService(IChatbotContextFactory contextFactory,
-            TwitchClient client, ConfigService configService)
+            TwitchClient client, IConfigService configService)
         {
             this.contextFactory = contextFactory;
             this.Client = client;
@@ -31,9 +31,6 @@ namespace CoreCodedChatbot.Library.Services
         
         public void GuessingGameStart(string songName)
         {
-            Client.SendMessage(Config.StreamerChannel,
-                $"The guessing game has begun! You have 30 seconds to !guess the accuracy that {Config.StreamerChannel} will get on {songName}!");
-
             InitialiseGameTimer(songName);
         }
 
@@ -43,10 +40,14 @@ namespace CoreCodedChatbot.Library.Services
             {
                 if (SecondsElapsed == 0)
                 {
+                    Client.SendMessage(Config.StreamerChannel,
+                        $"The guessing game has begun! You have 30 seconds to !guess the accuracy that {Config.StreamerChannel} will get on {songName}!");
                     OpenGuessingGame(songName);
-                }
 
-                SecondsElapsed += 10;
+                    SecondsElapsed += 10;
+
+                    return;
+                }
 
                 if (SecondsElapsed == Config.SecondsForGuessingGame)
                 {
@@ -54,12 +55,14 @@ namespace CoreCodedChatbot.Library.Services
                     SecondsElapsed = 0;
                     // Close guessing game in db
                     CloseGuessingGame();
+                    GameTimer.Dispose();
                     GameTimer = null;
                     return;
                 }
 
-                Client.SendMessage(Config.StreamerChannel, $"{Config.SecondsForGuessingGame - SecondsElapsed} until the guessing game closes!");
-            }, null, TimeSpan.FromSeconds(10), TimeSpan.FromSeconds(10));
+                Client.SendMessage(Config.StreamerChannel, $"{Config.SecondsForGuessingGame - SecondsElapsed} seconds until the guessing game closes!");
+                SecondsElapsed += 10;
+            }, null, TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(10));
         }
 
         private void OpenGuessingGame(string songName)

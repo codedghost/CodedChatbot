@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CoreCodedChatbot.Library.Interfaces.Services;
+using CoreCodedChatbot.Library.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using GuessingGameService = CoreCodedChatbot.Client.Services.GuessingGameService;
 
 namespace CoreCodedChatbot.Client
 {
@@ -22,6 +25,12 @@ namespace CoreCodedChatbot.Client
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
+            services.AddSingleton<IConfigService, ConfigService>();
+
+            var configService = new ConfigService();
+            
+            services.AddSingleton(new GuessingGameService(configService));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

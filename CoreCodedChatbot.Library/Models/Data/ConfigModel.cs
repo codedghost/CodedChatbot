@@ -35,5 +35,7 @@
         public string PlaylistApiUrl;
         public int ConcurrentRegularSongsToPlay;
         public int SecondsForGuessingGame;
+        public string RocksnifferSongDetailsLocation;
+        public string GuessingGameApiUrl;
     }
 }

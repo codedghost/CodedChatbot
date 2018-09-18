@@ -8,4 +8,12 @@
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.4" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CoreCodedChatbot.Library\CoreCodedChatbot.Library.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="config.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>
