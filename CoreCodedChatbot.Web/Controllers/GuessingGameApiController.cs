@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CoreCodedChatbot.Library.Interfaces.Services;
+using CoreCodedChatbot.Library.Models.ApiRequest.GuessingGame;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -44,11 +45,12 @@ namespace CoreCodedChatbot.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult SubmitGuess([FromBody] decimal guess)
+        public IActionResult SubmitGuess([FromBody] SubmitGuessModel submitGuessModel)
         {
-            // check if game in progress and submit guess
+            if (guessingGameService.UserGuess(submitGuessModel.Username, submitGuessModel.Guess))
+                return Ok();
 
-            return Ok();
+            return BadRequest();
         }
     }
 }

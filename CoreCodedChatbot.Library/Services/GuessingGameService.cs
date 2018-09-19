@@ -168,7 +168,7 @@ namespace CoreCodedChatbot.Library.Services
             return context.SongGuessingRecords?.SingleOrDefault(x => x.IsInProgress)?.SongGuessingRecordId ?? 0;
         }
 
-        public bool UserGuess(decimal percentageGuess, string username)
+        public bool UserGuess(string username, decimal percentageGuess)
         {
             try
             {

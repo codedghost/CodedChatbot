@@ -9,6 +9,6 @@ namespace CoreCodedChatbot.Library.Interfaces.Services
     {
         void GuessingGameStart(string songName);
         GuessingGameWinner SetPercentageAndFinishGame(decimal finalPercentage);
-        bool UserGuess(decimal percentageGuess, string username);
+        bool UserGuess(string username, decimal percentageGuess);
     }
 }
