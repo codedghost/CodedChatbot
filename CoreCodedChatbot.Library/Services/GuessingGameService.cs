@@ -55,7 +55,6 @@ namespace CoreCodedChatbot.Library.Services
                     SecondsElapsed = 0;
                     // Close guessing game in db
                     CloseGuessingGame();
-                    GameTimer.Dispose();
                     GameTimer = null;
                     return;
                 }
@@ -107,7 +106,7 @@ namespace CoreCodedChatbot.Library.Services
             }
         }
 
-        public GuessingGameWinner SetPercentageAndFinishGame(decimal finalPercentage)
+        public bool SetPercentageAndFinishGame(decimal finalPercentage)
         {
             try
             {
@@ -119,7 +118,7 @@ namespace CoreCodedChatbot.Library.Services
                     {
                         Console.WriteLine(
                             "Either the game has already been completed or there is currently more than 1 guessing game running");
-                        return null;
+                        return false;
                     }
 
                     currentGuessingGameRecord.IsInProgress = false;
@@ -127,32 +126,80 @@ namespace CoreCodedChatbot.Library.Services
                     context.SaveChanges();
 
                     // Find closest guess.
-                    return GetCurrentGameWinner(currentGuessingGameRecord);
+                    AnnounceCurrentGameWinner(currentGuessingGameRecord);
+                    return true;
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine($"{e} - {e.InnerException}");
-                return null;
+                return false;
             }
         }
 
-        private GuessingGameWinner GetCurrentGameWinner(SongGuessingRecord currentGuessingRecord)
+        private void AnnounceCurrentGameWinner(SongGuessingRecord currentGuessingRecord)
         {
             var potentialWinnerModels = currentGuessingRecord.SongPercentageGuesses.Select(pg =>
                 (Math.Abs(currentGuessingRecord.FinalPercentage - pg.Guess), pg));
 
-            var winner = potentialWinnerModels.OrderBy(w => w.Item1).FirstOrDefault();
+            var orderedWinners = potentialWinnerModels.OrderBy(w => w.Item1).ToList();
 
+            var firstWinner = orderedWinners.FirstOrDefault();
+            var winners = orderedWinners.Where(w => w.Item1 == firstWinner.Item1).ToList();
             // No-one guessed?
-            if (winner.Item1 == 0 && winner.Item2 == null) return new GuessingGameWinner();
+            if (!winners.Any())
+                Client.SendMessage(Config.StreamerChannel, "Nobody guessed! Good luck next time :)");
 
-            return new GuessingGameWinner
+            var result = new GuessingGameWinner
             {
-                Username = winner.Item2.Username,
-                Difference = winner.Item1,
-                BytesWon = winner.Item1 == 0 ? Config.BytesToVip : winner.Item1 <= 1 ? Config.BytesToVip / 2 : Config.BytesToVip / 4
+                Usernames = winners.Select(w => w.Item2.Username).ToArray(),
+                Difference = firstWinner.Item1,
+                BytesWon = (decimal)(firstWinner.Item1 == 0 ? 1 / winners.Count :
+                    firstWinner.Item1 <= 1 ? 0.5 / winners.Count :
+                    0.25 / winners.Count)
             };
+
+            // TODO: URGENT -> Refactor this to own service when bytes service is brought over to library project.
+            GiveBytes(result);
+
+            Client.SendMessage(Config.StreamerChannel,
+                result.Difference == 0
+                    ? $"{result.FormattedUsernames} has won! You were spot on! You've received {result.BytesWon} bytes"
+                    : $"{result.FormattedUsernames} has won! You were {result.Difference} away from the actual score. You've received {result.BytesWon} bytes");
+        }
+
+        private void GiveBytes(GuessingGameWinner winner)
+        {
+            using (var context = contextFactory.Create())
+            {
+                foreach (var username in winner.Usernames)
+                {
+                    // Find or add user
+                    var user = context.Users.Find(username);
+
+                    if (user == null)
+                    {
+                        user = new User
+                        {
+                            Username = username.ToLower(),
+                            UsedVipRequests = 0,
+                            ModGivenVipRequests = 0,
+                            FollowVipRequest = 0,
+                            SubVipRequests = 0,
+                            DonationOrBitsVipRequests = 0,
+                            TokenBytes = 0
+                        };
+
+                        context.Users.Add(user);
+                    }
+
+                    var bytesValueToGive = (int)Math.Round(Config.BytesToVip * winner.BytesWon);
+
+                    user.TokenBytes += (int) Math.Round(winner.BytesWon * Config.BytesToVip);
+                }
+
+                context.SaveChanges();
+            }
         }
 
         private int GetRunningGameId()

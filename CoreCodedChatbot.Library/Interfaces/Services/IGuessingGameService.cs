@@ -8,7 +8,7 @@ namespace CoreCodedChatbot.Library.Interfaces.Services
     public interface IGuessingGameService
     {
         void GuessingGameStart(string songName);
-        GuessingGameWinner SetPercentageAndFinishGame(decimal finalPercentage);
+        bool SetPercentageAndFinishGame(decimal finalPercentage);
         bool UserGuess(string username, decimal percentageGuess);
     }
 }

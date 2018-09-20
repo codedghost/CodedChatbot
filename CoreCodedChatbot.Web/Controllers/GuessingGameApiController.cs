@@ -39,9 +39,12 @@ namespace CoreCodedChatbot.Web.Controllers
         [HttpPost]
         public IActionResult FinishGuessingGame([FromBody] decimal finalPercentage)
         {
-            var winner = guessingGameService.SetPercentageAndFinishGame(finalPercentage);
+            if (guessingGameService.SetPercentageAndFinishGame(finalPercentage))
+            {
+                return Ok();
+            }
 
-            return Json(winner);
+            return BadRequest();
         }
 
         [HttpPost]
