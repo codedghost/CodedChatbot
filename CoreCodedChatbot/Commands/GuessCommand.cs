@@ -18,13 +18,13 @@ namespace CoreCodedChatbot.Commands
         private ConfigModel Config;
         private HttpClient GuessingGameClient;
 
-        public GuessCommand(IConfigService configService)
+        public GuessCommand(ConfigModel config)
         {
-            this.Config = configService.GetConfig();
+            this.Config = config;
             
             this.GuessingGameClient = new HttpClient
             {
-                BaseAddress = new Uri(Config.PlaylistApiUrl),
+                BaseAddress = new Uri(Config.GuessingGameApiUrl),
                 DefaultRequestHeaders =
                 {
                     Authorization = new AuthenticationHeaderValue("Bearer", Config.JwtTokenString)
