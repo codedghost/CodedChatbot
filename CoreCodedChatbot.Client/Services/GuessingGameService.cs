@@ -58,7 +58,7 @@ namespace CoreCodedChatbot.Client.Services
 
             var timerText = GetFileContents(songTimerLocation);
             var songName = GetFileContents(songDetailsLocation);
-            var finalAccuracy = GetFileContents(songAccuracyLocation).Trim('%');
+            var finalPercentage = GetFileContents(songAccuracyLocation).Trim('%');
 
             if (string.IsNullOrWhiteSpace(timerText)) return;
 
@@ -68,7 +68,7 @@ namespace CoreCodedChatbot.Client.Services
 
             if (runningTimeInSeconds != 0)
             {
-                if (!hasGameStarted)
+                if (!hasGameStarted && !hasGameBeenCompleted)
                 {
                     // send request to start guessing game
                     hasGameStarted = true;
@@ -93,7 +93,7 @@ namespace CoreCodedChatbot.Client.Services
 
                 // send percentage to server and finish game
                 var completedResult = await guessingGameClient.PostAsync("FinishGuessingGame",
-                    HttpClientHelper.GetJsonData(new {songAccuracy = finalAccuracy}));
+                    HttpClientHelper.GetJsonData(finalPercentage));
 
                 if (!completedResult.IsSuccessStatusCode) return;
 
