@@ -20,6 +20,8 @@ using CoreCodedChatbot.Library.Services;
 using CoreCodedChatbot.Web.Interfaces;
 using CoreCodedChatbot.Web.Services;
 using CoreCodedChatbot.Web.SignalRHubs;
+using TwitchLib.Client;
+using TwitchLib.Client.Models;
 
 namespace CoreCodedChatbot.Web
 {
@@ -62,8 +64,16 @@ namespace CoreCodedChatbot.Web
 
             services.AddSignalR();
 
+
+            var creds = new ConnectionCredentials(config.ChatbotNick, config.ChatbotPass);
+            var client = new TwitchClient();
+            client.Initialize(creds, config.StreamerChannel);
+            client.Connect();
+
+            services.AddSingleton(client);
             services.AddSingleton<IChatbotContextFactory, ChatbotContextFactory>();
             services.AddSingleton<IConfigService, ConfigService>();
+            services.AddSingleton<IGuessingGameService, GuessingGameService>();
             services.AddSingleton(typeof(SignalRHeartbeatService), typeof(SignalRHeartbeatService));
             services.AddSingleton<IChatterService, ChatterService>();
             services.AddSingleton<IPlaylistService, PlaylistService>();
