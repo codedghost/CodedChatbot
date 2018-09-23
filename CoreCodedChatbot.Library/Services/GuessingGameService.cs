@@ -30,7 +30,7 @@ namespace CoreCodedChatbot.Library.Services
             this.Client = client;
             this.Config = configService.GetConfig();
         }
-        
+
         public void GuessingGameStart(string songName)
         {
             lock (gameStartLock)
@@ -38,9 +38,10 @@ namespace CoreCodedChatbot.Library.Services
                 if (isGameStarted) return;
 
                 isGameStarted = true;
-                InitialiseGameTimer(songName);
-                isGameStarted = false;
             }
+
+            InitialiseGameTimer(songName);
+            isGameStarted = false;
         }
 
         private async void InitialiseGameTimer(string songName)
