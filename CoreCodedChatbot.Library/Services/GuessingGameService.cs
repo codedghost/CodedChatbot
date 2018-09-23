@@ -247,14 +247,24 @@ namespace CoreCodedChatbot.Library.Services
 
                     if (currentGameId == 0) return false;
 
-                    var newGuess = new SongPercentageGuess
-                    {
-                        Guess = percentageGuess,
-                        SongGuessingRecordId = currentGameId,
-                        Username = username
-                    };
+                    var existingGuess = context.SongPercentageGuesses.SingleOrDefault(g =>
+                        g.SongGuessingRecordId == currentGameId && g.Username == username);
 
-                    context.SongPercentageGuesses.Add(newGuess);
+                    
+                    if (existingGuess == null)
+                    {
+                        existingGuess = new SongPercentageGuess
+                        {
+                            Guess = percentageGuess,
+                            SongGuessingRecordId = currentGameId,
+                            Username = username
+                        };
+                        context.SongPercentageGuesses.Add(existingGuess);
+                    }
+                    else
+                    {
+                        existingGuess.Guess = percentageGuess;
+                    }
                     context.SaveChanges();
 
                     return true;
