@@ -19,6 +19,8 @@ namespace CoreCodedChatbot.Library.Services
         private readonly ConfigModel Config;
         private IChatbotContextFactory contextFactory;
 
+        private static object gameStartLock;
+
         private static bool isGameStarted = false;
 
         public GuessingGameService(IChatbotContextFactory contextFactory,
@@ -28,12 +30,16 @@ namespace CoreCodedChatbot.Library.Services
             this.Client = client;
             this.Config = configService.GetConfig();
         }
-        
+
         public void GuessingGameStart(string songName)
         {
-            if (isGameStarted) return;
+            lock (gameStartLock)
+            {
+                if (isGameStarted) return;
 
-            isGameStarted = true;
+                isGameStarted = true;
+            }
+
             InitialiseGameTimer(songName);
             isGameStarted = false;
         }
@@ -49,13 +55,13 @@ namespace CoreCodedChatbot.Library.Services
             Client.SendMessage(Config.StreamerChannel,
                 $"The guessing game has begun! You have 60 seconds to !guess the accuracy that {Config.StreamerChannel} will get on {songName}!");
 
-            await Task.Delay(TimeSpan.FromSeconds(10));
+            await Task.Delay(TimeSpan.FromSeconds(30));
 
-            for (var x = 10; x < Config.SecondsForGuessingGame; x += 10) // timer
-            {
-                Client.SendMessage(Config.StreamerChannel, $"{Config.SecondsForGuessingGame - x} seconds until the guessing game closes!");
-                await Task.Delay(TimeSpan.FromSeconds(10));
-            }
+            Client.SendMessage(Config.StreamerChannel, $"30 seconds until the guessing game closes!");
+
+            await Task.Delay(TimeSpan.FromSeconds(20));
+
+            Client.SendMessage(Config.StreamerChannel, $"10 seconds until the guessing game closes!");
 
             if (!CloseGuessingGame())
             {
