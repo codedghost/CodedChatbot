@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Database.Context.Models;
 using CoreCodedChatbot.Library.Interfaces.Services;
@@ -18,8 +19,7 @@ namespace CoreCodedChatbot.Library.Services
         private readonly ConfigModel Config;
         private IChatbotContextFactory contextFactory;
 
-        private Timer GameTimer;
-        private int SecondsElapsed = 0;
+        private static bool isGameStarted = false;
 
         public GuessingGameService(IChatbotContextFactory contextFactory,
             TwitchClient client, IConfigService configService)
@@ -31,40 +31,41 @@ namespace CoreCodedChatbot.Library.Services
         
         public void GuessingGameStart(string songName)
         {
+            if (isGameStarted) return;
+
+            isGameStarted = true;
             InitialiseGameTimer(songName);
+            isGameStarted = false;
         }
 
-        private void InitialiseGameTimer(string songName)
+        private async void InitialiseGameTimer(string songName)
         {
-            GameTimer = new Timer(x =>
+            if (!OpenGuessingGame(songName))
             {
-                if (SecondsElapsed == 0)
-                {
-                    Client.SendMessage(Config.StreamerChannel,
-                        $"The guessing game has begun! You have 30 seconds to !guess the accuracy that {Config.StreamerChannel} will get on {songName}!");
-                    OpenGuessingGame(songName);
+                Client.SendMessage(Config.StreamerChannel, "I couldn't start the guessing game :S");
+                return;
+            }
 
-                    SecondsElapsed += 10;
+            Client.SendMessage(Config.StreamerChannel,
+                $"The guessing game has begun! You have 60 seconds to !guess the accuracy that {Config.StreamerChannel} will get on {songName}!");
 
-                    return;
-                }
+            await Task.Delay(TimeSpan.FromSeconds(10));
 
-                if (SecondsElapsed == Config.SecondsForGuessingGame)
-                {
-                    Client.SendMessage(Config.StreamerChannel, "The guessing game has now closed. Good luck everyone!");
-                    SecondsElapsed = 0;
-                    // Close guessing game in db
-                    CloseGuessingGame();
-                    GameTimer = null;
-                    return;
-                }
+            for (var x = 10; x < Config.SecondsForGuessingGame; x += 10) // timer
+            {
+                Client.SendMessage(Config.StreamerChannel, $"{Config.SecondsForGuessingGame - x} seconds until the guessing game closes!");
+                await Task.Delay(TimeSpan.FromSeconds(10));
+            }
 
-                Client.SendMessage(Config.StreamerChannel, $"{Config.SecondsForGuessingGame - SecondsElapsed} seconds until the guessing game closes!");
-                SecondsElapsed += 10;
-            }, null, TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(10));
+            if (!CloseGuessingGame())
+            {
+                Client.SendMessage(Config.StreamerChannel, "I couldn't close the guessing game for some reason... SEND HALP");
+            }
+
+            Client.SendMessage(Config.StreamerChannel, "The guessing game has now closed. Good luck everyone!");
         }
 
-        private void OpenGuessingGame(string songName)
+        private bool OpenGuessingGame(string songName)
         {
             try
             {
@@ -81,28 +82,49 @@ namespace CoreCodedChatbot.Library.Services
 
                     context.SongGuessingRecords.Add(newGuessRecord);
                     context.SaveChanges();
+
+                    return true;
                 }
             }
             catch (Exception e)
             {
                 Console.WriteLine($"{e} - {e.InnerException}");
+                return false;
             }
         }
 
-        private void CloseGuessingGame()
+        private bool CloseGuessingGame()
         {
-            using (var context = contextFactory.Create())
+            try
             {
-                var currentGuessingGameRecord = context.SongGuessingRecords.SingleOrDefault(x => x.UsersCanGuess);
-
-                if (currentGuessingGameRecord == null)
+                using (var context = contextFactory.Create())
                 {
-                    Console.WriteLine("Looks like this game is already closed");
-                    return;
-                }
+                    var currentGuessingGameRecords = context.SongGuessingRecords.Where(x => x.UsersCanGuess);
 
-                currentGuessingGameRecord.UsersCanGuess = false;
-                context.SaveChanges();
+                    if (!currentGuessingGameRecords.Any())
+                    {
+                        Console.WriteLine("Looks like this game is already closed");
+                        return false;
+                    }
+
+                    var currentGuessingGameRecord = currentGuessingGameRecords.FirstOrDefault();
+
+                    if (currentGuessingGameRecord == null)
+                    {
+                        Console.WriteLine("This really shouldn't happen");
+                        return false;
+                    }
+
+                    currentGuessingGameRecord.UsersCanGuess = false;
+                    context.SaveChanges();
+
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"{e} - {e.InnerException}");
+                return false;
             }
         }
 
@@ -126,7 +148,7 @@ namespace CoreCodedChatbot.Library.Services
                     context.SaveChanges();
 
                     // Find closest guess.
-                    AnnounceCurrentGameWinner(currentGuessingGameRecord);
+                    AnnounceCurrentGameWinner(currentGuessingGameRecord, context);
                     return true;
                 }
             }
@@ -137,9 +159,11 @@ namespace CoreCodedChatbot.Library.Services
             }
         }
 
-        private void AnnounceCurrentGameWinner(SongGuessingRecord currentGuessingRecord)
+        private void AnnounceCurrentGameWinner(SongGuessingRecord currentGuessingRecord, IChatbotContext context)
         {
-            var potentialWinnerModels = currentGuessingRecord.SongPercentageGuesses.Select(pg =>
+            var potentialWinnerModels = context.SongPercentageGuesses
+                .Where(g => g.SongGuessingRecord.SongGuessingRecordId == currentGuessingRecord.SongGuessingRecordId).ToList()
+                .Select(pg =>
                 (Math.Abs(currentGuessingRecord.FinalPercentage - pg.Guess), pg));
 
             var orderedWinners = potentialWinnerModels.OrderBy(w => w.Item1).ToList();
@@ -193,8 +217,6 @@ namespace CoreCodedChatbot.Library.Services
                         context.Users.Add(user);
                     }
 
-                    var bytesValueToGive = (int)Math.Round(Config.BytesToVip * winner.BytesWon);
-
                     user.TokenBytes += (int) Math.Round(winner.BytesWon * Config.BytesToVip);
                 }
 
@@ -225,14 +247,24 @@ namespace CoreCodedChatbot.Library.Services
 
                     if (currentGameId == 0) return false;
 
-                    var newGuess = new SongPercentageGuess
-                    {
-                        Guess = percentageGuess,
-                        SongGuessingRecordId = currentGameId,
-                        Username = username
-                    };
+                    var existingGuess = context.SongPercentageGuesses.SingleOrDefault(g =>
+                        g.SongGuessingRecordId == currentGameId && g.Username == username);
 
-                    context.SongPercentageGuesses.Add(newGuess);
+                    
+                    if (existingGuess == null)
+                    {
+                        existingGuess = new SongPercentageGuess
+                        {
+                            Guess = percentageGuess,
+                            SongGuessingRecordId = currentGameId,
+                            Username = username
+                        };
+                        context.SongPercentageGuesses.Add(existingGuess);
+                    }
+                    else
+                    {
+                        existingGuess.Guess = percentageGuess;
+                    }
                     context.SaveChanges();
 
                     return true;
