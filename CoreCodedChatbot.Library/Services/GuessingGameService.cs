@@ -19,7 +19,7 @@ namespace CoreCodedChatbot.Library.Services
         private readonly ConfigModel Config;
         private IChatbotContextFactory contextFactory;
 
-        private static object gameStartLock;
+        private static string gameStartLock = "";
 
         private static bool isGameStarted = false;
 
