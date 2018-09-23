@@ -19,7 +19,7 @@ namespace CoreCodedChatbot.Library.Services
         private readonly ConfigModel Config;
         private IChatbotContextFactory contextFactory;
 
-        private bool isGameStarted = false;
+        private static bool isGameStarted = false;
 
         public GuessingGameService(IChatbotContextFactory contextFactory,
             TwitchClient client, IConfigService configService)
@@ -216,8 +216,6 @@ namespace CoreCodedChatbot.Library.Services
 
                         context.Users.Add(user);
                     }
-
-                    var bytesValueToGive = (int)Math.Round(Config.BytesToVip * winner.BytesWon);
 
                     user.TokenBytes += (int) Math.Round(winner.BytesWon * Config.BytesToVip);
                 }
