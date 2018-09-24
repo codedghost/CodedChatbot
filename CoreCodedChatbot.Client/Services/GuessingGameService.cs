@@ -39,11 +39,11 @@ namespace CoreCodedChatbot.Client.Services
 
             // Using a polling model rather than FileWatcher.
             // File watcher is triggered a lot due to the file being continually written to.
-            checkFileTimer = new Timer(x => CheckRocksnifferFiles(),
-                null, TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(1));
+            checkFileTimer = new Timer(async x => await CheckRocksnifferFiles(),
+                null, TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(2));
         }
 
-        private async void CheckRocksnifferFiles()
+        private async Task CheckRocksnifferFiles()
         {
 
             var songDetailsLocation = config.RocksnifferSongDetailsLocation + "song_details.txt";
