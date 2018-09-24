@@ -19,8 +19,6 @@ namespace CoreCodedChatbot.Library.Services
         private readonly ConfigModel Config;
         private IChatbotContextFactory contextFactory;
 
-        private static string gameStartLock = "";
-
         private static bool isGameStarted = false;
 
         public GuessingGameService(IChatbotContextFactory contextFactory,
@@ -33,12 +31,9 @@ namespace CoreCodedChatbot.Library.Services
 
         public void GuessingGameStart(string songName)
         {
-            lock (gameStartLock)
-            {
-                if (isGameStarted) return;
+            if (isGameStarted) return;
 
-                isGameStarted = true;
-            }
+            isGameStarted = true;
 
             InitialiseGameTimer(songName);
             isGameStarted = false;
