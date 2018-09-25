@@ -17,9 +17,12 @@ namespace CoreCodedChatbot.Client
             BuildWebHost(args).Run();
         }
 
+
+
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
+                .UseUrls("http://localhost:5001/") // TODO: Make this pull from command line args or config file
                 .Build();
     }
 }
