@@ -235,7 +235,7 @@ namespace CoreCodedChatbot.Library.Services
 
         private int GetRunningGameId(IChatbotContext context)
         {
-            return context.SongGuessingRecords?.SingleOrDefault(x => x.IsInProgress)?.SongGuessingRecordId ?? 0;
+            return context.SongGuessingRecords?.SingleOrDefault(x => x.UsersCanGuess)?.SongGuessingRecordId ?? 0;
         }
 
         public bool UserGuess(string username, decimal percentageGuess)
