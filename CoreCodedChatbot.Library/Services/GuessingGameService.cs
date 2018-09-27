@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,7 +20,7 @@ namespace CoreCodedChatbot.Library.Services
         private readonly ConfigModel Config;
         private IChatbotContextFactory contextFactory;
 
-        private static bool isGameStarted = false;
+        private ConcurrentDictionary<string, bool> GameStartedValues = new ConcurrentDictionary<string, bool>();
 
         public GuessingGameService(IChatbotContextFactory contextFactory,
             TwitchClient client, IConfigService configService)
@@ -31,12 +32,12 @@ namespace CoreCodedChatbot.Library.Services
 
         public void GuessingGameStart(string songName)
         {
-            if (isGameStarted) return;
+            if (GameStartedValues.GetOrAdd("IsGameStarted", false)) return;
 
-            isGameStarted = true;
+            GameStartedValues.AddOrUpdate("IsGameStarted", true, (key, oldValue) => true);
 
             InitialiseGameTimer(songName);
-            isGameStarted = false;
+            GameStartedValues.AddOrUpdate("IsGameStarted", false, (key, oldValue) => false);
         }
 
         private async void InitialiseGameTimer(string songName)
