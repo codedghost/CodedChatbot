@@ -63,7 +63,7 @@ namespace CoreCodedChatbot.Web.Controllers
         [HttpGet]
         public IActionResult Library()
         {
-            using (var sr = new StreamReader(Path.GetFullPath(Directory.GetCurrentDirectory() + "\\SongsMasterGrid.json")))
+            using (var sr = new StreamReader(Path.Combine(Directory.GetCurrentDirectory(), "SongsMasterGrid.json")))
             {
                 return View(JsonConvert.DeserializeObject<SongLibraryRecords>(sr.ReadToEnd()));
             }
