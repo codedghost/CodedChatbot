@@ -76,16 +76,11 @@ namespace CoreCodedChatbot.Client.Services
 
                     var result = await guessingGameClient.PostAsync("StartGuessingGame", HttpClientHelper.GetJsonData(songName));
 
-                    if (result.IsSuccessStatusCode)
-                    {
-                        totalTime = ConvertTimerToSeconds(timer[1]);
-                        return;
-                    }
+                    if (!result.IsSuccessStatusCode) return;
 
-                    //OnFail
-                    hasGameStarted = false;
-
+                    totalTime = ConvertTimerToSeconds(timer[1]);
                     return;
+
                 }
 
                 // Need hasGameBeenCompleted flag as the file remains on full time for a few seconds, allowing us to grab the final score.
