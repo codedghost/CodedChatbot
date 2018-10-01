@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
@@ -7,6 +8,7 @@ using AspNet.Security.OAuth.Twitch;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
+using CoreCodedChatbot.Library.Models.SongLibrary;
 using CoreCodedChatbot.Library.Models.View;
 using CoreCodedChatbot.Web.Interfaces;
 using CoreCodedChatbot.Web.Services;
@@ -56,6 +58,15 @@ namespace CoreCodedChatbot.Web.Controllers
             ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
 
             return View(playlistModel);
+        }
+
+        [HttpGet]
+        public IActionResult Library()
+        {
+            using (var sr = new StreamReader(Path.GetFullPath(Directory.GetCurrentDirectory() + "\\SongsMasterGrid.json")))
+            {
+                return View(JsonConvert.DeserializeObject<SongLibraryRecords>(sr.ReadToEnd()));
+            }
         }
 
         [HttpPost]
