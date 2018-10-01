@@ -166,7 +166,7 @@ namespace CoreCodedChatbot.Library.Services
             var potentialWinnerModels = context.SongPercentageGuesses
                 .Where(g => g.SongGuessingRecord.SongGuessingRecordId == currentGuessingRecord.SongGuessingRecordId).ToList()
                 .Select(pg =>
-                (Math.Abs(currentGuessingRecord.FinalPercentage - pg.Guess), pg));
+                (Math.Floor(Math.Abs(currentGuessingRecord.FinalPercentage - pg.Guess) * 10) / 10, pg));
 
             var orderedWinners = potentialWinnerModels.OrderBy(w => w.Item1).ToList();
 
@@ -180,7 +180,7 @@ namespace CoreCodedChatbot.Library.Services
             {
                 Usernames = winners.Select(w => w.Item2.Username).ToArray(),
                 Difference = firstWinner.Item1,
-                BytesWon = (decimal)(firstWinner.Item1 == 0 ? 1 / winners.Count :
+                BytesWon = (decimal)(firstWinner.Item1 == 0 ? 1.0 / winners.Count :
                     firstWinner.Item1 <= 1 ? 0.5 / winners.Count :
                     0.25 / winners.Count)
             };
