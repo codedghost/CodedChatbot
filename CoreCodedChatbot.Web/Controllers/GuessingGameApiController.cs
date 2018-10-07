@@ -15,17 +15,27 @@ namespace CoreCodedChatbot.Web.Controllers
     {
         private IGuessingGameService guessingGameService;
 
+        private object timerLock = new object();
+
         public GuessingGameApiController(IGuessingGameService guessingGameService)
         {
             this.guessingGameService = guessingGameService;
         }
 
         [HttpPost]
-        public IActionResult StartGuessingGame([FromBody] string songName)
+        public IActionResult StartGuessingGame([FromBody] StartGuessingGameModel songInfo)
         {
             try
             {
-                guessingGameService.GuessingGameStart(songName);
+                bool isGameInProgress;
+                lock (timerLock)
+                {
+                    // Check guessing game state
+                    isGameInProgress = guessingGameService.IsGuessingGameInProgress();
+                }
+
+                if (!isGameInProgress)
+                    guessingGameService.GuessingGameStart(songInfo.SongName, songInfo.SongLengthSeconds);
 
                 return Ok();
             }
