@@ -39,3 +39,4 @@
 /CoreCodedChatbot.Client/bin/
 /CoreCodedChatbot.Client/appsettings.Development.json
 /CoreCodedChatbot.Client/config.json
+/Website/node_modules

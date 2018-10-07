@@ -73,6 +73,7 @@ namespace CoreCodedChatbot.Web
             services.AddSingleton(client);
             services.AddSingleton<IChatbotContextFactory, ChatbotContextFactory>();
             services.AddSingleton<IConfigService, ConfigService>();
+            services.AddSingleton<IVipService, VipService>();
             services.AddSingleton<IGuessingGameService, GuessingGameService>();
             services.AddSingleton(typeof(SignalRHeartbeatService), typeof(SignalRHeartbeatService));
             services.AddSingleton<IChatterService, ChatterService>();
