@@ -40,7 +40,10 @@ namespace CoreCodedChatbot.Commands
             var commandSplit = commandText.Split(" ");
 
             if (!commandSplit.Any() || commandSplit.Length != 1 || !commandSplit[0].Contains("@"))
+            {
                 client.SendMessage(config.StreamerChannel, $"Hey @{username}, you need to @ someone to gift a vip!");
+                return;
+            }
 
             var giftVipModel = new GiftVipModel
             {
@@ -52,11 +55,14 @@ namespace CoreCodedChatbot.Commands
                 HttpClientHelper.GetJsonData(giftVipModel));
 
             if (giftVipResult.IsSuccessStatusCode)
+            {
                 client.SendMessage(config.StreamerChannel,
                     $"Hey @{username}, I have given @{giftVipModel.ReceiverUsername} one of your VIPs");
+                return;
+            }
 
             client.SendMessage(config.StreamerChannel,
-                $"Hey @{username}, I couldn't give the VIP for some reason");
+                $"Hey @{username}, I couldn't give the VIP for some reason, did you mistype the @?");
         }
 
         public void ShowHelp(TwitchClient client, string username)

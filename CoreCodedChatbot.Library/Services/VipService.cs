@@ -22,7 +22,7 @@ namespace CoreCodedChatbot.Library.Services
         public bool GiftVip(string donorUsername, string receiverUsername)
         {
             var donorUser = GetUser(donorUsername);
-            var receiverUser = GetUser(receiverUsername);
+            var receiverUser = GetUser(receiverUsername, false);
 
             if (donorUser == null || receiverUser == null) return false;
 
@@ -35,8 +35,8 @@ namespace CoreCodedChatbot.Library.Services
             {
                 using (var context = chatbotContextFactory.Create())
                 {
-                    var donorUser = context.Users.Find(donor);
-                    var receiverUser = context.Users.Find(receiver);
+                    var donorUser = context.Users.Find(donor.Username);
+                    var receiverUser = context.Users.Find(receiver.Username);
 
                     donorUser.SentGiftVipRequests++;
                     receiverUser.ReceivedGiftVipRequests++;
@@ -53,12 +53,16 @@ namespace CoreCodedChatbot.Library.Services
             return true;
         }
 
-        private User GetUser(string username)
+        private User GetUser(string username, bool createUser = true)
         {
             using (var context = chatbotContextFactory.Create())
             {
-                return context.Users.Find(username.ToLower())
-                    ?? this.AddUser(context, username, false);
+                var user = context.Users.Find(username.ToLower());
+
+                if (user == null && createUser)
+                    user = this.AddUser(context, username, false);
+
+                return user;
             }
         }
 
