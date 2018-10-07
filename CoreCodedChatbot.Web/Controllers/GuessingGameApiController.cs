@@ -15,6 +15,8 @@ namespace CoreCodedChatbot.Web.Controllers
     {
         private IGuessingGameService guessingGameService;
 
+        private object timerLock = new object();
+
         public GuessingGameApiController(IGuessingGameService guessingGameService)
         {
             this.guessingGameService = guessingGameService;
@@ -25,7 +27,14 @@ namespace CoreCodedChatbot.Web.Controllers
         {
             try
             {
-                guessingGameService.GuessingGameStart(songName);
+                bool isGameInProgress;
+                lock (timerLock)
+                {
+                    // Check guessing game state
+                    isGameInProgress = guessingGameService.IsGuessingGameInProgress();
+                }
+                
+                if (!isGameInProgress) guessingGameService.GuessingGameStart(songName);
 
                 return Ok();
             }

@@ -10,5 +10,7 @@ namespace CoreCodedChatbot.Library.Interfaces.Services
         void GuessingGameStart(string songName);
         bool SetPercentageAndFinishGame(decimal finalPercentage);
         bool UserGuess(string username, decimal percentageGuess);
+        bool IsGuessingGameInProgress();
+        bool SetGuessingGameState(bool state);
     }
 }

@@ -20,8 +20,8 @@ namespace CoreCodedChatbot.Library.Services
         private readonly ConfigModel Config;
         private IChatbotContextFactory contextFactory;
 
-        private ConcurrentDictionary<string, bool> GameStartedValues = new ConcurrentDictionary<string, bool>();
-
+        private const string GuessingGameStateSettingKey = "IsGuessingGameInProgress";
+        
         public GuessingGameService(IChatbotContextFactory contextFactory,
             TwitchClient client, IConfigService configService)
         {
@@ -32,12 +32,9 @@ namespace CoreCodedChatbot.Library.Services
 
         public void GuessingGameStart(string songName)
         {
-            if (GameStartedValues.GetOrAdd("IsGameStarted", false)) return;
-
-            GameStartedValues.AddOrUpdate("IsGameStarted", true, (key, oldValue) => true);
+            SetGuessingGameState(true);
 
             InitialiseGameTimer(songName);
-            GameStartedValues.AddOrUpdate("IsGameStarted", false, (key, oldValue) => false);
         }
 
         private async void InitialiseGameTimer(string songName)
@@ -51,13 +48,7 @@ namespace CoreCodedChatbot.Library.Services
             Client.SendMessage(Config.StreamerChannel,
                 $"The guessing game has begun! You have 60 seconds to !guess the accuracy that {Config.StreamerChannel} will get on {songName}!");
 
-            await Task.Delay(TimeSpan.FromSeconds(30));
-
-            Client.SendMessage(Config.StreamerChannel, $"30 seconds until the guessing game closes!");
-
-            await Task.Delay(TimeSpan.FromSeconds(20));
-
-            Client.SendMessage(Config.StreamerChannel, $"10 seconds until the guessing game closes!");
+            await Task.Delay(TimeSpan.FromSeconds(60));
 
             if (!CloseGuessingGame())
             {
@@ -65,6 +56,8 @@ namespace CoreCodedChatbot.Library.Services
             }
 
             Client.SendMessage(Config.StreamerChannel, "The guessing game has now closed. Good luck everyone!");
+
+            SetGuessingGameState(false);
         }
 
         private bool OpenGuessingGame(string songName)
@@ -292,6 +285,69 @@ namespace CoreCodedChatbot.Library.Services
             }
 
             context.SaveChanges();
+        }
+        
+        public bool IsGuessingGameInProgress()
+        {
+            try
+            {
+                using (var context = contextFactory.Create())
+                {
+                    var guessingGameVal =
+                        context.Settings.SingleOrDefault(s => s.SettingName == GuessingGameStateSettingKey);
+
+                    if (guessingGameVal == null)
+                    {
+                        guessingGameVal = new Setting
+                        {
+                            SettingName = GuessingGameStateSettingKey,
+                            SettingValue = "false"
+                        };
+
+                        context.Settings.Add(guessingGameVal);
+                        context.SaveChanges();
+                    }
+
+                    return guessingGameVal.SettingValue == "true";
+                }
+            }
+            catch (Exception e)
+            {
+                Console.Out.WriteLine($"{e} - {e.InnerException}");
+                return true;
+            }
+        }
+
+        public bool SetGuessingGameState(bool state)
+        {
+            try
+            {
+                using (var context = contextFactory.Create())
+                {
+                    var currentState =
+                        context.Settings.SingleOrDefault(s => s.SettingName == GuessingGameStateSettingKey);
+
+                    if (currentState == null)
+                    {
+                        currentState = new Setting
+                        {
+                            SettingName = GuessingGameStateSettingKey
+                        };
+
+                        context.Settings.Add(currentState);
+                    }
+
+                    currentState.SettingValue = state ? "true" : "false";
+                    context.SaveChanges();
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.Out.WriteLine($"{e} - {e.InnerException}");
+                return false;
+            }
         }
     }
 }
