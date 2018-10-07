@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CoreCodedChatbot.Library.Helpers;
 using CoreCodedChatbot.Library.Interfaces.Services;
+using CoreCodedChatbot.Library.Models.ApiRequest.GuessingGame;
 using CoreCodedChatbot.Library.Models.Data;
 
 namespace CoreCodedChatbot.Client.Services
@@ -66,6 +67,12 @@ namespace CoreCodedChatbot.Client.Services
 
             var runningTimeInSeconds = ConvertTimerToSeconds(timer[0]);
 
+            var songInfoModel = new StartGuessingGameModel
+            {
+                SongName = songName,
+                SongLengthSeconds = ConvertTimerToSeconds(timer[1])
+            };
+
             if (runningTimeInSeconds != 0)
             {
                 if (!hasGameStarted && !hasGameBeenCompleted)
@@ -74,7 +81,7 @@ namespace CoreCodedChatbot.Client.Services
                     hasGameStarted = true;
                     hasGameBeenCompleted = false;
 
-                    var result = await guessingGameClient.PostAsync("StartGuessingGame", HttpClientHelper.GetJsonData(songName));
+                    var result = await guessingGameClient.PostAsync("StartGuessingGame", HttpClientHelper.GetJsonData(songInfoModel));
 
                     if (!result.IsSuccessStatusCode) return;
 

@@ -23,7 +23,7 @@ namespace CoreCodedChatbot.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult StartGuessingGame([FromBody] string songName)
+        public IActionResult StartGuessingGame([FromBody] StartGuessingGameModel songInfo)
         {
             try
             {
@@ -33,8 +33,9 @@ namespace CoreCodedChatbot.Web.Controllers
                     // Check guessing game state
                     isGameInProgress = guessingGameService.IsGuessingGameInProgress();
                 }
-                
-                if (!isGameInProgress) guessingGameService.GuessingGameStart(songName);
+
+                if (!isGameInProgress)
+                    guessingGameService.GuessingGameStart(songInfo.SongName, songInfo.SongLengthSeconds);
 
                 return Ok();
             }

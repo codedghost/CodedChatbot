@@ -30,20 +30,25 @@ namespace CoreCodedChatbot.Library.Services
             this.Config = configService.GetConfig();
         }
 
-        public void GuessingGameStart(string songName)
+        public void GuessingGameStart(string songName, int songLengthInSeconds)
         {
-            SetGuessingGameState(true);
-
-            InitialiseGameTimer(songName);
+            InitialiseGameTimer(songName, songLengthInSeconds);
         }
 
-        private async void InitialiseGameTimer(string songName)
+        private async void InitialiseGameTimer(string songName, int songLengthInSeconds)
         {
+            if (songLengthInSeconds < Config.SecondsForGuessingGame)
+            {
+                return;
+            }
+
             if (!OpenGuessingGame(songName))
             {
                 Client.SendMessage(Config.StreamerChannel, "I couldn't start the guessing game :S");
                 return;
             }
+
+            SetGuessingGameState(true);
 
             Client.SendMessage(Config.StreamerChannel,
                 $"The guessing game has begun! You have {Config.SecondsForGuessingGame} seconds to !guess the accuracy that {Config.StreamerChannel} will get on {songName}!");
