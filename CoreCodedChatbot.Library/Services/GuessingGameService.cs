@@ -46,9 +46,9 @@ namespace CoreCodedChatbot.Library.Services
             }
 
             Client.SendMessage(Config.StreamerChannel,
-                $"The guessing game has begun! You have 60 seconds to !guess the accuracy that {Config.StreamerChannel} will get on {songName}!");
+                $"The guessing game has begun! You have {Config.SecondsForGuessingGame} seconds to !guess the accuracy that {Config.StreamerChannel} will get on {songName}!");
 
-            await Task.Delay(TimeSpan.FromSeconds(60));
+            await Task.Delay(TimeSpan.FromSeconds(Config.SecondsForGuessingGame));
 
             if (!CloseGuessingGame())
             {
