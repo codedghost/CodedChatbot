@@ -33,6 +33,7 @@
         public string ApiValidAudience;
         public string JwtTokenString;
         public string PlaylistApiUrl;
+        public string VipApiUrl;
         public int ConcurrentRegularSongsToPlay;
         public int SecondsForGuessingGame;
         public string RocksnifferSongDetailsLocation;

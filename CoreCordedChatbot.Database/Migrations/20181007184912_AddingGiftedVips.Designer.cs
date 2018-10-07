@@ -11,9 +11,10 @@ using System;
 namespace CoreCodedChatbot.Database.Migrations
 {
     [DbContext(typeof(ChatbotContext))]
-    partial class ChatbotContextModelSnapshot : ModelSnapshot
+    [Migration("20181007184912_AddingGiftedVips")]
+    partial class AddingGiftedVips
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
