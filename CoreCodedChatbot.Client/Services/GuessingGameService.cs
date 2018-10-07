@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CoreCodedChatbot.Library.Helpers;
 using CoreCodedChatbot.Library.Interfaces.Services;
+using CoreCodedChatbot.Library.Models.ApiRequest.GuessingGame;
 using CoreCodedChatbot.Library.Models.Data;
 
 namespace CoreCodedChatbot.Client.Services
@@ -40,7 +41,7 @@ namespace CoreCodedChatbot.Client.Services
             // Using a polling model rather than FileWatcher.
             // File watcher is triggered a lot due to the file being continually written to.
             checkFileTimer = new Timer(async x => await CheckRocksnifferFiles(),
-                null, TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(2));
+                null, TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(1));
         }
 
         private async Task CheckRocksnifferFiles()
@@ -52,9 +53,9 @@ namespace CoreCodedChatbot.Client.Services
                 "song_timer.txt"; // split on / left is current time, right is total.
             var songAccuracyLocation = config.RocksnifferSongDetailsLocation + "accuracy.txt";
 
-            TempWriteToFile($"SongDetails: {GetFileContents(songDetailsLocation)}");
-            TempWriteToFile($"SongTimer: {GetFileContents(songTimerLocation)}");
-            TempWriteToFile($"SongAccuracy: {GetFileContents(songAccuracyLocation)}");
+            //TempWriteToFile($"SongDetails: {GetFileContents(songDetailsLocation)}");
+            //TempWriteToFile($"SongTimer: {GetFileContents(songTimerLocation)}");
+            //TempWriteToFile($"SongAccuracy: {GetFileContents(songAccuracyLocation)}");
 
             var timerText = GetFileContents(songTimerLocation);
             var songName = GetFileContents(songDetailsLocation);
@@ -66,6 +67,12 @@ namespace CoreCodedChatbot.Client.Services
 
             var runningTimeInSeconds = ConvertTimerToSeconds(timer[0]);
 
+            var songInfoModel = new StartGuessingGameModel
+            {
+                SongName = songName,
+                SongLengthSeconds = ConvertTimerToSeconds(timer[1])
+            };
+
             if (runningTimeInSeconds != 0)
             {
                 if (!hasGameStarted && !hasGameBeenCompleted)
@@ -74,13 +81,12 @@ namespace CoreCodedChatbot.Client.Services
                     hasGameStarted = true;
                     hasGameBeenCompleted = false;
 
-                    var result = await guessingGameClient.PostAsync("StartGuessingGame", HttpClientHelper.GetJsonData(songName));
+                    var result = await guessingGameClient.PostAsync("StartGuessingGame", HttpClientHelper.GetJsonData(songInfoModel));
 
                     if (!result.IsSuccessStatusCode) return;
 
                     totalTime = ConvertTimerToSeconds(timer[1]);
                     return;
-
                 }
 
                 // Need hasGameBeenCompleted flag as the file remains on full time for a few seconds, allowing us to grab the final score.
