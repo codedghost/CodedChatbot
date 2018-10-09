@@ -6,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Helpers;
+using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Helpers;
 using CoreCodedChatbot.Library.Interfaces.Services;
@@ -21,9 +22,9 @@ namespace CoreCodedChatbot.Commands
         private ConfigModel config;
         private HttpClient vipClient;
 
-        public GiftVipCommand(ConfigModel config)
+        public GiftVipCommand(IConfigHelper configHelper)
         {
-            this.config = config;
+            this.config = configHelper.GetConfig();
 
             this.vipClient = new HttpClient
             {
