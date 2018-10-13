@@ -55,7 +55,7 @@ namespace CoreCodedChatbot.Library.Services
         public (AddRequestResult, int) AddRequest(string username, string commandText, bool vipRequest = false)
         {
             var songIndex = 0;
-            var isPlaylistOpen = IsPlaylistOpen();
+            var playlistState = this.GetPlaylistState();
             using (var context = contextFactory.Create())
             {
                 var request = new SongRequest
@@ -71,9 +71,12 @@ namespace CoreCodedChatbot.Library.Services
                     var playlistLength = context.SongRequests.Count(sr => !sr.Played);
                     var userSongCount = context.SongRequests.Count(sr => !sr.Played && sr.RequestUsername == username && sr.VipRequestTime == null);
                     Console.Out.WriteLine($"Not a vip request: {playlistLength}, {userSongCount}");
-                    if (!isPlaylistOpen)
+                    if (playlistState == PlaylistState.Closed)
                     {
                         return (AddRequestResult.PlaylistClosed, 0);
+                    } else if (playlistState == PlaylistState.VeryClosed)
+                    {
+                        return (AddRequestResult.PlaylistVeryClosed, 0);
                     }
 
                     if (userSongCount >= UserMaxSongCount)
@@ -109,13 +112,18 @@ namespace CoreCodedChatbot.Library.Services
             return (AddRequestResult.Success, songIndex);
         }
 
-        public bool IsPlaylistOpen()
+        public PlaylistState GetPlaylistState()
         {
             using (var context = contextFactory.Create())
             {
                 var status = context.Settings
                     .SingleOrDefault(set => set.SettingName == "PlaylistStatus");
-                return status?.SettingValue != null && status.SettingValue != "Closed";
+                if (status?.SettingValue == null)
+                {
+                    return PlaylistState.VeryClosed;
+                }
+
+                return Enum.Parse<PlaylistState>(status?.SettingValue);
             }
         }
 
@@ -215,7 +223,7 @@ namespace CoreCodedChatbot.Library.Services
                 var userRequests = context.SongRequests
                     .Where(sr => !sr.Played)
                     ?.OrderRequests()
-                    ?.Select((sr, index) => new {Index = index + 1, SongRequest = sr})
+                    ?.Select((sr, index) => new { Index = index + 1, SongRequest = sr })
                     ?.Where(x => x.SongRequest.RequestUsername == username)
                     ?.OrderBy(x => x.Index)
                     ?.Select(x =>
@@ -277,8 +285,7 @@ namespace CoreCodedChatbot.Library.Services
                     {
                         CurrentRequest = vipRequests.First();
                         vipRequests = vipRequests.Where(r => r.songRequestId != CurrentRequest.songRequestId).ToArray();
-                    }
-                    else if (regularRequests.Any())
+                    } else if (regularRequests.Any())
                     {
                         CurrentRequest = regularRequests[rand.Next(0, regularRequests.Length)];
                         regularRequests = regularRequests.Where(r => r.songRequestId != CurrentRequest.songRequestId).ToArray();
@@ -411,14 +418,12 @@ namespace CoreCodedChatbot.Library.Services
 
                         syntaxError = false;
                         return true;
-                    }
-                    else if (userVipRequestCount > 1 || userVipRequestCount == 0)
+                    } else if (userVipRequestCount > 1 || userVipRequestCount == 0)
                     {
                         songRequestText = string.Empty;
                         syntaxError = true;
                         return false;
-                    }
-                    else
+                    } else
                     {
                         // edit only vip request
                         var userRequest = userRequests.FirstOrDefault(x => x.SongRequest.RequestUsername == username && x.SongRequest.VipRequestTime != null);
@@ -439,8 +444,7 @@ namespace CoreCodedChatbot.Library.Services
                         syntaxError = false;
                         return true;
                     }
-                }
-                else if (userRequestCount > 1 && userVipRequestCount > 1 && playlistIndex == 0)
+                } else if (userRequestCount > 1 && userVipRequestCount > 1 && playlistIndex == 0)
                 {
                     songRequestText = string.Empty;
                     syntaxError = true;
@@ -462,8 +466,7 @@ namespace CoreCodedChatbot.Library.Services
 
                     context.SongRequests.Update(userRequest.SongRequest);
                     context.SaveChanges();
-                }
-                else if (userRequestCount == 1)
+                } else if (userRequestCount == 1)
                 {
                     if (playlistIndex != 0)
                     {
@@ -483,15 +486,13 @@ namespace CoreCodedChatbot.Library.Services
                                 syntaxError = false;
                                 return false;
                             }
-                        }
-                        else
+                        } else
                         {
                             songRequestText = string.Empty;
                             syntaxError = false;
                             return false;
                         }
-                    }
-                    else
+                    } else
                     {
                         var userRequest = userRequests?.Where(x => x.SongRequest.RequestUsername == username).FirstOrDefault();
 
@@ -500,8 +501,7 @@ namespace CoreCodedChatbot.Library.Services
                         context.SongRequests.Update(userRequest.SongRequest);
                         context.SaveChanges();
                     }
-                }
-                else
+                } else
                 {
                     // Vip edit
                     var userRequest = userRequests.FirstOrDefault(x => x.SongRequest.RequestUsername == username && x.Index == playlistIndex);
@@ -649,19 +649,16 @@ namespace CoreCodedChatbot.Library.Services
                 if (regularRequests.Any())
                 {
                     CurrentRequest = regularRequests[rand.Next(0, regularRequests.Length)];
-                }
-                else if (vipRequests.Any())
+                } else if (vipRequests.Any())
                 {
                     CurrentRequest = vipRequests.FirstOrDefault();
                 }
-            }
-            else
+            } else
             {
                 if (vipRequests.Any())
                 {
                     CurrentRequest = vipRequests.FirstOrDefault();
-                }
-                else if (regularRequests.Any())
+                } else if (regularRequests.Any())
                 {
                     CurrentRequest = regularRequests[rand.Next(0, regularRequests.Length)];
                 }
@@ -671,6 +668,40 @@ namespace CoreCodedChatbot.Library.Services
         private void UpdatePlaylists(bool updateCurrent = false)
         {
             UpdateFullPlaylist(updateCurrent);
+        }
+
+        public bool VeryClosePlaylist()
+        {
+            using (var context = contextFactory.Create())
+            {
+                try
+                {
+                    var playlistStatusSetting = context.Settings
+                        ?.SingleOrDefault(set => set.SettingName == "PlaylistStatus");
+
+                    if (playlistStatusSetting == null)
+                    {
+                        playlistStatusSetting = new Setting
+                        {
+                            SettingName = "PlaylistStatus",
+                            SettingValue = "VeryClosed"
+                        };
+
+                        context.Settings.Add(playlistStatusSetting);
+                        context.SaveChanges();
+                        return true;
+                    }
+
+                    playlistStatusSetting.SettingValue = "VeryClosed";
+                    context.SaveChanges();
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    Console.Out.WriteLine(e.ToString());
+                    return false;
+                }
+            }
         }
     }
 }

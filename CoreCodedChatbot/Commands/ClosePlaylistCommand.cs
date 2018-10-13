@@ -32,10 +32,18 @@ namespace CoreCodedChatbot.Commands
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            var response = await playlistClient.GetAsync("ClosePlaylist");
+            HttpResponseMessage response;
+            if (commandText == "very")
+            {
+                response = await playlistClient.GetAsync("VeryClosePlaylist");
+            } 
+            else
+            {
+                response = await playlistClient.GetAsync("ClosePlaylist");
+            }
 
             client.SendMessage(config.StreamerChannel, response.IsSuccessStatusCode
-                ? $"Hey @{username}, I have closed the playlist!" 
+                ? $"Hey @{username}, I have closed the playlist{(commandText == "very" ? " completely" : string.Empty)}!" 
                 : $"Hey {username}, I can't seem to close the playlist for some reason :(");
         }
 

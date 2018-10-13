@@ -11,7 +11,7 @@ namespace CoreCodedChatbot.Library.Interfaces.Services
     {
         PlaylistItem GetRequestById(int songId);
         (AddRequestResult, int) AddRequest(string username, string commandText, bool vipRequest = false);
-        bool IsPlaylistOpen();
+        PlaylistState GetPlaylistState();
         int PromoteRequest(string username);
         void UpdateFullPlaylist(bool updateCurrent = false);
         void ArchiveCurrentRequest();
@@ -28,6 +28,6 @@ namespace CoreCodedChatbot.Library.Interfaces.Services
         bool ClosePlaylist();
         bool ArchiveRequestById(int songId);
         string GetEstimatedTime(ChatViewersModel chattersModel);
-
+        bool VeryClosePlaylist();
     }
 }

@@ -53,6 +53,12 @@ namespace CoreCodedChatbot.Commands
 
                 var addResult =
                     JsonConvert.DeserializeObject<AddRequestResponse>(await addRequest.Content.ReadAsStringAsync());
+                if (addResult.Result == AddRequestResult.PlaylistVeryClosed)
+                {
+                    client.SendMessage(config.StreamerChannel, $"Hey @{username}, the playlist is currently very closed. No Requests allowed.");
+                    return;
+                }
+
                 playlistPosition = addResult.PlaylistPosition;
 
                 vipHelper.UseVipRequest(username);
