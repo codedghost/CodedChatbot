@@ -57,53 +57,6 @@ namespace CoreCodedChatbot.Database.Migrations
                     b.ToTable("Songs");
                 });
 
-            modelBuilder.Entity("CoreCodedChatbot.Database.Context.Models.SongGuessingRecord", b =>
-                {
-                    b.Property<int>("SongGuessingRecordId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("SongGuessingRecordId");
-
-                    b.Property<decimal>("FinalPercentage")
-                        .HasColumnName("FinalPercentage");
-
-                    b.Property<bool>("IsInProgress")
-                        .HasColumnName("IsInProgress");
-
-                    b.Property<string>("SongDetails")
-                        .IsRequired()
-                        .HasColumnName("SongDetails");
-
-                    b.Property<bool>("UsersCanGuess")
-                        .HasColumnName("UsersCanGuess");
-
-                    b.HasKey("SongGuessingRecordId");
-
-                    b.ToTable("SongGuessingRecord");
-                });
-
-            modelBuilder.Entity("CoreCodedChatbot.Database.Context.Models.SongPercentageGuess", b =>
-                {
-                    b.Property<int>("SongPercentageGuessId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("SongPercentageGuessId");
-
-                    b.Property<decimal>("Guess")
-                        .HasColumnName("Guess");
-
-                    b.Property<int>("SongGuessingRecordId")
-                        .HasColumnName("SongGuessingRecordId");
-
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnName("Username");
-
-                    b.HasKey("SongPercentageGuessId");
-
-                    b.HasIndex("SongGuessingRecordId");
-
-                    b.ToTable("SongPercentageGuess");
-                });
-
             modelBuilder.Entity("CoreCodedChatbot.Database.Context.Models.SongRequest", b =>
                 {
                     b.Property<int>("SongRequestId")
@@ -145,16 +98,6 @@ namespace CoreCodedChatbot.Database.Migrations
                     b.Property<int>("ModGivenVipRequests")
                         .HasColumnName("ModGivenVipRequests");
 
-                    b.Property<int>("ReceivedGiftVipRequests")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("ReceivedGiftVipRequests")
-                        .HasDefaultValue(0);
-
-                    b.Property<int>("SentGiftVipRequests")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("SendgiftVipRequests")
-                        .HasDefaultValue(0);
-
                     b.Property<int>("SubVipRequests")
                         .HasColumnName("SubVipRequests");
 
@@ -177,14 +120,6 @@ namespace CoreCodedChatbot.Database.Migrations
                     b.HasKey("Username");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("CoreCodedChatbot.Database.Context.Models.SongPercentageGuess", b =>
-                {
-                    b.HasOne("CoreCodedChatbot.Database.Context.Models.SongGuessingRecord", "SongGuessingRecord")
-                        .WithMany("SongPercentageGuesses")
-                        .HasForeignKey("SongGuessingRecordId")
-                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

@@ -7,7 +7,7 @@ namespace CoreCodedChatbot.Library.Models.Data
     public class PlaylistItem
     {
         private Regex songRequestRegex = new Regex(
-            "((?<index>[0-9]*)?(?<seperator> ?- ?)?(?<artistname>[\\d\\w ,.!\"£$%^&*=+\\\\\\/|<>?`¬[\\]{};\'#:@~]*)(?<seperator2> ?- ?)(?<songname>[\\d\\w ,.!\"£$%^&*\\(\\)=+\\\\\\/|<>?`¬[\\]{};\'#:@~]*)(?<instrument>(( ?- ?)?\\(?(bass|guitar)?\\)?)?))");
+            "((?<index>[0-9]*)?(?<seperator> ?- ?)?(?<songname>[\\d\\w ,.!\"£$%^&*\\(\\)=+\\\\\\/|<>?`¬[\\]{};\'#:@~]*)(?<seperator2> ?- ?)(?<artistname>[\\d\\w ,.!\"£$%^&*=+\\\\\\/|<>?`¬[\\]{};\'#:@~]*)(?<instrument>(( ?- ?)?\\(?(bass|guitar)?\\)?)?))");
 
         private Match regMatch => songRequestRegex.Match(songRequestText);
         private string possibleInstrument => songRequestText.IndexOf("bass",  StringComparison.OrdinalIgnoreCase) >= 0 ? "bass" : "guitar";

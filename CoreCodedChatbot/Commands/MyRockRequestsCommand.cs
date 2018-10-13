@@ -34,19 +34,10 @@ namespace CoreCodedChatbot.Commands
         public async void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
             var request = await playlistClient.PostAsync("GetUserRequests", HttpClientHelper.GetJsonData(username));
+            var requests =
+                JsonConvert.DeserializeObject<GetUserRequestsResponse>(await request.Content.ReadAsStringAsync());
 
-            if (request.IsSuccessStatusCode)
-            {
-                var requests =
-                    JsonConvert.DeserializeObject<GetUserRequestsResponse>(await request.Content.ReadAsStringAsync());
-
-                client.SendMessage(config.StreamerChannel,
-                    $"Hey @{username}, you have requested: {requests.UserRequests}");
-                return;
-            }
-
-            client.SendMessage(config.StreamerChannel,
-                $"Hey @{username}, I couldn't check your requests at the moment. Please try again in a sec");
+            client.SendMessage(config.StreamerChannel, $"Hey @{username}, you have requested: {requests.UserRequests}");
         }
 
         public void ShowHelp(TwitchClient client, string username)

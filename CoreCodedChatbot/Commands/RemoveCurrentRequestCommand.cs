@@ -34,13 +34,7 @@ namespace CoreCodedChatbot.Commands
             var request = await playlistClient.GetAsync("ArchiveCurrentRequest");
 
             if (request.IsSuccessStatusCode)
-            {
                 client.SendMessage(config.StreamerChannel, $"Hey @{username}, the current request has been removed");
-                return;
-            }
-
-            client.SendMessage(config.StreamerChannel,
-                $"Hey @{username}, I can't seem to do that right now, please try again in a sec");
         }
 
         public void ShowHelp(TwitchClient client, string username)

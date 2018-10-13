@@ -33,11 +33,9 @@ namespace CoreCodedChatbot.Commands
         public async void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
             var request = await playlistClient.GetAsync("IsPlaylistOpen");
-            if (!request.IsSuccessStatusCode) return;
-
             var isOpen = JsonConvert.DeserializeObject<bool>(await request.Content.ReadAsStringAsync());
 
-            if (isOpen || username != "Chatbot")
+            if (isOpen || username != "chatbot")
             {
                 client.SendMessage(config.StreamerChannel,
                     $"To request a song just use: !request <SongArtist> - <SongTitle> - (Guitar or Bass)");

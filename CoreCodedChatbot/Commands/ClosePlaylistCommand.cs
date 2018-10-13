@@ -36,7 +36,7 @@ namespace CoreCodedChatbot.Commands
 
             client.SendMessage(config.StreamerChannel, response.IsSuccessStatusCode
                 ? $"Hey @{username}, I have closed the playlist!" 
-                : $"Hey @{username}, I can't seem to close the playlist for some reason :(");
+                : $"Hey {username}, I can't seem to close the playlist for some reason :(");
         }
 
         public void ShowHelp(TwitchClient client, string username)

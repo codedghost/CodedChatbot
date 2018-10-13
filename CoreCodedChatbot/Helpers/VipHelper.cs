@@ -49,9 +49,7 @@ namespace CoreCodedChatbot.Helpers
                 FollowVipRequest = 0,
                 SubVipRequests = 0,
                 DonationOrBitsVipRequests = 0,
-                TokenBytes = 0,
-                ReceivedGiftVipRequests = 0,
-                SentGiftVipRequests = 0
+                TokenBytes = 0
             };
 
             try
@@ -111,9 +109,7 @@ namespace CoreCodedChatbot.Helpers
                         DonationOrBitsVipRequests = 0,
                         SubVipRequests = 1,
                         UsedVipRequests = 0,
-                        TokenBytes = 0,
-                        ReceivedGiftVipRequests = 0,
-                        SentGiftVipRequests = 0
+                        TokenBytes = 0
                     });
 
                     context.Users.AddRange(models);
@@ -274,9 +270,7 @@ namespace CoreCodedChatbot.Helpers
                     ModGiven = user.ModGivenVipRequests,
                     Sub = user.SubVipRequests,
                     Used = user.UsedVipRequests,
-                    Byte = user.TokenVipRequests,
-                    ReceivedGift = user.ReceivedGiftVipRequests,
-                    SentGift = user.SentGiftVipRequests
+                    Byte = user.TokenVipRequests
                 };
             }
 

@@ -9,7 +9,7 @@ using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Commands
 {
-    [ChatCommand(new [] {"youtube", "yt"}, false)]
+    [ChatCommand(new [] {"yt", "youtube"}, false)]
     public class YoutubeCommand : ICommand
     {
         private readonly ConfigModel config;

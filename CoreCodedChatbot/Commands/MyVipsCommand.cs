@@ -24,16 +24,10 @@ namespace CoreCodedChatbot.Commands
         {
             var vips = vipHelper.GetVipRequests(username);
 
-            if (vips == null)
-            {
-                client.SendMessage(config.StreamerChannel, $"Hey @{username}, something went wrong with the chatbot. Ask @CodedGhost2 what he's playing at!");
-                return;
-            }
+            if (vips == null) client.SendMessage(config.StreamerChannel, $"Hey @{username}, something went wrong with the chatbot. Ask @CodedGhost2 what he's playing at!");
 
-            client.SendMessage(config.StreamerChannel,
-                vips.TotalRemaining == 0
-                    ? $"Hey @{username}, it looks like you have {vips.TotalRemaining}. :("
-                    : $"Hey @{username}, it looks like you have {vips.TotalRemaining} VIPs left!");
+            if (vips.TotalRemaining == 0) client.SendMessage(config.StreamerChannel, $"Hey @{username}, it looks like you have {vips.TotalRemaining}. :(");
+            else client.SendMessage(config.StreamerChannel, $"Hey @{username}, it looks like you have {vips.TotalRemaining} VIPs left!");
         }
 
         public void ShowHelp(TwitchClient client, string username)

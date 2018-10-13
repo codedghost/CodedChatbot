@@ -32,12 +32,9 @@ namespace CoreCodedChatbot.Commands
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            var response = await playlistClient.GetAsync("ClearRockRequests");
+            await playlistClient.GetAsync("ClearRockRequests");
 
-            client.SendMessage(config.StreamerChannel,
-                response.IsSuccessStatusCode
-                    ? $"Hey @{username}, I've cleared all requests for you!"
-                    : $"Hey @{username} I couldn't clear the requests! Something went wrong :(");
+            client.SendMessage(config.StreamerChannel, $"@{username} Hey, I've cleared all requests for you!");
         }
 
         public void ShowHelp(TwitchClient client, string username)

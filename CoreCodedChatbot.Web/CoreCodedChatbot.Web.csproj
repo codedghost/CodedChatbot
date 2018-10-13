@@ -33,10 +33,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="wwwroot\favicon.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\CoreCodedChatbot.Library\CoreCodedChatbot.Library.csproj" />
     <ProjectReference Include="..\CoreCodedChatbot\CoreCodedChatbot.csproj" />
     <ProjectReference Include="..\CoreCordedChatbot.Database\CoreCodedChatbot.Database.csproj" />
@@ -47,9 +43,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Update="config.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="SongsMasterGrid.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

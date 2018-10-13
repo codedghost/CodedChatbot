@@ -13,8 +13,6 @@ namespace CoreCodedChatbot.Database.Context.Interfaces
         DbSet<SongRequest> SongRequests { get; set; }
         DbSet<Song> Songs { get; set; }
         DbSet<User> Users { get; set; }
-        DbSet<SongGuessingRecord> SongGuessingRecords { get; set; }
-        DbSet<SongPercentageGuess> SongPercentageGuesses { get; set; }
 
         int SaveChanges();
 
