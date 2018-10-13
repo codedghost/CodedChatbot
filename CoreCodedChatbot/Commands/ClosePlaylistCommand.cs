@@ -33,7 +33,7 @@ namespace CoreCodedChatbot.Commands
         public async void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
             HttpResponseMessage response;
-            if (commandText == "very")
+            if (commandText.ToLower().Contains("very"))
             {
                 response = await playlistClient.GetAsync("VeryClosePlaylist");
             } 
