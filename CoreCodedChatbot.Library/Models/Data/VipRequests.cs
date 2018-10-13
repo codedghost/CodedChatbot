@@ -8,7 +8,9 @@
         public int Sub { get; set; }
         public int Byte { get; set; }
         public int Used { get; set; }
+        public int SentGift { get; set; }
+        public int ReceivedGift { get; set; }
 
-        public int TotalRemaining => (Donations + Follow + ModGiven + Sub + Byte) - Used;
+        public int TotalRemaining => (Donations + Follow + ModGiven + Sub + Byte + ReceivedGift) - Used - SentGift;
     }
 }
