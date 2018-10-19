@@ -40,26 +40,28 @@ namespace CoreCodedChatbot.Commands
         {
             if (string.IsNullOrWhiteSpace(commandText))
             {
-                client.SendMessage(config.StreamerChannel, $"Hey @{username}, looks like you haven't included a request there!");
+                client.SendMessage(config.StreamerChannel,
+                    $"Hey @{username}, looks like you haven't included a request there!");
                 return;
             }
 
             if (vipHelper.CanUseVipRequest(username))
             {
-                var playlistPosition = 0;
-
                 var addRequest = await playlistClient.PostAsync("AddRequest",
                     HttpClientHelper.GetJsonData(new {username, commandText, isVipRequest = true}));
 
-                var addResult =
-                    JsonConvert.DeserializeObject<AddRequestResponse>(await addRequest.Content.ReadAsStringAsync());
-                if (addResult.Result == AddRequestResult.PlaylistVeryClosed)
+                if (addRequest.IsSuccessStatusCode)
                 {
-                    client.SendMessage(config.StreamerChannel, $"Hey @{username}, the playlist is currently very closed. No Requests allowed.");
-                    return;
-                }
+                    var addResult =
+                        JsonConvert.DeserializeObject<AddRequestResponse>(await addRequest.Content.ReadAsStringAsync());
+                    if (addResult.Result == AddRequestResult.PlaylistVeryClosed)
+                    {
+                        client.SendMessage(config.StreamerChannel,
+                            $"Hey @{username}, the playlist is currently very closed. No Requests allowed.");
+                        return;
+                    }
 
-                playlistPosition = addResult.PlaylistPosition;
+                    var playlistPosition = addResult.PlaylistPosition;
 
                     vipHelper.UseVipRequest(username);
                     client.SendMessage(config.StreamerChannel,
