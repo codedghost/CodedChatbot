@@ -5,6 +5,7 @@ using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Library.Models.Data;
+using Microsoft.AspNetCore.Localization;
 using Newtonsoft.Json;
 using TwitchLib.Client;
 
@@ -43,7 +44,7 @@ namespace CoreCodedChatbot.Commands
             }
 
             client.SendMessage(config.StreamerChannel, response.IsSuccessStatusCode
-                ? $"Hey @{username}, I have closed the playlist{(commandText == "very" ? " completely" : string.Empty)}!" 
+                ? $"Hey @{username}, I have closed the playlist{(commandText.Equals("very", StringComparison.OrdinalIgnoreCase) ? " completely" : string.Empty)}!"
                 : $"Hey {username}, I can't seem to close the playlist for some reason :(");
         }
 
