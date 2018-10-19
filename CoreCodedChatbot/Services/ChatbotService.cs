@@ -12,13 +12,13 @@ using CoreCodedChatbot.Library.Models.Data;
 using Microsoft.EntityFrameworkCore.Internal;
 using TwitchLib.Client.Events;
 using TwitchLib.PubSub.Events;
-using TwitchLib.Api.Exceptions;
 using TwitchLib.Client;
 using TwitchLib.Api;
+using TwitchLib.Api.Core.Exceptions;
 using TwitchLib.Api.Services;
+using TwitchLib.Api.Services.Events;
 using TwitchLib.Api.Services.Events.LiveStreamMonitor;
 using TwitchLib.PubSub;
-using TwitchLib.Api.Models.v5.Channels;
 
 namespace CoreCodedChatbot.Services
 {
@@ -31,7 +31,7 @@ namespace CoreCodedChatbot.Services
         private readonly VipHelper vipHelper;
         private readonly BytesHelper bytesHelper;
         private readonly StreamLabsHelper streamLabsHelper;
-        private readonly LiveStreamMonitor liveStreamMonitor;
+        private readonly LiveStreamMonitorService liveStreamMonitor;
 
         private Timer HowToRequestTimer { get; set; }
         private Timer CustomsForgeTimer { get; set; }
@@ -51,7 +51,7 @@ namespace CoreCodedChatbot.Services
 
         private static readonly HttpClient httpClient = new HttpClient();
 
-        public ChatbotService(CommandHelper commandHelper, TwitchClient client, TwitchAPI api, TwitchPubSub pubsub, LiveStreamMonitor liveStreamMonitor,
+        public ChatbotService(CommandHelper commandHelper, TwitchClient client, TwitchAPI api, TwitchPubSub pubsub, LiveStreamMonitorService liveStreamMonitor,
             VipHelper vipHelper, BytesHelper bytesHelper, StreamLabsHelper streamLabsHelper, IConfigHelper configHelper)
         {
             this.commandHelper = commandHelper;
@@ -72,13 +72,13 @@ namespace CoreCodedChatbot.Services
             this.client.OnReSubscriber += OnReSub;
             this.client.Connect();
             
-            this.liveStreamMonitor.SetStreamsByUsername(new List<string>{config.StreamerChannel});
+            this.liveStreamMonitor.SetChannelsByName(new List<string>{config.StreamerChannel});
             this.liveStreamMonitor.OnStreamOnline += OnStreamOnline;
             this.liveStreamMonitor.OnStreamOffline += OnStreamOffline;
-            this.liveStreamMonitor.OnStreamMonitorStarted += OnStreamMonitorStarted;
+            this.liveStreamMonitor.OnServiceStarted += OnStreamMonitorStarted;
             //this.liveStreamMonitor.OnStreamUpdate += OnStreamUpdate;
 
-            this.liveStreamMonitor.StartService();
+            this.liveStreamMonitor.Start();
 
             this.pubsub.OnPubSubServiceConnected += OnPubSubConnected;
             this.pubsub.OnBitsReceived += OnBitsReceived;
@@ -179,7 +179,7 @@ namespace CoreCodedChatbot.Services
             {
                 client.SendMessage(e.Channel, $"Looks like @{e.Channel} has come online, better get to work!");
             }
-            ScheduleStreamTasks(e.Stream.Game);
+            ScheduleStreamTasks(e.Stream.Title);
         }
 
         private void OnStreamOffline(object sender, OnStreamOfflineArgs e)
@@ -192,17 +192,17 @@ namespace CoreCodedChatbot.Services
             UnScheduleStreamTasks();
         }
 
-        private void OnStreamMonitorStarted(object sender, OnStreamMonitorStartedArgs e)
+        private void OnStreamMonitorStarted(object sender, OnServiceStartedArgs e)
         {
             Console.Out.WriteLine("Stream Monitor Started");
-            Console.Out.WriteLine($"Monitoring Channels: {e.Channels.Select(c => c.Key).Join()}");
+            Console.Out.WriteLine($"Monitoring Channels: {e}");
         }
 
         private void OnStreamUpdate(object sender, OnStreamUpdateArgs e)
         {
             Console.Out.WriteLine("Assuming stream category or title has updated, rescheduling tasks");
             UnScheduleStreamTasks();
-            ScheduleStreamTasks(e.Stream.Game);
+            ScheduleStreamTasks(e.Stream.Title);
         }
 
         private async void ScheduleStreamTasks(string streamGame = "Rocksmith 2014")
@@ -214,7 +214,7 @@ namespace CoreCodedChatbot.Services
             // Align database with any potentially missed or offline subs
             try
             {
-                var subs = await api.Channels.v5.GetAllSubscribersAsync(config.ChannelId, config.ChatbotAccessToken);
+                var subs = await api.V5.Channels.GetAllSubscribersAsync(config.ChannelId, config.ChatbotAccessToken);
 
                 // TODO: Need to consider length of sub in db alignment
                 vipHelper.StartupSubVips(subs);

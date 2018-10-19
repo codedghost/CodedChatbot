@@ -24,7 +24,7 @@ namespace CoreCodedChatbot.Commands
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            var Stream = await api.Streams.v5.GetStreamByUserAsync(config.ChannelId);
+            var Stream = await api.V5.Streams.GetStreamByUserAsync(config.ChannelId);
             var streamGoLiveTime = Stream?.Stream?.CreatedAt;
 
             if (streamGoLiveTime != null)
