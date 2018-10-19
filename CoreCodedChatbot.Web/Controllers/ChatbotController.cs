@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
@@ -7,6 +8,7 @@ using AspNet.Security.OAuth.Twitch;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
+using CoreCodedChatbot.Library.Models.SongLibrary;
 using CoreCodedChatbot.Library.Models.View;
 using CoreCodedChatbot.Web.Interfaces;
 using CoreCodedChatbot.Web.Services;
@@ -58,6 +60,15 @@ namespace CoreCodedChatbot.Web.Controllers
             return View(playlistModel);
         }
 
+        [HttpGet]
+        public IActionResult Library()
+        {
+            using (var sr = new StreamReader(Path.Combine(Directory.GetCurrentDirectory(), "SongsMasterGrid.json")))
+            {
+                return View(JsonConvert.DeserializeObject<SongLibraryRecords>(sr.ReadToEnd()));
+            }
+        }
+
         [HttpPost]
         public IActionResult RenderRegularList([FromBody]PlaylistItem[] data)
         {
@@ -74,7 +85,7 @@ namespace CoreCodedChatbot.Web.Controllers
                 ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
                 return PartialView("Partials/List/RegularList", data);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return Json(new { Success = false, Message = "Encountered an error" });
             }
@@ -100,7 +111,7 @@ namespace CoreCodedChatbot.Web.Controllers
                 ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
                 return PartialView("Partials/List/VipList", data);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return Json(new { Success = false, Message = "Encountered an error" });
             }
@@ -115,7 +126,7 @@ namespace CoreCodedChatbot.Web.Controllers
             {
                 return PartialView("Partials/List/DeleteModal", requestToDelete);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return Json(new { Success = false, Message = "Encountered an error" });
             }
@@ -129,7 +140,7 @@ namespace CoreCodedChatbot.Web.Controllers
             {
                 return PartialView("Partials/List/RemoveCurrentModal", requestToDelete);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return Json(new {Success = false, Message = "Encountered an error"});
             }
@@ -151,14 +162,14 @@ namespace CoreCodedChatbot.Web.Controllers
                 ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
                 return PartialView("Partials/List/CurrentSong", data);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return Json(new {Success = false, Message = "Encountered an error"});
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> RemoveSong([FromBody] int songId)
+        public IActionResult RemoveSong([FromBody] int songId)
         {
             if (User.Identity.IsAuthenticated)
             {
@@ -190,7 +201,7 @@ namespace CoreCodedChatbot.Web.Controllers
                         playlistService.ArchiveCurrentRequest();
                         return Ok();
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         return Json(new { Success = false, Message = "Encountered an error, or you are not a moderator" });
                     }

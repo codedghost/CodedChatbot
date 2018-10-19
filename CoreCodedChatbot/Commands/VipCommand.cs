@@ -61,9 +61,15 @@ namespace CoreCodedChatbot.Commands
 
                 playlistPosition = addResult.PlaylistPosition;
 
-                vipHelper.UseVipRequest(username);
+                    vipHelper.UseVipRequest(username);
+                    client.SendMessage(config.StreamerChannel,
+                        $"Hey @{username}, I have queued {commandText} for you, you're #{playlistPosition} in the queue!");
+
+                    return;
+                }
+
                 client.SendMessage(config.StreamerChannel,
-                    $"Hey @{username}, I have queued {commandText} for you, you're #{playlistPosition} in the queue!");
+                    $"Hey @{username}, I can't queue your VIP request right now, please try again in a sec");
             }
             else
             {

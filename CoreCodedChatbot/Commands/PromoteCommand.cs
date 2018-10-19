@@ -41,17 +41,26 @@ namespace CoreCodedChatbot.Commands
             {
                 var request = await playlistClient.PostAsync("PromoteRequest",
                     HttpClientHelper.GetJsonData(new {username}));
-                var playlistPosition = JsonConvert.DeserializeObject<int>(await request.Content.ReadAsStringAsync());
-                client.SendMessage(config.StreamerChannel, playlistPosition == -1
-                    ? $"Hey @{username}, I can't find a song at that position! Please check your requests with !myrequests"
-                    : playlistPosition == -2
-                        ? $"Hey @{username}, I'm sorry but that request doesn't seem to belong to you. Please check your requests with !myrequests"
-                        : playlistPosition == 0
-                            ? $"Hey @{username}, something seems to have gone wrong. Please try again in a minute or two"
-                            : $"Hey @{username}, I have promoted your request to #{playlistPosition} for you!");
 
-                if (playlistPosition > 0) vipHelper.UseVipRequest(username);
-                return;
+                if (request.IsSuccessStatusCode)
+                {
+                    var playlistPosition =
+                        JsonConvert.DeserializeObject<int>(await request.Content.ReadAsStringAsync());
+                    client.SendMessage(config.StreamerChannel, playlistPosition == -1
+                        ? $"Hey @{username}, I can't find a song at that position! Please check your requests with !myrequests"
+                        : playlistPosition == -2
+                            ? $"Hey @{username}, I'm sorry but that request doesn't seem to belong to you. Please check your requests with !myrequests"
+                            : playlistPosition == 0
+                                ? $"Hey @{username}, something seems to have gone wrong. Please try again in a minute or two"
+                                : $"Hey @{username}, I have promoted your request to #{playlistPosition} for you!");
+
+
+                    if (playlistPosition > 0) vipHelper.UseVipRequest(username);
+                    return;
+                }
+
+                client.SendMessage(config.StreamerChannel,
+                    $"Hey @{username}, sorry I can't promote your request right now, please try again in a sec");
             }
             else
             {

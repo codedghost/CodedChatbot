@@ -32,7 +32,11 @@ namespace CoreCodedChatbot.Web.Services
         public async void UpdateChatters()
         {
             var httpClient = new HttpClient();
-            var currentChattersJson = await httpClient.GetStringAsync($"https://tmi.twitch.tv/group/user/{config.StreamerChannel}/chatters");
+            var request = await httpClient.GetAsync($"https://tmi.twitch.tv/group/user/{config.StreamerChannel}/chatters");
+
+            if (!request.IsSuccessStatusCode) return;
+
+            var currentChattersJson = await request.Content.ReadAsStringAsync();
             // process json into username list.
             Chatters = JsonConvert.DeserializeObject<ChatViewersModel>(currentChattersJson);
         }

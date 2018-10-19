@@ -42,7 +42,10 @@ namespace CoreCodedChatbot.Commands
             }
 
             var request = await playlistClient.PostAsync("AddRequest", HttpClientHelper.GetJsonData(new {username, commandText}));
-            var result = JsonConvert.DeserializeObject<AddRequestResponse>(await request.Content.ReadAsStringAsync());
+            if (request.IsSuccessStatusCode)
+            {
+                var result =
+                    JsonConvert.DeserializeObject<AddRequestResponse>(await request.Content.ReadAsStringAsync());
 
             string message;
             switch (result.Result)
