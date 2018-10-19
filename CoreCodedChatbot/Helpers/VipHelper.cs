@@ -228,9 +228,9 @@ namespace CoreCodedChatbot.Helpers
             {
                 var user = this.FindUser(context, username);
                 if (user == null ||
-                    user.UsedVipRequests >=
+                    user.UsedVipRequests + user.SentGiftVipRequests >=
                     (user.FollowVipRequest + user.SubVipRequests + user.ModGivenVipRequests +
-                        user.DonationOrBitsVipRequests + user.TokenVipRequests)) return false;
+                        user.DonationOrBitsVipRequests + user.TokenVipRequests + user.ReceivedGiftVipRequests)) return false;
 
                 return true;
             }
