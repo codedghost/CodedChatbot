@@ -20,16 +20,18 @@ namespace CoreCodedChatbot.Library.Services
 
         private readonly ConfigModel config;
         private readonly IChatbotContextFactory contextFactory;
+        private readonly IVipService vipService;
 
         private PlaylistItem CurrentRequest;
         private int CurrentVipRequestsPlayed;
         private int ConcurrentVipSongsToPlay;
         private Random rand = new Random();
 
-        public PlaylistService(IChatbotContextFactory contextFactory, IConfigService configService)
+        public PlaylistService(IChatbotContextFactory contextFactory, IConfigService configService, IVipService vipService)
         {
             this.contextFactory = contextFactory;
             this.config = configService.GetConfig();
+            this.vipService = vipService;
 
             this.ConcurrentVipSongsToPlay = config.ConcurrentRegularSongsToPlay;
         }
@@ -352,6 +354,8 @@ namespace CoreCodedChatbot.Library.Services
 
                 if (userRequest == null) return false;
 
+                vipService.RefundVip(userRequest.SongRequest.RequestUsername);
+
                 context.Remove(userRequest.SongRequest);
                 context.SaveChanges();
             }
@@ -604,6 +608,12 @@ namespace CoreCodedChatbot.Library.Services
                 if (request == null) return false;
 
                 request.Played = true;
+
+                if (request.VipRequestTime != null)
+                {
+                    vipService.RefundVip(request.RequestUsername);
+                }
+
                 context.SaveChanges();
 
                 UpdatePlaylists();
