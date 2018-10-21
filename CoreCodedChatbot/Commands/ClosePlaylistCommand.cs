@@ -5,6 +5,7 @@ using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Library.Models.Data;
+using Microsoft.AspNetCore.Localization;
 using Newtonsoft.Json;
 using TwitchLib.Client;
 
@@ -32,11 +33,19 @@ namespace CoreCodedChatbot.Commands
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod)
         {
-            var response = await playlistClient.GetAsync("ClosePlaylist");
+            HttpResponseMessage response;
+            if (commandText.Equals("very", StringComparison.OrdinalIgnoreCase))
+            {
+                response = await playlistClient.GetAsync("VeryClosePlaylist");
+            } 
+            else
+            {
+                response = await playlistClient.GetAsync("ClosePlaylist");
+            }
 
             client.SendMessage(config.StreamerChannel, response.IsSuccessStatusCode
-                ? $"Hey @{username}, I have closed the playlist!" 
-                : $"Hey @{username}, I can't seem to close the playlist for some reason :(");
+                ? $"Hey @{username}, I have closed the playlist{(commandText.Equals("very", StringComparison.OrdinalIgnoreCase) ? " completely" : string.Empty)}!"
+                : $"Hey {username}, I can't seem to close the playlist for some reason :(");
         }
 
         public void ShowHelp(TwitchClient client, string username)

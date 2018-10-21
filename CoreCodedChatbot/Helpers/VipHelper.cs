@@ -6,7 +6,7 @@ using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Database.Context.Models;
 using CoreCodedChatbot.Helpers.Interfaces;
-using TwitchLib.Api.Models.v5.Subscriptions;
+using TwitchLib.Api.V5.Models.Subscriptions;
 
 
 namespace CoreCodedChatbot.Helpers
@@ -228,9 +228,9 @@ namespace CoreCodedChatbot.Helpers
             {
                 var user = this.FindUser(context, username);
                 if (user == null ||
-                    user.UsedVipRequests >=
+                    user.UsedVipRequests + user.SentGiftVipRequests >=
                     (user.FollowVipRequest + user.SubVipRequests + user.ModGivenVipRequests +
-                        user.DonationOrBitsVipRequests + user.TokenVipRequests)) return false;
+                        user.DonationOrBitsVipRequests + user.TokenVipRequests + user.ReceivedGiftVipRequests)) return false;
 
                 return true;
             }

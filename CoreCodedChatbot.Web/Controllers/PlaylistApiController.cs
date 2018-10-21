@@ -71,6 +71,14 @@ namespace CoreCodedChatbot.Web.Controllers
             return BadRequest();
         }
 
+        public IActionResult VeryClosePlaylist()
+        {
+            if (playlistService.VeryClosePlaylist())
+                return Ok();
+
+            return BadRequest();
+        }
+
         public IActionResult ClosePlaylist()
         {
             if (playlistService.ClosePlaylist())
@@ -81,7 +89,7 @@ namespace CoreCodedChatbot.Web.Controllers
 
         public IActionResult IsPlaylistOpen()
         {
-            return Json(playlistService.IsPlaylistOpen());
+            return Json(playlistService.GetPlaylistState());
         }
 
         public IActionResult ArchiveCurrentRequest()

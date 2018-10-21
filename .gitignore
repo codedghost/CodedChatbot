@@ -34,9 +34,13 @@
 /CoreCodedChatbot.Library/bin/Debug/netcoreapp2.0
 /CoreCodedChatbot.PlaylistApi/obj
 /CoreCodedChatbot.Services/obj
-/CoreCodedChatbot.Discord/obj/Debug/netcoreapp2.0
+/CoreCodedChatbot.Client/bin/Debug/netcoreapp2.0
 /CoreCodedChatbot.Client/obj
+/CoreCodedChatbot.Client/config.json
+/CoreCodedChatbot.Client/appsettings.Development.json
+/CoreCodedChatbot.Discord/obj/Debug/netcoreapp2.0
+/Website/node_modules
 /CoreCodedChatbot.Client/bin/
 /CoreCodedChatbot.Client/appsettings.Development.json
-/CoreCodedChatbot.Client/config.json
-/Website/node_modules
+/CoreCodedChatbot.Library/bin/Debug/netcoreapp2.1
+/CoreCodedChatbot.Web/bin/Debug/netcoreapp2.1

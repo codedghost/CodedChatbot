@@ -25,9 +25,9 @@ namespace CoreCodedChatbot.Helpers
             var client = new TwitchClient();
             client.Initialize(creds, config.StreamerChannel);
             var api = new TwitchAPI();
-            api.InitializeAsync(accessToken: config.ChatbotAccessToken).Wait();
+            api.Settings.AccessToken = config.ChatbotAccessToken;
 
-            var liveStreamMonitor = new LiveStreamMonitor(api, 60, true, true);
+            var liveStreamMonitor = new LiveStreamMonitorService(api);
 
             var pubsub = new TwitchPubSub();
 

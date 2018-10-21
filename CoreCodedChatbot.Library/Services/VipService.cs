@@ -22,11 +22,35 @@ namespace CoreCodedChatbot.Library.Services
         public bool GiftVip(string donorUsername, string receiverUsername)
         {
             var donorUser = GetUser(donorUsername);
-            var receiverUser = GetUser(receiverUsername, false);
+            var receiverUser = GetUser(receiverUsername);
 
             if (donorUser == null || receiverUser == null) return false;
 
             return GiftVip(donorUser, receiverUser);
+        }
+
+        public bool RefundVip(string username)
+        {
+            try
+            {
+                var user = GetUser(username);
+
+                using (var context = chatbotContextFactory.Create())
+                {
+                    var refundUser = context.Users.Find(user.Username);
+
+                    refundUser.ModGivenVipRequests++;
+
+                    context.SaveChanges();
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"{e} - {e.InnerException}");
+                return false;
+            }
         }
 
         private bool GiftVip(User donor, User receiver)
