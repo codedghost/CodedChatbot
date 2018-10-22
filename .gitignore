@@ -40,3 +40,6 @@
 /CoreCodedChatbot.Client/appsettings.Development.json
 /CoreCodedChatbot.Discord/obj/Debug/netcoreapp2.0
 /Website/node_modules
+/CoreCodedChatbot.Client/bin/Debug/netcoreapp2.1
+/CoreCodedChatbot.Library/bin/Debug/netcoreapp2.1
+/CoreCodedChatbot.Web/bin/Debug/netcoreapp2.1
