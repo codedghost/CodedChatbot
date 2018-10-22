@@ -9,10 +9,10 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+	<TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
     <AssemblyName>CoreCodedChatbot</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>CoreCodedChatbot</PackageId>
-    <AssetTargetFallback>$(AssetTargetFallback);dnxcore50</AssetTargetFallback>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>

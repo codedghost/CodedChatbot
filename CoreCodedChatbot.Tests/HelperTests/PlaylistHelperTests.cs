@@ -33,7 +33,10 @@ namespace CoreCodedChatbot.Tests.HelperTests
             var configService = Substitute.For<IConfigService>();
             configService.GetConfig().Returns(new ConfigModel { ObsPlaylistPath = "obsplaylist.txt" });
 
-            return new PlaylistService(contextFactory, configService);
+            var vipService = Substitute.For<IVipService>();
+            vipService.RefundVip(string.Empty).ReturnsForAnyArgs(true);
+
+            return new PlaylistService(contextFactory, configService, vipService);
         }
 
         [Fact]
