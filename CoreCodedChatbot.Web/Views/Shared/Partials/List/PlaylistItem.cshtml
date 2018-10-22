@@ -4,7 +4,7 @@
 @{
     var oddOrEvenStyle = Model.isEvenIndex ? "even" : "odd";
     var vipStyle = Model.isVip ? "vipText" : "";
-    <div class="request @oddOrEvenStyle">
+    <div id="@Model.songRequestId" class="request @oddOrEvenStyle">
         <div class="requestBadges">
             <br/>
             @{
