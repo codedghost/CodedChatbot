@@ -8,7 +8,7 @@
         <div class="requestBadges">
             <br/>
             @{
-                if (ViewContext.ViewBag.UserIsMod)
+                if (ViewContext.ViewBag.UserIsMod || ViewContext.ViewBag.Username.ToLower() == Model.songRequester.ToLower())
                 {
                     <span id="@Model.songRequestId" class="requestBadge moderatorBadge" onclick="showDeleteModal()"></span>
                 }

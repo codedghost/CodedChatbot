@@ -56,7 +56,7 @@ namespace CoreCodedChatbot.Web.Controllers
                     .ToArray();
 
             ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
-
+            ViewBag.Username = twitchUser?.Username ?? string.Empty;
             return View(playlistModel);
         }
 
@@ -83,6 +83,7 @@ namespace CoreCodedChatbot.Web.Controllers
                 } : null;
 
                 ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
+                ViewBag.Username = twitchUser?.Username ?? string.Empty;
                 return PartialView("Partials/List/RegularList", data);
             }
             catch (Exception)
@@ -109,6 +110,7 @@ namespace CoreCodedChatbot.Web.Controllers
                     : null;
 
                 ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
+                ViewBag.Username = twitchUser?.Username ?? string.Empty;
                 return PartialView("Partials/List/VipList", data);
             }
             catch (Exception)
@@ -174,16 +176,18 @@ namespace CoreCodedChatbot.Web.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 var chattersModel = chatterService.GetCurrentChatters();
+                var request = playlistService.GetRequestById(songId);
 
                 if (chattersModel.chatters.moderators.Any(mod =>
-                    string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)))
+                    string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ||
+                    string.Equals(User.Identity.Name, request.songRequester))
                 {
                     if (playlistService.ArchiveRequestById(songId))
                         return Ok();
                 }
             }
 
-            return Json(new { Success = false, Message = "Encountered an error, or you are not a moderator" });
+            return Json(new { Success = false, Message = "Encountered an error, are you certain you're logged in?" });
         }
 
         [HttpPost]

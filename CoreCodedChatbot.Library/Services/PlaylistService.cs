@@ -608,8 +608,6 @@ namespace CoreCodedChatbot.Library.Services
             {
                 var request = context.SongRequests.Find(songId);
 
-
-
                 if (request == null) return false;
 
                 request.Played = true;
