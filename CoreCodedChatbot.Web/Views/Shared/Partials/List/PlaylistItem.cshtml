@@ -10,7 +10,7 @@
             @{
                 if (ViewContext.ViewBag.UserIsMod || ViewContext.ViewBag.Username.ToLower() == Model.songRequester.ToLower())
                 {
-                    <span id="@Model.songRequestId" class="requestBadge moderatorBadge" onclick="showDeleteModal()"></span>
+                    <span id="@Model.songRequestId" class="requestBadge removeSongBadge" onclick="showDeleteModal()"></span>
                 }
                 if (!Model.isInChat)
                 {
