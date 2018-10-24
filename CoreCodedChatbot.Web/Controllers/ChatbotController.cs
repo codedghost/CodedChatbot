@@ -198,7 +198,7 @@ namespace CoreCodedChatbot.Web.Controllers
                 {
                     try
                     {
-                        playlistService.ArchiveCurrentRequest();
+                        playlistService.ArchiveCurrentRequest(songId);
                         return Ok();
                     }
                     catch (Exception)
