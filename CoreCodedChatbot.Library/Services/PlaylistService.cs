@@ -190,13 +190,16 @@ namespace CoreCodedChatbot.Library.Services
             await connection.DisposeAsync();
         }
 
-        public void ArchiveCurrentRequest()
+        public void ArchiveCurrentRequest(int songId = 0)
         {
+            // SongId of zero indicates that the command has been called from twitch chat
+
             using (var context = contextFactory.Create())
             {
-                var currentRequest = CurrentRequest;
+                var currentRequest = songId == 0 ? CurrentRequest :
+                    songId == CurrentRequest.songRequestId ? CurrentRequest : null;
 
-                if (CurrentRequest == null)
+                if (currentRequest == null)
                     return;
 
                 var currentRequestDbModel = context.SongRequests.Find(currentRequest.songRequestId);
@@ -604,6 +607,8 @@ namespace CoreCodedChatbot.Library.Services
             using (var context = contextFactory.Create())
             {
                 var request = context.SongRequests.Find(songId);
+
+
 
                 if (request == null) return false;
 

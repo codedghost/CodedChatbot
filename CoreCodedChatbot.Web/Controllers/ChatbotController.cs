@@ -187,7 +187,7 @@ namespace CoreCodedChatbot.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult RemoveCurrentSong()
+        public IActionResult RemoveCurrentSong([FromBody] int songId)
         {
             if (User.Identity.IsAuthenticated)
             {
