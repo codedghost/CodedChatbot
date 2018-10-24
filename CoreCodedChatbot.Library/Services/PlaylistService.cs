@@ -20,14 +20,20 @@ namespace CoreCodedChatbot.Library.Services
 
         private readonly ConfigModel config;
         private readonly IChatbotContextFactory contextFactory;
+        private readonly IVipService vipService;
 
         private PlaylistItem CurrentRequest;
+        private int CurrentVipRequestsPlayed;
+        private int ConcurrentVipSongsToPlay;
         private Random rand = new Random();
 
-        public PlaylistService(IChatbotContextFactory contextFactory, IConfigService configService)
+        public PlaylistService(IChatbotContextFactory contextFactory, IConfigService configService, IVipService vipService)
         {
             this.contextFactory = contextFactory;
             this.config = configService.GetConfig();
+            this.vipService = vipService;
+
+            this.ConcurrentVipSongsToPlay = config.ConcurrentRegularSongsToPlay;
         }
 
         public PlaylistItem GetRequestById(int songId)
@@ -348,6 +354,8 @@ namespace CoreCodedChatbot.Library.Services
 
                 if (userRequest == null) return false;
 
+                vipService.RefundVip(userRequest.SongRequest.RequestUsername);
+
                 context.Remove(userRequest.SongRequest);
                 context.SaveChanges();
             }
@@ -600,6 +608,12 @@ namespace CoreCodedChatbot.Library.Services
                 if (request == null) return false;
 
                 request.Played = true;
+
+                if (request.VipRequestTime != null)
+                {
+                    vipService.RefundVip(request.RequestUsername);
+                }
+
                 context.SaveChanges();
 
                 UpdatePlaylists();
@@ -638,6 +652,8 @@ namespace CoreCodedChatbot.Library.Services
 
         private void UpdateCurrentSong(PlaylistItem[] regularRequests, PlaylistItem[] vipRequests)
         {
+            RequestTypes updateDecision;
+
             if (!regularRequests.Any() && !vipRequests.Any())
             {
                 CurrentRequest = null;
@@ -646,22 +662,55 @@ namespace CoreCodedChatbot.Library.Services
 
             if (CurrentRequest.isVip)
             {
-                if (regularRequests.Any())
+                CurrentVipRequestsPlayed++;
+                if (CurrentVipRequestsPlayed < ConcurrentVipSongsToPlay
+                    && vipRequests.Any())
                 {
-                    CurrentRequest = regularRequests[rand.Next(0, regularRequests.Length)];
-                } else if (vipRequests.Any())
-                {
-                    CurrentRequest = vipRequests.FirstOrDefault();
+                    updateDecision = RequestTypes.Vip;
                 }
-            } else
+                else if (regularRequests.Any())
+                {
+                    CurrentVipRequestsPlayed = 0;
+                    updateDecision = RequestTypes.Regular;
+                }
+                else if (vipRequests.Any())
+                {
+                    updateDecision = RequestTypes.Vip;
+                }
+                else
+                {
+                    updateDecision = RequestTypes.Empty;
+                }
+            }
+            else
             {
                 if (vipRequests.Any())
                 {
-                    CurrentRequest = vipRequests.FirstOrDefault();
-                } else if (regularRequests.Any())
-                {
-                    CurrentRequest = regularRequests[rand.Next(0, regularRequests.Length)];
+                    updateDecision = RequestTypes.Vip;
                 }
+                else if (regularRequests.Any())
+                {
+                    updateDecision = RequestTypes.Regular;
+                }
+                else
+                {
+                    updateDecision = RequestTypes.Empty;
+                }
+            }
+
+            switch (updateDecision)
+            {
+                case RequestTypes.Regular:
+                    CurrentRequest = regularRequests[rand.Next(0, regularRequests.Length)];
+                    break;
+                case RequestTypes.Vip:
+                    CurrentRequest = vipRequests.FirstOrDefault();
+                    break;
+                case RequestTypes.Empty:
+                    CurrentRequest = null;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
 

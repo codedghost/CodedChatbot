@@ -40,30 +40,38 @@ namespace CoreCodedChatbot.Commands
         {
             if (string.IsNullOrWhiteSpace(commandText))
             {
-                client.SendMessage(config.StreamerChannel, $"Hey @{username}, looks like you haven't included a request there!");
+                client.SendMessage(config.StreamerChannel,
+                    $"Hey @{username}, looks like you haven't included a request there!");
                 return;
             }
 
             if (vipHelper.CanUseVipRequest(username))
             {
-                var playlistPosition = 0;
-
                 var addRequest = await playlistClient.PostAsync("AddRequest",
                     HttpClientHelper.GetJsonData(new {username, commandText, isVipRequest = true}));
 
-                var addResult =
-                    JsonConvert.DeserializeObject<AddRequestResponse>(await addRequest.Content.ReadAsStringAsync());
-                if (addResult.Result == AddRequestResult.PlaylistVeryClosed)
+                if (addRequest.IsSuccessStatusCode)
                 {
-                    client.SendMessage(config.StreamerChannel, $"Hey @{username}, the playlist is currently very closed. No Requests allowed.");
+                    var addResult =
+                        JsonConvert.DeserializeObject<AddRequestResponse>(await addRequest.Content.ReadAsStringAsync());
+                    if (addResult.Result == AddRequestResult.PlaylistVeryClosed)
+                    {
+                        client.SendMessage(config.StreamerChannel,
+                            $"Hey @{username}, the playlist is currently very closed. No Requests allowed.");
+                        return;
+                    }
+
+                    var playlistPosition = addResult.PlaylistPosition;
+
+                    vipHelper.UseVipRequest(username);
+                    client.SendMessage(config.StreamerChannel,
+                        $"Hey @{username}, I have queued {commandText} for you, you're #{playlistPosition} in the queue!");
+
                     return;
                 }
 
-                playlistPosition = addResult.PlaylistPosition;
-
-                vipHelper.UseVipRequest(username);
                 client.SendMessage(config.StreamerChannel,
-                    $"Hey @{username}, I have queued {commandText} for you, you're #{playlistPosition} in the queue!");
+                    $"Hey @{username}, I can't queue your VIP request right now, please try again in a sec");
             }
             else
             {

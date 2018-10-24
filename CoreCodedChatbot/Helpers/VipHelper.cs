@@ -6,7 +6,7 @@ using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Database.Context.Models;
 using CoreCodedChatbot.Helpers.Interfaces;
-using TwitchLib.Api.Models.v5.Subscriptions;
+using TwitchLib.Api.V5.Models.Subscriptions;
 
 
 namespace CoreCodedChatbot.Helpers
@@ -49,7 +49,9 @@ namespace CoreCodedChatbot.Helpers
                 FollowVipRequest = 0,
                 SubVipRequests = 0,
                 DonationOrBitsVipRequests = 0,
-                TokenBytes = 0
+                TokenBytes = 0,
+                ReceivedGiftVipRequests = 0,
+                SentGiftVipRequests = 0
             };
 
             try
@@ -109,7 +111,9 @@ namespace CoreCodedChatbot.Helpers
                         DonationOrBitsVipRequests = 0,
                         SubVipRequests = 1,
                         UsedVipRequests = 0,
-                        TokenBytes = 0
+                        TokenBytes = 0,
+                        ReceivedGiftVipRequests = 0,
+                        SentGiftVipRequests = 0
                     });
 
                     context.Users.AddRange(models);
@@ -224,9 +228,9 @@ namespace CoreCodedChatbot.Helpers
             {
                 var user = this.FindUser(context, username);
                 if (user == null ||
-                    user.UsedVipRequests >=
+                    user.UsedVipRequests + user.SentGiftVipRequests >=
                     (user.FollowVipRequest + user.SubVipRequests + user.ModGivenVipRequests +
-                        user.DonationOrBitsVipRequests + user.TokenVipRequests)) return false;
+                        user.DonationOrBitsVipRequests + user.TokenVipRequests + user.ReceivedGiftVipRequests)) return false;
 
                 return true;
             }
@@ -270,7 +274,9 @@ namespace CoreCodedChatbot.Helpers
                     ModGiven = user.ModGivenVipRequests,
                     Sub = user.SubVipRequests,
                     Used = user.UsedVipRequests,
-                    Byte = user.TokenVipRequests
+                    Byte = user.TokenVipRequests,
+                    ReceivedGift = user.ReceivedGiftVipRequests,
+                    SentGift = user.SentGiftVipRequests
                 };
             }
 

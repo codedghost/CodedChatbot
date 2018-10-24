@@ -105,5 +105,24 @@ namespace CoreCodedChatbot.Helpers
                 }
             }
         }
+
+        public bool ConvertAllBytes(string username)
+        {
+            var totalBytes = 0;
+            using (var context = contextFactory.Create())
+            {
+                try
+                {
+                    var user = vipHelper.FindUser(context, username);
+                    totalBytes = user.TokenBytes / config.BytesToVip;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+
+            return ConvertByte(username, totalBytes);
+        }
     }
 }
