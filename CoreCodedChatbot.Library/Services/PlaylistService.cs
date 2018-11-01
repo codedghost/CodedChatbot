@@ -654,7 +654,8 @@ namespace CoreCodedChatbot.Library.Services
         {
             RequestTypes updateDecision;
 
-            if (!regularRequests.Any() && !vipRequests.Any())
+            var inChatRegularRequests = regularRequests.Where(r => r.isInChat).ToList();
+            if (!inChatRegularRequests.Any() && !vipRequests.Any())
             {
                 CurrentRequest = null;
                 return;
@@ -668,7 +669,7 @@ namespace CoreCodedChatbot.Library.Services
                 {
                     updateDecision = RequestTypes.Vip;
                 }
-                else if (regularRequests.Any())
+                else if (inChatRegularRequests.Any())
                 {
                     CurrentVipRequestsPlayed = 0;
                     updateDecision = RequestTypes.Regular;
@@ -688,7 +689,7 @@ namespace CoreCodedChatbot.Library.Services
                 {
                     updateDecision = RequestTypes.Vip;
                 }
-                else if (regularRequests.Any())
+                else if (inChatRegularRequests.Any())
                 {
                     updateDecision = RequestTypes.Regular;
                 }
@@ -701,7 +702,7 @@ namespace CoreCodedChatbot.Library.Services
             switch (updateDecision)
             {
                 case RequestTypes.Regular:
-                    CurrentRequest = regularRequests[rand.Next(0, regularRequests.Length)];
+                    CurrentRequest = inChatRegularRequests[rand.Next(inChatRegularRequests.Count)];
                     break;
                 case RequestTypes.Vip:
                     CurrentRequest = vipRequests.FirstOrDefault();
