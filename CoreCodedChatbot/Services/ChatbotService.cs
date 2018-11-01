@@ -70,6 +70,7 @@ namespace CoreCodedChatbot.Services
             this.client.OnChatCommandReceived += OnCommandReceived;
             this.client.OnNewSubscriber += OnNewSub;
             this.client.OnReSubscriber += OnReSub;
+            this.client.OnGiftedSubscription += OnGiftSub;
             this.client.Connect();
             
             this.liveStreamMonitor.SetChannelsByName(new List<string>{config.StreamerChannel});
@@ -130,6 +131,24 @@ namespace CoreCodedChatbot.Services
             catch (Exception ex)
             {
                 Console.Out.WriteLine(ex.ToString());
+            }
+        }
+
+        private async void OnGiftSub(object sender, OnGiftedSubscriptionArgs e)
+        {
+            try
+            {
+                Console.Out.WriteLine($"Gifted Sub! {e.GiftedSubscription.MsgParamRecipientUserName} has received a sub from {e.GiftedSubscription.DisplayName}");
+
+                // A whole vip for the recipient
+                vipHelper.GiveSubVip(e.GiftedSubscription.MsgParamRecipientUserName);
+
+                // Half as thanks to the gifter
+                bytesHelper.GiveGiftSubBytes(e.GiftedSubscription.DisplayName);
+            }
+            catch (Exception ex)
+            {
+                Console.Out.WriteLine(ex);
             }
         }
 
