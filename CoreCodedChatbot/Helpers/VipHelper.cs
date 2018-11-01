@@ -148,6 +148,31 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
+        public bool GiveSubBombVips(string[] usernames, int subs)
+        {
+            using (var context = contextFactory.Create())
+            {
+                try
+                {
+                    foreach (var username in usernames)
+                    {
+                        var user = FindUser(context, username);
+                        if (user == null) return false;
+
+                        user.SubVipRequests++;
+
+                    }
+
+                    context.SaveChanges();
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+        }
+
         public bool GiveBitsVip(string username, int totalBitsToDate)
         {
             using (var context = this.contextFactory.Create())

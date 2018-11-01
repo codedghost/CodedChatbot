@@ -153,6 +153,20 @@ namespace CoreCodedChatbot.Services
             }
         }
 
+        private void OnSubBomb(object sender, OnCommunitySubscriptionArgs e)
+        {
+            try
+            {
+                Console.Out.WriteLine($"Sub Bomb!!! {e.GiftedSubscription.DisplayName} has gifted {e.GiftedSubscription.MsgParamMassGiftCount} subs!");
+                
+                // Leaving blank for now, it is assumed that subbomb gifts go through gift event too, so relevant vips and bytes will be handled there.
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
+
         private void OnPubSubConnected(object sender, EventArgs e)
         {
             try
