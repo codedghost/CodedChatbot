@@ -44,7 +44,7 @@ namespace CoreCodedChatbot.Web.Controllers
             var twitchUser = User.Identity.IsAuthenticated ? new LoggedInTwitchUser
             {
                 Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)?.Value,
-                IsMod = chattersModel.chatters.moderators.Any(mod => string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase))
+                IsMod = chattersModel?.chatters?.moderators?.Any(mod => string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false
             } : null;
 
             var playlistModel = playlistService.GetAllSongs(twitchUser);
@@ -79,7 +79,7 @@ namespace CoreCodedChatbot.Web.Controllers
                 var twitchUser = User.Identity.IsAuthenticated ? new LoggedInTwitchUser
                 {
                     Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)?.Value,
-                    IsMod = chattersModel.chatters.moderators.Any(mod => string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase))
+                    IsMod = chattersModel?.chatters?.moderators?.Any(mod => string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false
                 } : null;
 
                 ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
@@ -104,8 +104,8 @@ namespace CoreCodedChatbot.Web.Controllers
                     {
                         Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
                             ?.Value,
-                        IsMod = chattersModel.chatters.moderators.Any(mod =>
-                            string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase))
+                        IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
+                            string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false
                     }
                     : null;
 
@@ -158,7 +158,7 @@ namespace CoreCodedChatbot.Web.Controllers
                 var twitchUser = User.Identity.IsAuthenticated ? new LoggedInTwitchUser
                 {
                     Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)?.Value,
-                    IsMod = chattersModel.chatters.moderators.Any(mod => string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase))
+                    IsMod = chattersModel?.chatters?.moderators?.Any(mod => string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false
                 } : null;
 
                 ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
@@ -178,8 +178,8 @@ namespace CoreCodedChatbot.Web.Controllers
                 var chattersModel = chatterService.GetCurrentChatters();
                 var request = playlistService.GetRequestById(songId);
 
-                if (chattersModel.chatters.moderators.Any(mod =>
-                    string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ||
+                if (chattersModel?.chatters?.moderators?.Any(mod =>
+                    string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? 
                     string.Equals(User.Identity.Name, request.songRequester))
                 {
                     if (playlistService.ArchiveRequestById(songId))
@@ -197,8 +197,8 @@ namespace CoreCodedChatbot.Web.Controllers
             {
                 var chattersModel = chatterService.GetCurrentChatters();
 
-                if (chattersModel.chatters.moderators.Any(mod =>
-                    string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)))
+                if (chattersModel?.chatters?.moderators?.Any(mod =>
+                    string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false)
                 {
                     try
                     {
