@@ -701,7 +701,8 @@ namespace CoreCodedChatbot.Library.Services
             switch (updateDecision)
             {
                 case RequestTypes.Regular:
-                    CurrentRequest = regularRequests[rand.Next(0, regularRequests.Length)];
+                    var inChatRegularRequests = regularRequests.Where(r => r.isInChat).ToList();
+                    CurrentRequest = inChatRegularRequests[rand.Next(inChatRegularRequests.Count)];
                     break;
                 case RequestTypes.Vip:
                     CurrentRequest = vipRequests.FirstOrDefault();
