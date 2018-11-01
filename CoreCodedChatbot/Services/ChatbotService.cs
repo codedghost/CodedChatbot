@@ -71,6 +71,7 @@ namespace CoreCodedChatbot.Services
             this.client.OnNewSubscriber += OnNewSub;
             this.client.OnReSubscriber += OnReSub;
             this.client.OnGiftedSubscription += OnGiftSub;
+            this.client.OnCommunitySubscription += OnSubBomb;
             this.client.Connect();
             
             this.liveStreamMonitor.SetChannelsByName(new List<string>{config.StreamerChannel});
@@ -134,7 +135,7 @@ namespace CoreCodedChatbot.Services
             }
         }
 
-        private async void OnGiftSub(object sender, OnGiftedSubscriptionArgs e)
+        private void OnGiftSub(object sender, OnGiftedSubscriptionArgs e)
         {
             try
             {
