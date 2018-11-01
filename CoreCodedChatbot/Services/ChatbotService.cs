@@ -304,10 +304,14 @@ namespace CoreCodedChatbot.Services
                 {
                     try
                     {
-                        var currentChattersJson = await httpClient.GetStringAsync($"https://tmi.twitch.tv/group/user/{config.StreamerChannel}/chatters");
-                        // process json into username list.
-                        var chattersModel = JsonConvert.DeserializeObject<ChatViewersModel>(currentChattersJson);
-                        bytesHelper.GiveBytes(chattersModel);
+                        var currentChattersJson = await httpClient.GetAsync($"https://tmi.twitch.tv/group/user/{config.StreamerChannel}/chatters");
+
+                        if (currentChattersJson.IsSuccessStatusCode)
+                        {
+                            // process json into username list.
+                            var chattersModel = JsonConvert.DeserializeObject<ChatViewersModel>(currentChattersJson.Content.ReadAsStringAsync().Result);
+                            bytesHelper.GiveBytes(chattersModel);
+                        }
                     }
                     catch (Exception ex)
                     {
