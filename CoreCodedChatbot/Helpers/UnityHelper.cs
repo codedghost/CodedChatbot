@@ -1,4 +1,5 @@
-﻿using CoreCodedChatbot.Database.Context;
+﻿using System.Linq;
+using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Helpers.Interfaces;
 
@@ -24,8 +25,22 @@ namespace CoreCodedChatbot.Helpers
             var creds = new ConnectionCredentials(config.ChatbotNick, config.ChatbotPass);
             var client = new TwitchClient();
             client.Initialize(creds, config.StreamerChannel);
+
             var api = new TwitchAPI();
             api.Settings.AccessToken = config.ChatbotAccessToken;
+
+            if (config.developmentBuild)
+            {
+                var rooms = api.V5.Chat.GetChatRoomsByChannelAsync(config.ChannelId, config.ChatbotAccessToken);
+                if (rooms.IsCompletedSuccessfully)
+                {
+                    var devRoomId = rooms.Result.Rooms.SingleOrDefault(r => r.Name == "dev")?.Id;
+                    if (!string.IsNullOrWhiteSpace(devRoomId))
+                    {
+                        client.JoinRoom(config.ChannelId, devRoomId);
+                    }
+                }
+            }
 
             var liveStreamMonitor = new LiveStreamMonitorService(api);
 
