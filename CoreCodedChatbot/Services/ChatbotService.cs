@@ -343,16 +343,16 @@ namespace CoreCodedChatbot.Services
 
         private void UnScheduleStreamTasks()
         {
-            HowToRequestTimer.Dispose();
-            CustomsForgeTimer.Dispose();
-            PlaylistTimer.Dispose();
-            FollowTimer.Dispose();
-            DiscordTimer.Dispose();
-            TwitterTimer.Dispose();
-            YoutubeTimer.Dispose();
-            MerchTimer.Dispose();
-            BytesTimer.Dispose();
-            DonationsTimer.Dispose();
+            HowToRequestTimer?.Dispose();
+            CustomsForgeTimer?.Dispose();
+            PlaylistTimer?.Dispose();
+            FollowTimer?.Dispose();
+            DiscordTimer?.Dispose();
+            TwitterTimer?.Dispose();
+            YoutubeTimer?.Dispose();
+            MerchTimer?.Dispose();
+            BytesTimer?.Dispose();
+            DonationsTimer?.Dispose();
         }
 
         public void Main()
