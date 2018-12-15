@@ -1,12 +1,12 @@
-﻿using CoreCodedChatbot.CustomAttributes;
-using CoreCodedChatbot.Interfaces;
+﻿using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Models.Data;
 
 using TwitchLib.Client;
+using TwitchLib.Client.Models;
 
 namespace CoreCodedChatbot.Commands
 {
-    [ChatCommand(new[] { "customsforge", "cf", "customforge" }, false)]
+    [CustomAttributes.ChatCommand(new[] { "customsforge", "cf", "customforge" }, false)]
     public class CustomsforgeCommand : ICommand
     {
         private readonly ConfigModel config;
@@ -16,14 +16,14 @@ namespace CoreCodedChatbot.Commands
             this.config = config;
         }
 
-        public void Process(TwitchClient client, string username, string commandText, bool isMod)
+        public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            client.SendMessage(config.StreamerChannel, $"Create a login and find songs to choose from at http://ignition.customsforge.com");
+            client.SendMessage(joinedChannel, $"Create a login and find songs to choose from at http://ignition.customsforge.com");
         }
 
-        public void ShowHelp(TwitchClient client, string username)
+        public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)
         {
-            client.SendMessage(config.StreamerChannel, $"Hey @{username}, this command outputs where to find CDLC from time to time.");
+            client.SendMessage(joinedChannel, $"Hey @{username}, this command outputs where to find CDLC from time to time.");
         }
     }
 }

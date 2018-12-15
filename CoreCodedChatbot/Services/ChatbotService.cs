@@ -18,6 +18,7 @@ using TwitchLib.Api.Core.Exceptions;
 using TwitchLib.Api.Services;
 using TwitchLib.Api.Services.Events;
 using TwitchLib.Api.Services.Events.LiveStreamMonitor;
+using TwitchLib.Client.Models;
 using TwitchLib.PubSub;
 
 namespace CoreCodedChatbot.Services
@@ -91,7 +92,27 @@ namespace CoreCodedChatbot.Services
 
         private void OnJoinedChannel(object sender, OnJoinedChannelArgs e)
         {
-            client.SendMessage(config.StreamerChannel, $"BEEP BOOP: {config.ChatbotNick} online!");
+
+            if (config.developmentBuild)
+            {
+                api.V5.Chat.GetChatRoomsByChannelAsync(config.ChannelId, config.ChatbotAccessToken)
+                    .ContinueWith(
+                        rooms =>
+                        {
+                            if (!rooms.IsCompletedSuccessfully) return;
+                            var devRoomId = rooms.Result.Rooms.SingleOrDefault(r => r.Name == "dev")?.Id;
+                            if (!string.IsNullOrWhiteSpace(devRoomId))
+                            {
+                                client.JoinRoom(config.ChannelId, devRoomId);
+                                client.SendMessage(client.JoinedChannels.FirstOrDefault(jc => jc.Channel.Contains(devRoomId)),
+                                    $"BEEP BOOP: {config.ChatbotNick} has joined dev!");
+                            }
+                        });
+            }
+            else
+            {
+                client.SendMessage(config.StreamerChannel, $"BEEP BOOP: {config.ChatbotNick} online!");
+            }
         }
 
         private void OnCommandReceived(object sender, OnChatCommandReceivedArgs e)
@@ -99,7 +120,11 @@ namespace CoreCodedChatbot.Services
             try
             {
                 commandHelper.ProcessCommand(e.Command.CommandText, client, e.Command.ChatMessage.Username,
-                    e.Command.ArgumentsAsString, e.Command.ChatMessage.IsModerator || e.Command.ChatMessage.IsBroadcaster);
+                    e.Command.ArgumentsAsString,
+                    e.Command.ChatMessage.IsModerator || e.Command.ChatMessage.IsBroadcaster,
+                    config.developmentBuild
+                        ? client.JoinedChannels.FirstOrDefault(jc => jc.Channel.Contains(e.Command.ChatMessage.RoomId))
+                        : client.JoinedChannels.First());
             }
             catch (Exception ex)
             {
@@ -209,19 +234,64 @@ namespace CoreCodedChatbot.Services
         private void OnStreamOnline(object sender, OnStreamOnlineArgs e)
         {
             Console.Out.WriteLine("Streamer is online");
+            JoinedChannel channel = null;
+
             if (client.IsConnected)
             {
-                client.SendMessage(e.Channel, $"Looks like @{e.Channel} has come online, better get to work!");
+                if (config.developmentBuild)
+                {
+                    api.V5.Chat.GetChatRoomsByChannelAsync(config.ChannelId, config.ChatbotAccessToken)
+                        .ContinueWith(
+                            rooms =>
+                            {
+                                if (!rooms.IsCompletedSuccessfully) return;
+                                var devRoomId = rooms.Result.Rooms.SingleOrDefault(r => r.Name == "dev")?.Id;
+                                if (!string.IsNullOrWhiteSpace(devRoomId))
+                                {
+                                    client.JoinRoom(config.ChannelId, devRoomId);
+
+                                    channel =
+                                        client.JoinedChannels.FirstOrDefault(jc => jc.Channel.Contains(devRoomId));
+                                    client.SendMessage(client.JoinedChannels.FirstOrDefault(jc => jc.Channel.Contains(devRoomId)),
+                                        $"Looks like @{e.Channel} has come online, better get to work!");
+                                }
+                            });
+                }
+                else
+                {
+                    channel = client.GetJoinedChannel(config.StreamerChannel);
+                    client.SendMessage(e.Channel, $"Looks like @{e.Channel} has come online, better get to work!");
+                }
             }
-            ScheduleStreamTasks(e.Stream.Title);
+            ScheduleStreamTasks(channel, e.Stream.Title);
         }
 
         private void OnStreamOffline(object sender, OnStreamOfflineArgs e)
         {
             Console.Out.WriteLine("Streamer is offline");
+
             if (client.IsConnected)
             {
-                client.SendMessage(e.Channel, $"Looks like @{e.Channel} has gone offline, *yawn* powering down");
+                if (config.developmentBuild)
+                {
+                    api.V5.Chat.GetChatRoomsByChannelAsync(config.ChannelId, config.ChatbotAccessToken)
+                        .ContinueWith(
+                            rooms =>
+                            {
+                                if (!rooms.IsCompletedSuccessfully) return;
+                                var devRoomId = rooms.Result.Rooms.SingleOrDefault(r => r.Name == "dev")?.Id;
+                                if (!string.IsNullOrWhiteSpace(devRoomId))
+                                {
+                                    client.JoinRoom(config.ChannelId, devRoomId);
+                                    client.SendMessage(client.JoinedChannels.FirstOrDefault(jc => jc.Channel.Contains(devRoomId)),
+                                        $"Looks like @{e.Channel} has gone offline, *yawn* powering down");
+                                }
+                            });
+                }
+                else
+                {
+                    client.SendMessage(e.Channel, $"Looks like @{e.Channel} has gone offline, *yawn* powering down");
+                }
             }
             UnScheduleStreamTasks();
         }
@@ -236,12 +306,12 @@ namespace CoreCodedChatbot.Services
         {
             Console.Out.WriteLine("Assuming stream category or title has updated, rescheduling tasks");
             UnScheduleStreamTasks();
-            ScheduleStreamTasks(e.Stream.Title);
+            //ScheduleStreamTasks(e.Stream.Title);
         }
 
-        private async void ScheduleStreamTasks(string streamGame = "Rocksmith 2014")
+        private async void ScheduleStreamTasks(JoinedChannel devChannel, string streamGame = "Rocksmith 2014")
         {
-            var isStreamingRocksmith = streamGame == "Rocksmith 2014";
+            var isStreamingRocksmith = streamGame == "Rocksmith 2014"; // TODO: This needs to query the actual game id as this currently doesn't work correctly
             var maxTimerMinutes =
                 TimeSpan.FromMinutes(isStreamingRocksmith ? MaxTimerMinutesRocksmith : MaxTimerMinutesGaming);
 
@@ -262,37 +332,37 @@ namespace CoreCodedChatbot.Services
             if (isStreamingRocksmith)
             {
                 HowToRequestTimer = new Timer(
-                    e => commandHelper.ProcessCommand("howtorequest", client, "Chatbot", string.Empty, true),
+                    e => commandHelper.ProcessCommand("howtorequest", client, "Chatbot", string.Empty, true, devChannel),
                     null,
                     TimeSpan.Zero, maxTimerMinutes);
                 CustomsForgeTimer = new Timer(
-                    e => commandHelper.ProcessCommand("customsforge", client, "Chatbot", string.Empty, true),
+                    e => commandHelper.ProcessCommand("customsforge", client, "Chatbot", string.Empty, true, devChannel),
                     null,
                     TimeSpan.FromMinutes(7), maxTimerMinutes);
                 PlaylistTimer = new Timer(
-                    e => commandHelper.ProcessCommand("list", client, "Chatbot", string.Empty, true),
+                    e => commandHelper.ProcessCommand("list", client, "Chatbot", string.Empty, true, devChannel),
                     null,
                     TimeSpan.FromMinutes(14), maxTimerMinutes);
             }
 
             FollowTimer = new Timer(
-                e => commandHelper.ProcessCommand("followme", client, "Chatbot", string.Empty, true),
+                e => commandHelper.ProcessCommand("followme", client, "Chatbot", string.Empty, true, devChannel),
                 null,
                 TimeSpan.FromMinutes(isStreamingRocksmith ? 21 : 0), maxTimerMinutes);
             DiscordTimer = new Timer(
-                e => commandHelper.ProcessCommand("discord", client, "Chatbot", string.Empty, true),
+                e => commandHelper.ProcessCommand("discord", client, "Chatbot", string.Empty, true, devChannel),
                 null,
                 TimeSpan.FromMinutes(isStreamingRocksmith ? 28 : 7), maxTimerMinutes);
             TwitterTimer = new Timer(
-                e => commandHelper.ProcessCommand("twitter", client, "Chatbot", string.Empty, true),
+                e => commandHelper.ProcessCommand("twitter", client, "Chatbot", string.Empty, true, devChannel),
                 null,
                 TimeSpan.FromMinutes(isStreamingRocksmith ? 35 : 14), maxTimerMinutes);
             YoutubeTimer = new Timer(
-                e => commandHelper.ProcessCommand("youtube", client, "Chatbot", string.Empty, true),
+                e => commandHelper.ProcessCommand("youtube", client, "Chatbot", string.Empty, true, devChannel),
                 null,
                 TimeSpan.FromMinutes(isStreamingRocksmith ? 42 : 21), maxTimerMinutes);
             MerchTimer = new Timer(
-                e => commandHelper.ProcessCommand("merch", client, "Chatbot", string.Empty, true),
+                e => commandHelper.ProcessCommand("merch", client, "Chatbot", string.Empty, true, devChannel),
                 null,
                 TimeSpan.FromMinutes(isStreamingRocksmith ? 49 : 28), maxTimerMinutes);
 

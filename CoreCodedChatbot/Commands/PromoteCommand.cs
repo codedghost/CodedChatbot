@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Helpers;
 using CoreCodedChatbot.Library.Models.Data;
 using Newtonsoft.Json;
 using TwitchLib.Client;
+using TwitchLib.Client.Models;
 
 namespace CoreCodedChatbot.Commands
 {
-    [ChatCommand(new [] { "promote"}, false)]
+    [CustomAttributes.ChatCommand(new [] { "promote"}, false)]
     public class PromoteCommand : ICommand
     {
         private VipHelper vipHelper;
@@ -35,7 +35,7 @@ namespace CoreCodedChatbot.Commands
             };
         }
 
-        public async void Process(TwitchClient client, string username, string commandText, bool isMod)
+        public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
             if (vipHelper.CanUseVipRequest(username))
             {
@@ -46,7 +46,7 @@ namespace CoreCodedChatbot.Commands
                 {
                     var playlistPosition =
                         JsonConvert.DeserializeObject<int>(await request.Content.ReadAsStringAsync());
-                    client.SendMessage(config.StreamerChannel, playlistPosition == -1
+                    client.SendMessage(joinedChannel, playlistPosition == -1
                         ? $"Hey @{username}, I can't find a song at that position! Please check your requests with !myrequests"
                         : playlistPosition == -2
                             ? $"Hey @{username}, I'm sorry but that request doesn't seem to belong to you. Please check your requests with !myrequests"
@@ -59,19 +59,19 @@ namespace CoreCodedChatbot.Commands
                     return;
                 }
 
-                client.SendMessage(config.StreamerChannel,
+                client.SendMessage(joinedChannel,
                     $"Hey @{username}, sorry I can't promote your request right now, please try again in a sec");
             }
             else
             {
-                client.SendMessage(config.StreamerChannel,
+                client.SendMessage(joinedChannel,
                     $"Hey @{username}, it looks like you don't have any remaining VIP requests. Please use the standard !request command.");
             }
         }
 
-        public void ShowHelp(TwitchClient client, string username)
+        public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)
         {
-            client.SendMessage(config.StreamerChannel,
+            client.SendMessage(joinedChannel,
                 $"Hey @{username}, if you have a VIP token, this command will bump your song request right to the top of the queue. Usage: !promote");
         }
     }
