@@ -23,7 +23,7 @@ namespace CoreCodedChatbot.Library.Services
         private readonly ConfigModel Config;
         private IChatbotContextFactory contextFactory;
 
-        private JoinedChannel JoinedChannel;
+        private string DevelopmentRoomId;
 
         private const string GuessingGameStateSettingKey = "IsGuessingGameInProgress";
         
@@ -35,15 +35,14 @@ namespace CoreCodedChatbot.Library.Services
             this.Api = api;
             this.Config = configService.GetConfig();
 
-            if (Config.developmentBuild)
+            if (Config.DevelopmentBuild)
             {
                 Api.V5.Chat.GetChatRoomsByChannelAsync(Config.ChannelId, Config.ChatbotAccessToken)
                     .ContinueWith(
                         rooms =>
                         {
                             if (!rooms.IsCompletedSuccessfully) return;
-                            var devRoomId = rooms.Result.Rooms.SingleOrDefault(r => r.Name == "dev")?.Id;
-                            JoinedChannel = Client.JoinedChannels.FirstOrDefault(jc => jc.Channel.Contains(devRoomId));
+                            DevelopmentRoomId = rooms.Result.Rooms.SingleOrDefault(r => r.Name == "dev")?.Id;
                         });
             }
         }
@@ -55,6 +54,10 @@ namespace CoreCodedChatbot.Library.Services
 
         private async void InitialiseGameTimer(string songName, int songLengthInSeconds)
         {
+            if (Config.DevelopmentBuild && !Client.JoinedChannels.Select(jc => jc.Channel)
+                    .Any(jc => jc.Contains(DevelopmentRoomId)))
+                Client.JoinRoom(Config.ChannelId, DevelopmentRoomId);
+
             if (songLengthInSeconds < Config.SecondsForGuessingGame)
             {
                 return;
@@ -63,23 +66,23 @@ namespace CoreCodedChatbot.Library.Services
             if (!OpenGuessingGame(songName))
             {
                 
-                Client.SendMessage(JoinedChannel ?? Client.GetJoinedChannel(Config.StreamerChannel), "I couldn't start the guessing game :S");
+                Client.SendMessage(string.IsNullOrEmpty(DevelopmentRoomId) ? Config.StreamerChannel : DevelopmentRoomId, "I couldn't start the guessing game :S");
                 return;
             }
 
             SetGuessingGameState(true);
 
-            Client.SendMessage(JoinedChannel ?? Client.GetJoinedChannel(Config.StreamerChannel),
+            Client.SendMessage(string.IsNullOrEmpty(DevelopmentRoomId) ? Config.StreamerChannel : DevelopmentRoomId,
                 $"The guessing game has begun! You have {Config.SecondsForGuessingGame} seconds to !guess the accuracy that {Config.StreamerChannel} will get on {songName}!");
 
             await Task.Delay(TimeSpan.FromSeconds(Config.SecondsForGuessingGame));
 
             if (!CloseGuessingGame())
             {
-                Client.SendMessage(JoinedChannel ?? Client.GetJoinedChannel(Config.StreamerChannel), "I couldn't close the guessing game for some reason... SEND HALP");
+                Client.SendMessage(string.IsNullOrEmpty(DevelopmentRoomId) ? Config.StreamerChannel : DevelopmentRoomId, "I couldn't close the guessing game for some reason... SEND HALP");
             }
 
-            Client.SendMessage(JoinedChannel ?? Client.GetJoinedChannel(Config.StreamerChannel), "The guessing game has now closed. Good luck everyone!");
+            Client.SendMessage(string.IsNullOrEmpty(DevelopmentRoomId) ? Config.StreamerChannel : DevelopmentRoomId, "The guessing game has now closed. Good luck everyone!");
 
             SetGuessingGameState(false);
         }
@@ -191,7 +194,7 @@ namespace CoreCodedChatbot.Library.Services
             var winners = orderedWinners.Where(w => w.Item1 == firstWinner.Item1).ToList();
             // No-one guessed?
             if (!winners.Any())
-                Client.SendMessage(JoinedChannel ?? Client.GetJoinedChannel(Config.StreamerChannel), "Nobody guessed! Good luck next time :)");
+                Client.SendMessage(string.IsNullOrEmpty(DevelopmentRoomId) ? Config.StreamerChannel : DevelopmentRoomId, "Nobody guessed! Good luck next time :)");
 
             var result = new GuessingGameWinner
             {
@@ -205,7 +208,7 @@ namespace CoreCodedChatbot.Library.Services
             // TODO: URGENT -> Refactor this to own service when bytes service is brought over to library project.
             GiveBytes(result);
 
-            Client.SendMessage(JoinedChannel ?? Client.GetJoinedChannel(Config.StreamerChannel),
+            Client.SendMessage(string.IsNullOrEmpty(DevelopmentRoomId) ? Config.StreamerChannel : DevelopmentRoomId,
                 result.Difference == 0
                     ? $"{result.FormattedUsernames} has won! You were spot on! You've received {result.BytesWon} bytes"
                     : $"{result.FormattedUsernames} has won! You were {result.Difference} away from the actual score. You've received {result.BytesWon} bytes");
