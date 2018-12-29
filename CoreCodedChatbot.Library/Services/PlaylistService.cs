@@ -66,7 +66,7 @@ namespace CoreCodedChatbot.Library.Services
             {
                 var request = new SongRequest
                 {
-                    RequestTime = DateTime.Now,
+                    RequestTime = DateTime.UtcNow,
                     RequestText = commandText,
                     RequestUsername = username,
                     Played = false
@@ -91,7 +91,7 @@ namespace CoreCodedChatbot.Library.Services
                     }
                 }
 
-                if (vipRequest) request.VipRequestTime = DateTime.Now;
+                if (vipRequest) request.VipRequestTime = DateTime.UtcNow;
 
                 context.SongRequests.Add(request);
                 context.SaveChanges();
@@ -146,7 +146,7 @@ namespace CoreCodedChatbot.Library.Services
                 if (request.RequestUsername != username)
                     return -2; // Not this users request.
 
-                request.VipRequestTime = DateTime.Now;
+                request.VipRequestTime = DateTime.UtcNow;
                 context.SaveChanges();
 
                 newSongIndex = context.SongRequests.Where(sr => !sr.Played).OrderRequests()
@@ -642,7 +642,7 @@ namespace CoreCodedChatbot.Library.Services
                         .OrderRequests()
                         .Count(sr => allViewers.Contains(sr.RequestUsername));
 
-                    var estimatedFinishTime = DateTime.Now.AddMinutes(requests * 6d).ToString("HH:mm:ss");
+                    var estimatedFinishTime = DateTime.UtcNow.AddMinutes(requests * 6d).ToString("HH:mm:ss");
                     return $"Estimated time to finish: {estimatedFinishTime}";
                 }
                 catch (Exception e)
