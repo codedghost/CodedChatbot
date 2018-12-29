@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Interfaces;
@@ -13,10 +12,11 @@ using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.ApiRequest.Vip;
 using CoreCodedChatbot.Library.Models.Data;
 using TwitchLib.Client;
+using TwitchLib.Client.Models;
 
 namespace CoreCodedChatbot.Commands
 {
-    [ChatCommand(new []{ "giftvip", "iamasaintto"}, false)]
+    [CustomAttributes.ChatCommand(new []{ "giftvip", "iamasaintto"}, false)]
     public class GiftVipCommand : ICommand
     {
         private ConfigModel config;
@@ -36,13 +36,13 @@ namespace CoreCodedChatbot.Commands
             };
         }
 
-        public async void Process(TwitchClient client, string username, string commandText, bool isMod)
+        public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
             var commandSplit = commandText.Split(" ");
 
             if (!commandSplit.Any() || commandSplit.Length != 1 || !commandSplit[0].Contains("@"))
             {
-                client.SendMessage(config.StreamerChannel, $"Hey @{username}, you need to @ someone to gift a vip!");
+                client.SendMessage(joinedChannel, $"Hey @{username}, you need to @ someone to gift a vip!");
                 return;
             }
 
@@ -57,18 +57,18 @@ namespace CoreCodedChatbot.Commands
 
             if (giftVipResult.IsSuccessStatusCode)
             {
-                client.SendMessage(config.StreamerChannel,
+                client.SendMessage(joinedChannel,
                     $"Hey @{username}, I have given @{giftVipModel.ReceiverUsername} one of your VIPs");
                 return;
             }
 
-            client.SendMessage(config.StreamerChannel,
+            client.SendMessage(joinedChannel,
                 $"Hey @{username}, I couldn't give the VIP for some reason, did you mistype the @?");
         }
 
-        public void ShowHelp(TwitchClient client, string username)
+        public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)
         {
-            client.SendMessage(config.StreamerChannel,
+            client.SendMessage(joinedChannel,
                 $"Hey @{username}, this command lets you gift a vip to another viewer. Usage: !giftvip @<username>");
         }
     }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Helpers;
@@ -10,11 +9,12 @@ using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Library.Models.Enums;
 using Newtonsoft.Json;
 using TwitchLib.Client;
+using TwitchLib.Client.Models;
 
 
 namespace CoreCodedChatbot.Commands
 {
-    [ChatCommand(new[] { "request", "rr", "sr", "songrequest", "rockrequest", "song" }, false)]
+    [CustomAttributes.ChatCommand(new[] { "request", "rr", "sr", "songrequest", "rockrequest", "song" }, false)]
     public class RockRequestCommand : ICommand
     {
         private HttpClient playlistClient;
@@ -33,11 +33,11 @@ namespace CoreCodedChatbot.Commands
             this.config = config;
         }
 
-        public async void Process(TwitchClient client, string username, string commandText, bool isMod)
+        public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
             if (string.IsNullOrWhiteSpace(commandText))
             {
-                client.SendMessage(config.StreamerChannel, $"Hi @{username}, looks like you haven't included a request there!");
+                client.SendMessage(joinedChannel, $"Hi @{username}, looks like you haven't included a request there!");
                 return;
             }
 
@@ -71,12 +71,12 @@ namespace CoreCodedChatbot.Commands
                 message = $"Hey @{username}, something's gone wrong. Please try again soon!";
             }
 
-            client.SendMessage(config.StreamerChannel, message);
+            client.SendMessage(joinedChannel, message);
         }
 
-        public void ShowHelp(TwitchClient client, string username)
+        public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)
         {
-            client.SendMessage(config.StreamerChannel,
+            client.SendMessage(joinedChannel,
                 $"Hey @{username}, this command is used to add a song request to the queue. Usage: !request <SongArtist> - <SongName>");
         }
     }

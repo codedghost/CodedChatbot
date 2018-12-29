@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Helpers;
 using CoreCodedChatbot.Library.Models.Data;
 using Newtonsoft.Json;
 using TwitchLib.Client;
+using TwitchLib.Client.Models;
 
 namespace CoreCodedChatbot.Commands
 {
-    [ChatCommand(new[] { "howtorequest", "helprequest" }, false)]
+    [CustomAttributes.ChatCommand(new[] { "howtorequest", "helprequest" }, false)]
     public class HowToRequestCommand : ICommand
     {
         private readonly ConfigModel config;
@@ -30,7 +30,7 @@ namespace CoreCodedChatbot.Commands
             };
         }
 
-        public async void Process(TwitchClient client, string username, string commandText, bool isMod)
+        public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
             var request = await playlistClient.GetAsync("IsPlaylistOpen");
             if (!request.IsSuccessStatusCode) return;
@@ -39,14 +39,14 @@ namespace CoreCodedChatbot.Commands
 
             if (isOpen || username != "Chatbot")
             {
-                client.SendMessage(config.StreamerChannel,
+                client.SendMessage(joinedChannel,
                     $"To request a song just use: !request <SongArtist> - <SongTitle> - (Guitar or Bass)");
             }
         }
 
-        public void ShowHelp(TwitchClient client, string username)
+        public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)
         {
-            client.SendMessage(config.StreamerChannel, $"Hey @{username}, this command outputs how to request a song from time to time.");
+            client.SendMessage(joinedChannel, $"Hey @{username}, this command outputs how to request a song from time to time.");
         }
     }
 }

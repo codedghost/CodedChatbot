@@ -38,5 +38,6 @@
         public int SecondsForGuessingGame;
         public string RocksnifferSongDetailsLocation;
         public string GuessingGameApiUrl;
+        public bool DevelopmentBuild;
     }
 }

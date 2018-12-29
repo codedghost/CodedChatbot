@@ -4,10 +4,11 @@ using System.Linq;
 using System.Reflection;
 using CoreCodedChatbot.Commands;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Library.Models.Data;
 using Unity;
 using TwitchLib.Client;
+using TwitchLib.Client.Models;
+using ChatCommand = CoreCodedChatbot.CustomAttributes.ChatCommand;
 
 namespace CoreCodedChatbot.Helpers
 {
@@ -41,7 +42,7 @@ namespace CoreCodedChatbot.Helpers
         }
 
         public void ProcessCommand(string userCommand, TwitchClient client, string username,
-            string userParameters, bool userIsModOrBroadcaster)
+            string userParameters, bool userIsModOrBroadcaster, JoinedChannel joinedRoom)
         {
             var command = Commands.SingleOrDefault(c =>
                 c.GetType().GetTypeInfo().GetCustomAttributes<ChatCommand>()
@@ -51,13 +52,13 @@ namespace CoreCodedChatbot.Helpers
 
             if (userParameters.Contains("www.") || userParameters.Contains("http"))
             {
-                client.SendMessage(config.StreamerChannel, $"Hey @{username}, no links in the chatbot, just request the track you want!");
+                client.SendMessage(joinedRoom, $"Hey @{username}, no links in the chatbot, just request the track you want!");
                 return;
             }
 
             if (userCommand.ToLower() == "help" && !string.IsNullOrWhiteSpace(userParameters))
             {
-                ProcessHelp(client, userParameters.ToLower(), username);
+                ProcessHelp(client, userParameters.ToLower(), username, joinedRoom);
                 return;
             }
 
@@ -65,14 +66,14 @@ namespace CoreCodedChatbot.Helpers
 
             if (!userIsModOrBroadcaster && isCommandModOnly)
             {
-                client.SendMessage(config.StreamerChannel, $"@{username} Sorry, that command's reserved for mods only!");
+                client.SendMessage(joinedRoom, $"@{username} Sorry, that command's reserved for mods only!");
                 return;
             }
 
             if (userIsModOrBroadcaster && allowModCommand && isCommandModOnly)
             {
                 TimeoutModCommand();
-                command.Process(client, username, userParameters, userIsModOrBroadcaster);
+                command.Process(client, username, userParameters, userIsModOrBroadcaster, joinedRoom);
             }
             else if (!isCommandModOnly)
             {
@@ -80,7 +81,7 @@ namespace CoreCodedChatbot.Helpers
                 {
                     TimeoutModCommand();
                 }
-                command.Process(client, username, userParameters, userIsModOrBroadcaster);
+                command.Process(client, username, userParameters, userIsModOrBroadcaster, joinedRoom);
             }
         }
 
@@ -97,7 +98,7 @@ namespace CoreCodedChatbot.Helpers
                 TimeSpan.FromSeconds(0));
         }
 
-        private void ProcessHelp(TwitchClient client, string commandName, string username)
+        private void ProcessHelp(TwitchClient client, string commandName, string username, JoinedChannel joinedChannel)
         {
             var command = Commands.SingleOrDefault(c =>
                 c.GetType().GetTypeInfo().GetCustomAttributes<ChatCommand>()
@@ -105,11 +106,11 @@ namespace CoreCodedChatbot.Helpers
 
             if (command == null)
             {
-                client.SendMessage(config.StreamerChannel, "Sorry, I can't help with that :(");
+                client.SendMessage(joinedChannel, "Sorry, I can't help with that :(");
                 return;
             }
 
-            command.ShowHelp(client, username);
+            command.ShowHelp(client, username, joinedChannel);
         }
     }
 }

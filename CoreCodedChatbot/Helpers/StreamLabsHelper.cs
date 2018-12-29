@@ -102,12 +102,14 @@ namespace CoreCodedChatbot.Helpers
             var retries = 2;
             List<StreamLabsDonation> donations = null;
 
-            while (donations == null || attempted >= retries)
+            while (donations == null)
             {
                 donations = GetRecentDonations();
 
                 if (donations == null) RefreshAuthToken();
                 attempted++;
+
+                if (attempted >= retries) break;
             }
 
             if (donations == null) return false;
