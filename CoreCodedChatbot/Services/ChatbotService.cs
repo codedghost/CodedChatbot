@@ -371,7 +371,7 @@ namespace CoreCodedChatbot.Services
                         {
                             // process json into username list.
                             var chattersModel = JsonConvert.DeserializeObject<ChatViewersModel>(currentChattersJson.Content.ReadAsStringAsync().Result);
-                            bytesHelper.GiveBytes(chattersModel);
+                            bytesHelper.GiveViewershipBytes(chattersModel);
                         }
                     }
                     catch (Exception ex)

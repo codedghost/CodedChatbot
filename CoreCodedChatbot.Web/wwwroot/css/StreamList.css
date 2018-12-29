@@ -85,7 +85,7 @@
 .firstTimeBadge {
 	background-image: url("/images/firstRequest-18.png");
 }
-.moderatorBadge {
+.removeSongBadge {
 	background-image: url("/images/axe-18.png");
     cursor: pointer;
 

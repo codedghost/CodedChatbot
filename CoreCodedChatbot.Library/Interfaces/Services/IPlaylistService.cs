@@ -14,7 +14,7 @@ namespace CoreCodedChatbot.Library.Interfaces.Services
         PlaylistState GetPlaylistState();
         int PromoteRequest(string username);
         void UpdateFullPlaylist(bool updateCurrent = false);
-        void ArchiveCurrentRequest();
+        void ArchiveCurrentRequest(int songId = 0);
         string GetUserRequests(string username);
         List<string> GetUserRelevantRequests(string username);
         PlaylistBrowserSource GetAllSongs(LoggedInTwitchUser twitchUser = null);

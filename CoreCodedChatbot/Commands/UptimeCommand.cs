@@ -28,7 +28,7 @@ namespace CoreCodedChatbot.Commands
 
             if (streamGoLiveTime != null)
             {
-                var timeLiveFor = DateTime.Now.ToUniversalTime().Subtract(streamGoLiveTime.Value.ToUniversalTime());
+                var timeLiveFor = DateTime.UtcNow.Subtract(streamGoLiveTime.Value.ToUniversalTime());
 
                 client.SendMessage(joinedChannel, $"Hey @{username}, {config.StreamerChannel} has been live for: {timeLiveFor.Hours} hours and {timeLiveFor.Minutes} minutes.");
             }

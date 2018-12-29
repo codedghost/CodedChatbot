@@ -4,13 +4,13 @@
 @{
     var oddOrEvenStyle = Model.isEvenIndex ? "even" : "odd";
     var vipStyle = Model.isVip ? "vipText" : "";
-    <div class="request @oddOrEvenStyle">
+    <div id="@Model.songRequestId" class="request @oddOrEvenStyle">
         <div class="requestBadges">
             <br/>
             @{
-                if (ViewContext.ViewBag.UserIsMod)
+                if (ViewContext.ViewBag.UserIsMod || ViewContext.ViewBag.Username.ToLower() == Model.songRequester.ToLower())
                 {
-                    <span id="@Model.songRequestId" class="requestBadge moderatorBadge" onclick="showDeleteModal()"></span>
+                    <span id="@Model.songRequestId" class="requestBadge removeSongBadge" onclick="showDeleteModal()"></span>
                 }
                 if (!Model.isInChat)
                 {
