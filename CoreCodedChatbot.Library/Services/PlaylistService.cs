@@ -625,6 +625,36 @@ namespace CoreCodedChatbot.Library.Services
             return EditRequestResult.Success;
         }
 
+        public PromoteRequestResult PromoteWebRequest(int songId, string username)
+        {
+            var vipIssued = false;
+            try
+            {
+                using (var context = contextFactory.Create())
+                {
+                    var songRequest = context.SongRequests.SingleOrDefault(sr => sr.SongRequestId == songId);
+
+                    if (songRequest == null) return PromoteRequestResult.UnSuccessful;
+                    if (songRequest.RequestUsername != username) return PromoteRequestResult.NotYourRequest;
+                    if (songRequest.VipRequestTime != null) return PromoteRequestResult.AlreadyVip;
+                    if (!vipService.UseVip(username)) return PromoteRequestResult.NoVipAvailable;
+
+                    vipIssued = true;
+                    songRequest.VipRequestTime = DateTime.UtcNow;
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception e)
+            {
+                if (vipIssued) vipService.RefundVip(username);
+                Console.WriteLine($"Exception in PromoteWebRequest\n{e} - {e.InnerException}");
+                return PromoteRequestResult.UnSuccessful;
+            }
+
+            UpdatePlaylists();
+            return PromoteRequestResult.Successful;
+        }
+
         public RequestSongViewModel GetNewRequestSongViewModel(string username)
         {
             return new RequestSongViewModel

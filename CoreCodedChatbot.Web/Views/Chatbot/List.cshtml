@@ -144,4 +144,19 @@
         });
     }
 
+    function showPromoteRequestModal() {
+        $("#modalContainer").empty();
+        var songId = JSON.stringify(event.target.id);
+        $.ajax({
+            url: '@Url.Action("RenderPromoteSongModal", "Chatbot")',
+            type: "POST",
+            data: songId,
+            contentType: "application/json",
+            success: function(html) {
+                $("#modalContainer").html(html);
+                $("#promoteModal").modal('show');
+            }
+        });
+    }
+
 </script>

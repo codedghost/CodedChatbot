@@ -11,13 +11,16 @@
             </div>
             <div class="modal-body">
                 <p>@Model.songRequestText</p>
-                @if (Model.isInChat)
+                @if (ViewContext.ViewBag.UserIsMod)
                 {
-                    <p>This person seems to still be in chat </p>
-                }
-                else
-                {
-                    <p>This person has left chat</p>
+                    if (Model.isInChat)
+                    {
+                        <p>This person seems to still be in chat </p>
+                    }
+                    else
+                    {
+                        <p>This person has left chat</p>
+                    }
                 }
                 <br/>
                 <p>Are you sure you want to remove this request?</p>

@@ -1,0 +1,46 @@
+﻿@model CoreCodedChatbot.Library.Models.Data.PlaylistItem
+
+<div class="modal fade" id="promoteModal" tabindex="-1" role="dialog" aria-labelledby="promoteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="promoteModalLabel">Promote this request?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger" role="alert" id="validationMessage" style="display: none">
+
+                </div>
+                @Model.songRequestText
+                <br/>
+                Are you sure you want to use a VIP token and promote this request?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                <button id="@Model.songRequestId" type="button" class="btn btn-primary" onclick="promoteSong()">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function promoteSong() {
+        var songId = JSON.stringify(event.target.id);
+
+        $.ajax({
+            url: '@Url.Action("PromoteRequest", "Chatbot")',
+            type: "POST",
+            data: songId,
+            contentType: "application/json",
+            success: function() {
+                $("#promoteModal").modal('hide');
+            },
+            error: function(err) {
+                $("#validationMessage").text(err.responseJSON.message);
+                $("#validationMessage").show();
+            }
+        });
+    }
+</script>
