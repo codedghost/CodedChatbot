@@ -129,4 +129,19 @@
         });
     }
 
+    function showEditRequestModal() {
+        $("#modalContainer").empty();
+        var songId = JSON.stringify(event.target.id);
+        $.ajax({
+            url: '@Url.Action("RenderEditRequestModal", "Chatbot")',
+            type: "POST",
+            data: songId,
+            contentType: "application/json",
+            success: function(html) {
+                $("#modalContainer").html(html);
+                $("#requestModal").modal('show');
+            }
+        });
+    }
+
 </script>

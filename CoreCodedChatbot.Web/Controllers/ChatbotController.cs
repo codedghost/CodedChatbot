@@ -176,11 +176,32 @@ namespace CoreCodedChatbot.Web.Controllers
         {
             try
             {
-                var requestViewModel = playlistService.GetRequestSongViewModel(User.Identity.Name.ToLower());
+                var requestViewModel = playlistService.GetNewRequestSongViewModel(User.Identity.Name.ToLower());
 
                 return PartialView("Partials/List/RequestModal", requestViewModel);
             }
             catch (Exception )
+            {
+                return Json(new {Success = false, Message = "Encountered an error"});
+            }
+        }
+
+        [HttpPost]
+        public IActionResult RenderEditRequestModal([FromBody] int songId)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Json(new {Success = false, Message = "It looks like you aren't logged in!"});
+            }
+
+            try
+            {
+                var requestViewModel =
+                    playlistService.GetEditRequestSongViewModel(User.Identity.Name.ToLower(), songId);
+
+                    return PartialView("Partials/List/RequestModal", requestViewModel);
+            }
+            catch (Exception)
             {
                 return Json(new {Success = false, Message = "Encountered an error"});
             }
@@ -273,7 +294,48 @@ namespace CoreCodedChatbot.Web.Controllers
                 }
             }
 
-            return BadRequest(new {Message = "It doesn't seem as though you are logged in, please try logging in again!"});
+            return BadRequest(new {Message = "It looks like you're not logged in, log in and try again"});
+        }
+
+        [HttpPost]
+        public IActionResult EditSong([FromBody] RequestSongViewModel requestData)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var chatters = chatterService.GetCurrentChatters();
+                var userIsMod = chatters?.chatters?.moderators?.Any(m => m == User.Identity.Name.ToLower()) ?? false;
+
+                var editRequestResult =
+                    playlistService.EditWebRequest(requestData, User.Identity.Name.ToLower(), userIsMod);
+
+                switch (editRequestResult)
+                {
+                    case EditRequestResult.Success:
+                        return Ok();
+                    case EditRequestResult.NoRequestEntered:
+                        return BadRequest(new
+                        {
+                            Message = "You haven't entered a request. Please enter a Song name and/or Artist"
+                        });
+                    case EditRequestResult.NotYourRequest:
+                        return BadRequest(new
+                        {
+                            Message = "This doesn't seem to be your request. Please try again"
+                        });
+                    case EditRequestResult.RequestAlreadyRemoved:
+                        return BadRequest(new
+                        {
+                            Message = "It seems like this song has been played or removed from the list"
+                        });
+                    default:
+                        return BadRequest(new
+                        {
+                            Message = "An error occurred, please wait until the issue is resolved"
+                        });
+                }
+            }
+
+            return BadRequest(new {Message = "It looks like you're not logged in, log in and try again"});
         }
     }
 }

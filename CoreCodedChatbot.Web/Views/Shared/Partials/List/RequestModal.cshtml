@@ -4,7 +4,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="requestModalLabel">Request a song</h5>
+                <h5 class="modal-title" id="requestModalLabel">@Model.ModalTitle</h5>
                 <button type="button" class="close" data-dismiss="modal" arial-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -13,6 +13,7 @@
                 <div class="alert alert-danger" role="alert" id="validationMessage" style="display: none">
 
                 </div>
+                @Html.HiddenFor(m => m.SongRequestId, new {id = "songRequestId"})
                 <div class="row">
                     <div class="col-md-4">
                         @Html.LabelFor(m => m.Title)
@@ -37,7 +38,7 @@
                         @Html.DropDownListFor(m => m.SelectedInstrument, Model.Instruments, new {id = "requestInstrument"})
                     </div>
                 </div>
-                @if (Model.ShouldShowVip)
+                @if (Model.ShouldShowVip && Model.IsNewRequest)
                 {
                     <div class="row">
                         <div class="col-md-4">
@@ -48,6 +49,7 @@
                         </div>
                     </div>
                 }
+                @Html.HiddenFor(m => m.IsNewRequest, new {id = "isNewRequest"})
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -60,6 +62,7 @@
 <script>
     function requestSong() {
         var requestData = JSON.stringify({
+            SongRequestId: $("#songRequestId").val(),
             Title: $("#requestTitle").val(),
             Artist: $("#requestArtist").val(),
             SelectedInstrument: $("#requestInstrument").val(),
@@ -67,19 +70,39 @@
             IsVip: $("#requestIsVip").prop('checked')
         });
 
-        $.ajax({
-            url: '@Url.Action("RequestSong", "Chatbot")',
-            type: "POST",
-            data: requestData,
-            contentType: "application/json",
-            success: function() {
-                $("#requestModal").modal('hide');
-            },
-            error: function(err) {
-                debugger;
-                $("#validationMessage").text(err.responseJSON.message);
-                $("#validationMessage").show();
-            }
-        });
+        var isNewRequest = $("#isNewRequest").val() === "True" ? true : false;
+
+        debugger;
+
+        if (isNewRequest) {
+            $.ajax({
+                url: '@Url.Action("RequestSong", "Chatbot")',
+                type: "POST",
+                data: requestData,
+                contentType: "application/json",
+                success: function() {
+                    $("#requestModal").modal('hide');
+                },
+                error: function(err) {
+                    debugger;
+                    $("#validationMessage").text(err.responseJSON.message);
+                    $("#validationMessage").show();
+                }
+            });
+        } else {
+            $.ajax({
+                url: '@Url.Action("EditSong", "Chatbot")',
+                type: "POST",
+                data: requestData,
+                contentType: "application/json",
+                success: function() {
+                    $("#requestModal").modal('hide');
+                },
+                error: function(err) {
+                    $("#validationMessage").text(err.responseJSON.message);
+                    $("#validationMessage").show();
+                }
+            })
+        }
     }
 </script>

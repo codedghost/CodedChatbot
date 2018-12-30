@@ -8,6 +8,12 @@ namespace CoreCodedChatbot.Library.Models.View
 {
     public class RequestSongViewModel
     {
+        public int SongRequestId { get; set; }
+
+        public string ModalTitle { get; set; }
+
+        public bool IsNewRequest { get; set; }
+
         [Display(Name="Song Name")]
         public string Title { get; set; }
 

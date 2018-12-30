@@ -25,7 +25,10 @@ namespace CoreCodedChatbot.Library.Interfaces.Services
         bool EditRequest(string username, string commandText, bool isMod, out string songRequestText,
             out bool syntaxError);
 
-        RequestSongViewModel GetRequestSongViewModel(string username);
+        EditRequestResult EditWebRequest(RequestSongViewModel editRequestModel, string username, bool isMod);
+
+        RequestSongViewModel GetNewRequestSongViewModel(string username);
+        RequestSongViewModel GetEditRequestSongViewModel(string username, int songRequestId);
 
         bool OpenPlaylist();
         bool ClosePlaylist();

@@ -10,6 +10,7 @@ using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Library.Models.Enums;
 using CoreCodedChatbot.Library.Models.SignalR;
 using CoreCodedChatbot.Library.Models.View;
+using Microsoft.AspNetCore.Mvc.Formatters.Xml;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.SignalR.Client;
 
@@ -588,10 +589,48 @@ namespace CoreCodedChatbot.Library.Services
             return true;
         }
 
-        public RequestSongViewModel GetRequestSongViewModel(string username)
+        public EditRequestResult EditWebRequest(RequestSongViewModel editRequestModel, string username, bool isMod)
+        {
+            try
+            {
+
+                if (string.IsNullOrWhiteSpace(editRequestModel.Title) &&
+                    string.IsNullOrWhiteSpace(editRequestModel.Artist))
+                {
+                    return EditRequestResult.NoRequestEntered;
+                }
+
+                using (var context = contextFactory.Create())
+                {
+                    var songRequest =
+                        context.SongRequests.SingleOrDefault(sr => sr.SongRequestId == editRequestModel.SongRequestId);
+
+                    if (songRequest == null) return EditRequestResult.UnSuccessful;
+                    if (songRequest.Played) return EditRequestResult.RequestAlreadyRemoved;
+                    if (!isMod && songRequest.RequestUsername != username) return EditRequestResult.NotYourRequest;
+
+                    songRequest.RequestText =
+                        $"{editRequestModel.Artist} - {editRequestModel.Title} ({editRequestModel.SelectedInstrument}";
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Exception in EditWebRequest\n{e} - {e.InnerException}");
+                return EditRequestResult.UnSuccessful;
+            }
+            
+            UpdatePlaylists();
+
+            return EditRequestResult.Success;
+        }
+
+        public RequestSongViewModel GetNewRequestSongViewModel(string username)
         {
             return new RequestSongViewModel
             {
+                ModalTitle = "Request a song",
+                IsNewRequest = true,
                 Title = string.Empty,
                 Artist = string.Empty,
                 Instruments = GetRequestInstruments(),
@@ -599,6 +638,32 @@ namespace CoreCodedChatbot.Library.Services
                 IsVip = false,
                 ShouldShowVip = vipService.HasVip(username)
             };
+        }
+
+        public RequestSongViewModel GetEditRequestSongViewModel(string username, int songRequestId)
+        {
+            using (var context = contextFactory.Create())
+            {
+                var songRequest = context.SongRequests.SingleOrDefault(sr =>
+                    !sr.Played && sr.RequestUsername == username && sr.SongRequestId == songRequestId);
+
+                if (songRequest == null) return null;
+                
+                var formattedRequest = FormattedRequest.GetFormattedRequest(songRequest.RequestText);
+
+                return new RequestSongViewModel
+                {
+                    ModalTitle = "Edit your request",
+                    IsNewRequest = false,
+                    SongRequestId = songRequest.SongRequestId,
+                    Title = formattedRequest?.SongName ?? songRequest.RequestText,
+                    Artist = formattedRequest?.SongArtist ?? string.Empty,
+                    Instruments = GetRequestInstruments(formattedRequest?.InstrumentName),
+                    SelectedInstrument = formattedRequest?.InstrumentName ?? "guitar",
+                    IsVip = songRequest.VipRequestTime != null,
+                    ShouldShowVip = false,
+                };
+            }
         }
 
         public bool OpenPlaylist()
@@ -828,12 +893,13 @@ namespace CoreCodedChatbot.Library.Services
             return UserMaxSongCount;
         }
 
-        private SelectListItem[] GetRequestInstruments()
+        private SelectListItem[] GetRequestInstruments(string selectedInstrumentName = "guitar")
         {
+            var instrumentName = string.IsNullOrWhiteSpace(selectedInstrumentName) ? "guitar" : selectedInstrumentName;
             return new []
             {
-                new SelectListItem("Guitar", "guitar", true),
-                new SelectListItem("Bass", "bass"), 
+                new SelectListItem("Guitar", "guitar", instrumentName == "guitar"),
+                new SelectListItem("Bass", "bass", instrumentName == "bass"), 
             };
         }
     }
