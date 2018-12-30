@@ -23,12 +23,14 @@ namespace CoreCodedChatbot.Web.Controllers
     public class ChatbotController : Controller
     {
         private readonly IPlaylistService playlistService;
+        private readonly IVipService vipService;
 
         private readonly IChatterService chatterService;
 
-        public ChatbotController(IPlaylistService playlistService, IChatterService chatterService)
+        public ChatbotController(IPlaylistService playlistService, IVipService vipService, IChatterService chatterService)
         {
             this.playlistService = playlistService;
+            this.vipService = vipService;
 
             this.chatterService = chatterService;
         }
@@ -55,6 +57,8 @@ namespace CoreCodedChatbot.Web.Controllers
             playlistModel.VipList =
                 playlistModel.VipList.Where(r => r.songRequestId != playlistModel.CurrentSong.songRequestId)
                     .ToArray();
+
+            ViewBag.UserHasVip = vipService.HasVip(User.Identity.Name.ToLower());
 
             ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
             ViewBag.Username = twitchUser?.Username ?? string.Empty;
@@ -83,6 +87,8 @@ namespace CoreCodedChatbot.Web.Controllers
                     IsMod = chattersModel?.chatters?.moderators?.Any(mod => string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false
                 } : null;
 
+                ViewBag.UserHasVip = vipService.HasVip(User.Identity.Name.ToLower());
+
                 ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
                 ViewBag.Username = twitchUser?.Username ?? string.Empty;
                 return PartialView("Partials/List/RegularList", data);
@@ -109,6 +115,8 @@ namespace CoreCodedChatbot.Web.Controllers
                             string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false
                     }
                     : null;
+
+                ViewBag.UserHasVip = vipService.HasVip(User.Identity.Name.ToLower());
 
                 ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
                 ViewBag.Username = twitchUser?.Username ?? string.Empty;
@@ -162,6 +170,8 @@ namespace CoreCodedChatbot.Web.Controllers
                     IsMod = chattersModel?.chatters?.moderators?.Any(mod => string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false
                 } : null;
 
+                ViewBag.UserHasVip = vipService.HasVip(User.Identity.Name.ToLower());
+
                 ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
                 return PartialView("Partials/List/CurrentSong", data);
             }
@@ -200,6 +210,26 @@ namespace CoreCodedChatbot.Web.Controllers
                     playlistService.GetEditRequestSongViewModel(User.Identity.Name.ToLower(), songId);
 
                     return PartialView("Partials/List/RequestModal", requestViewModel);
+            }
+            catch (Exception)
+            {
+                return Json(new {Success = false, Message = "Encountered an error"});
+            }
+        }
+
+        [HttpPost]
+        public IActionResult RenderPromoteSongModal([FromBody] int songId)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Json(new {Success = false, Message = "It looks like you aren't logged in!"});
+            }
+
+            try
+            {
+                var requestToPromote = playlistService.GetRequestById(songId);
+
+                return PartialView("Partials/List/PromoteSongModal", requestToPromote);
             }
             catch (Exception)
             {
@@ -327,6 +357,43 @@ namespace CoreCodedChatbot.Web.Controllers
                         {
                             Message = "It seems like this song has been played or removed from the list"
                         });
+                    default:
+                        return BadRequest(new
+                        {
+                            Message = "An error occurred, please wait until the issue is resolved"
+                        });
+                }
+            }
+
+            return BadRequest(new {Message = "It looks like you're not logged in, log in and try again"});
+        }
+
+        [HttpPost]
+        public IActionResult PromoteRequest([FromBody] int songId)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var promoteRequestResult = playlistService.PromoteWebRequest(songId, User.Identity.Name.ToLower());
+
+                switch (promoteRequestResult)
+                {
+                    case PromoteRequestResult.NotYourRequest:
+                        return BadRequest(new
+                        {
+                            Message = "This is not your request. Please try again"
+                        });
+                    case PromoteRequestResult.AlreadyVip:
+                        return BadRequest(new
+                        {
+                            Message = "This request has already been promoted! Congratulations"
+                        });
+                    case PromoteRequestResult.NoVipAvailable:
+                        return BadRequest(new
+                        {
+                            Message = "Sorry but you don't seem to have a VIP token"
+                        });
+                    case PromoteRequestResult.Successful:
+                        return Ok();
                     default:
                         return BadRequest(new
                         {

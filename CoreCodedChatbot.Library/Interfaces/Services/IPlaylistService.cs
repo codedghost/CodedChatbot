@@ -26,6 +26,7 @@ namespace CoreCodedChatbot.Library.Interfaces.Services
             out bool syntaxError);
 
         EditRequestResult EditWebRequest(RequestSongViewModel editRequestModel, string username, bool isMod);
+        PromoteRequestResult PromoteWebRequest(int songId, string username);
 
         RequestSongViewModel GetNewRequestSongViewModel(string username);
         RequestSongViewModel GetEditRequestSongViewModel(string username, int songRequestId);
