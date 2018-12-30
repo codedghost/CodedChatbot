@@ -79,10 +79,14 @@ namespace CoreCodedChatbot.Library.Services
         {
             try
             {
+                if (!HasVip(donor.Username)) return false;
+
                 using (var context = chatbotContextFactory.Create())
                 {
                     var donorUser = context.Users.Find(donor.Username);
                     var receiverUser = context.Users.Find(receiver.Username);
+
+
 
                     donorUser.SentGiftVipRequests++;
                     receiverUser.ReceivedGiftVipRequests++;
