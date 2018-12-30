@@ -2,7 +2,7 @@
 
 namespace CoreCodedChatbot.Library.Models.View
 {
-    public class PlaylistBrowserSource
+    public class PlaylistViewModel
     {
         public PlaylistItem CurrentSong { get; set; }
         public PlaylistItem[] VipList { get; set; }

@@ -17,7 +17,7 @@ namespace CoreCodedChatbot.Library.Interfaces.Services
         void ArchiveCurrentRequest(int songId = 0);
         string GetUserRequests(string username);
         List<string> GetUserRelevantRequests(string username);
-        PlaylistBrowserSource GetAllSongs(LoggedInTwitchUser twitchUser = null);
+        PlaylistViewModel GetAllSongs(LoggedInTwitchUser twitchUser = null);
         void ClearRockRequests();
         bool RemoveRockRequests(string username, string commandText, bool isMod);
 

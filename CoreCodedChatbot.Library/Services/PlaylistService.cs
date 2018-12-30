@@ -245,7 +245,7 @@ namespace CoreCodedChatbot.Library.Services
             }
         }
 
-        public PlaylistBrowserSource GetAllSongs(LoggedInTwitchUser twitchUser = null)
+        public PlaylistViewModel GetAllSongs(LoggedInTwitchUser twitchUser = null)
         {
             using (var context = contextFactory.Create())
             {
@@ -301,7 +301,7 @@ namespace CoreCodedChatbot.Library.Services
                     }
                 }
 
-                return new PlaylistBrowserSource
+                return new PlaylistViewModel
                 {
                     CurrentSong = CurrentRequest,
                     RegularList = regularRequests,
