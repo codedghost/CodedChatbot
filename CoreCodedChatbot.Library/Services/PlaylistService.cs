@@ -10,6 +10,7 @@ using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Library.Models.Enums;
 using CoreCodedChatbot.Library.Models.SignalR;
 using CoreCodedChatbot.Library.Models.View;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace CoreCodedChatbot.Library.Services
@@ -116,6 +117,58 @@ namespace CoreCodedChatbot.Library.Services
             UpdatePlaylists();
 
             return (AddRequestResult.Success, songIndex);
+        }
+
+        public AddRequestResult AddWebRequest(RequestSongViewModel requestSongViewModel, string username)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(requestSongViewModel.Title) &&
+                    string.IsNullOrWhiteSpace(requestSongViewModel.Artist)) return AddRequestResult.NoRequestEntered;
+
+                var playlistState = GetPlaylistState();
+
+                switch (playlistState)
+                {
+                    case PlaylistState.VeryClosed:
+                        return AddRequestResult.PlaylistVeryClosed;
+                    case PlaylistState.Closed when !requestSongViewModel.IsVip:
+                        return AddRequestResult.PlaylistClosed;
+                }
+
+                using (var context = contextFactory.Create())
+                {
+                    if (!requestSongViewModel.IsVip)
+                    {
+                        var userSongCount = context.SongRequests.Count(sr =>
+                            !sr.Played && sr.RequestUsername == username && sr.VipRequestTime == null);
+
+                        if (userSongCount >= UserMaxSongCount) return AddRequestResult.NoMultipleRequests;
+                    }
+
+                    var request = new SongRequest
+                    {
+                        RequestTime = DateTime.UtcNow,
+                        RequestText =
+                            $"{requestSongViewModel.Artist} - {requestSongViewModel.Title} ({requestSongViewModel.SelectedInstrument})",
+                        RequestUsername = username,
+                        Played = false
+                    };
+
+                    if (requestSongViewModel.IsVip) request.VipRequestTime = DateTime.UtcNow;
+
+                    context.SongRequests.Add(request);
+                    context.SaveChanges();
+                }
+
+                UpdatePlaylists();
+            }
+            catch (Exception)
+            {
+                return AddRequestResult.UnSuccessful;
+            }
+
+            return AddRequestResult.Success;
         }
 
         public PlaylistState GetPlaylistState()
@@ -535,6 +588,19 @@ namespace CoreCodedChatbot.Library.Services
             return true;
         }
 
+        public RequestSongViewModel GetRequestSongViewModel(string username)
+        {
+            return new RequestSongViewModel
+            {
+                Title = string.Empty,
+                Artist = string.Empty,
+                Instruments = GetRequestInstruments(),
+                SelectedInstrument = string.Empty,
+                IsVip = false,
+                ShouldShowVip = vipService.HasVip(username)
+            };
+        }
+
         public bool OpenPlaylist()
         {
             using (var context = contextFactory.Create())
@@ -755,6 +821,20 @@ namespace CoreCodedChatbot.Library.Services
                     return false;
                 }
             }
+        }
+
+        public int GetMaxUserRequests()
+        {
+            return UserMaxSongCount;
+        }
+
+        private SelectListItem[] GetRequestInstruments()
+        {
+            return new []
+            {
+                new SelectListItem("Guitar", "guitar", true),
+                new SelectListItem("Bass", "bass"), 
+            };
         }
     }
 }

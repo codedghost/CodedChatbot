@@ -10,21 +10,23 @@
 }
 
 <div id="modalContainer"></div>
+<br />
 
-@if (User.Identity.IsAuthenticated)
-{
-    <h3>Welcome @Model.TwitchUser.Username!</h3>
+@{
+    Html.RenderPartial("Partials/List/PlaylistToolsHeader", Model.TwitchUser);
 }
 
-<div id="currentSong">
-    @{
-        Html.RenderPartial("Partials/List/CurrentSong", Model.CurrentSong);
-    }
-</div>
-<div class="queueWrapper">
-    @{
-        Html.RenderPartial("Partials/List/Playlist", Model);
-    }
+<div class="col-md-12">
+    <div id="currentSong">
+        @{
+            Html.RenderPartial("Partials/List/CurrentSong", Model.CurrentSong);
+        }
+    </div>
+    <div class="queueWrapper">
+        @{
+            Html.RenderPartial("Partials/List/Playlist", Model);
+        }
+    </div>
 </div>
 
 <script>
@@ -113,6 +115,18 @@
                 }
             });
         }
+    }
+
+    function showRequestModal() {
+        $("#modalContainer").empty();
+        $.ajax({
+            url: '@Url.Action("RenderRequestModal", "Chatbot")',
+            type: "POST",
+            success: function(html) {
+                $("#modalContainer").html(html);
+                $("#requestModal").modal('show');
+            }
+        });
     }
 
 </script>

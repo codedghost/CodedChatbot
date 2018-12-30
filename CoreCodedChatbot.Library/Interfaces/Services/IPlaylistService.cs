@@ -11,6 +11,7 @@ namespace CoreCodedChatbot.Library.Interfaces.Services
     {
         PlaylistItem GetRequestById(int songId);
         (AddRequestResult, int) AddRequest(string username, string commandText, bool vipRequest = false);
+        AddRequestResult AddWebRequest(RequestSongViewModel requestSongViewModel, string username);
         PlaylistState GetPlaylistState();
         int PromoteRequest(string username);
         void UpdateFullPlaylist(bool updateCurrent = false);
@@ -24,10 +25,13 @@ namespace CoreCodedChatbot.Library.Interfaces.Services
         bool EditRequest(string username, string commandText, bool isMod, out string songRequestText,
             out bool syntaxError);
 
+        RequestSongViewModel GetRequestSongViewModel(string username);
+
         bool OpenPlaylist();
         bool ClosePlaylist();
         bool ArchiveRequestById(int songId);
         string GetEstimatedTime(ChatViewersModel chattersModel);
         bool VeryClosePlaylist();
+        int GetMaxUserRequests();
     }
 }
