@@ -215,8 +215,8 @@ namespace CoreCodedChatbot.Web.Controllers
                 var chattersModel = chatterService.GetCurrentChatters();
                 var request = playlistService.GetRequestById(songId);
 
-                if (chattersModel?.chatters?.moderators?.Any(mod =>
-                    string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? 
+                if ((chattersModel?.chatters?.moderators?.Any(mod =>
+                         string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false) ||
                     string.Equals(User.Identity.Name, request.songRequester))
                 {
                     if (playlistService.ArchiveRequestById(songId))
