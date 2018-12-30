@@ -9,6 +9,8 @@ namespace CoreCodedChatbot.Library.Models.Enums
         PlaylistVeryClosed,
         PlaylistClosed,
         NoMultipleRequests,
-        Success
+        Success,
+        UnSuccessful,
+        NoRequestEntered
     }
 }

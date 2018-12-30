@@ -8,6 +8,7 @@ using AspNet.Security.OAuth.Twitch;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
+using CoreCodedChatbot.Library.Models.Enums;
 using CoreCodedChatbot.Library.Models.SongLibrary;
 using CoreCodedChatbot.Library.Models.View;
 using CoreCodedChatbot.Web.Interfaces;
@@ -171,6 +172,42 @@ namespace CoreCodedChatbot.Web.Controllers
         }
 
         [HttpPost]
+        public IActionResult RenderRequestModal()
+        {
+            try
+            {
+                var requestViewModel = playlistService.GetNewRequestSongViewModel(User.Identity.Name.ToLower());
+
+                return PartialView("Partials/List/RequestModal", requestViewModel);
+            }
+            catch (Exception )
+            {
+                return Json(new {Success = false, Message = "Encountered an error"});
+            }
+        }
+
+        [HttpPost]
+        public IActionResult RenderEditRequestModal([FromBody] int songId)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Json(new {Success = false, Message = "It looks like you aren't logged in!"});
+            }
+
+            try
+            {
+                var requestViewModel =
+                    playlistService.GetEditRequestSongViewModel(User.Identity.Name.ToLower(), songId);
+
+                    return PartialView("Partials/List/RequestModal", requestViewModel);
+            }
+            catch (Exception)
+            {
+                return Json(new {Success = false, Message = "Encountered an error"});
+            }
+        }
+
+        [HttpPost]
         public IActionResult RemoveSong([FromBody] int songId)
         {
             if (User.Identity.IsAuthenticated)
@@ -178,8 +215,8 @@ namespace CoreCodedChatbot.Web.Controllers
                 var chattersModel = chatterService.GetCurrentChatters();
                 var request = playlistService.GetRequestById(songId);
 
-                if (chattersModel?.chatters?.moderators?.Any(mod =>
-                    string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? 
+                if ((chattersModel?.chatters?.moderators?.Any(mod =>
+                         string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false) ||
                     string.Equals(User.Identity.Name, request.songRequester))
                 {
                     if (playlistService.ArchiveRequestById(songId))
@@ -213,6 +250,92 @@ namespace CoreCodedChatbot.Web.Controllers
             }
 
             return Json(new { Success = false, Message = "Encountered an error, or you are not a moderator" });
+        }
+
+        [HttpPost]
+        public IActionResult RequestSong([FromBody] RequestSongViewModel requestData)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var requestResult = playlistService.AddWebRequest(requestData, User.Identity.Name);
+
+                switch (requestResult)
+                {
+                    case AddRequestResult.Success:
+                        return Ok();
+                    case AddRequestResult.NoMultipleRequests:
+                        return BadRequest(new
+                        {
+                            Message =
+                                $"You cannot have more than {playlistService.GetMaxUserRequests()} regular request{(playlistService.GetMaxUserRequests() > 1 ? "s" : "")}"
+                        });
+                    case AddRequestResult.PlaylistClosed:
+                        return BadRequest(new
+                        {
+                            Message =
+                                "The playlist is currently closed, you can still use a VIP token to request though!"
+                        });
+                    case AddRequestResult.PlaylistVeryClosed:
+                        return BadRequest(new
+                        {
+                            Message =
+                                "The playlist is completely closed, please wait until the playlist opens to request a song"
+                        });
+                    case AddRequestResult.UnSuccessful:
+                        return BadRequest(new
+                        {
+                            Message = "An error occurred, please wait until the issue is resolved"
+                        });
+                    case AddRequestResult.NoRequestEntered:
+                        return BadRequest(new
+                        {
+                            Message = "You haven't entered a request. Please enter a Song Name and/or Artist"
+                        });
+                }
+            }
+
+            return BadRequest(new {Message = "It looks like you're not logged in, log in and try again"});
+        }
+
+        [HttpPost]
+        public IActionResult EditSong([FromBody] RequestSongViewModel requestData)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var chatters = chatterService.GetCurrentChatters();
+                var userIsMod = chatters?.chatters?.moderators?.Any(m => m == User.Identity.Name.ToLower()) ?? false;
+
+                var editRequestResult =
+                    playlistService.EditWebRequest(requestData, User.Identity.Name.ToLower(), userIsMod);
+
+                switch (editRequestResult)
+                {
+                    case EditRequestResult.Success:
+                        return Ok();
+                    case EditRequestResult.NoRequestEntered:
+                        return BadRequest(new
+                        {
+                            Message = "You haven't entered a request. Please enter a Song name and/or Artist"
+                        });
+                    case EditRequestResult.NotYourRequest:
+                        return BadRequest(new
+                        {
+                            Message = "This doesn't seem to be your request. Please try again"
+                        });
+                    case EditRequestResult.RequestAlreadyRemoved:
+                        return BadRequest(new
+                        {
+                            Message = "It seems like this song has been played or removed from the list"
+                        });
+                    default:
+                        return BadRequest(new
+                        {
+                            Message = "An error occurred, please wait until the issue is resolved"
+                        });
+                }
+            }
+
+            return BadRequest(new {Message = "It looks like you're not logged in, log in and try again"});
         }
     }
 }

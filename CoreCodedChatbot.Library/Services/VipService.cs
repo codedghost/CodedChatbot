@@ -53,14 +53,40 @@ namespace CoreCodedChatbot.Library.Services
             }
         }
 
+        public bool HasVip(string username)
+        {
+            try
+            {
+                var user = GetUser(username);
+
+                if (user == null ||
+                    user.UsedVipRequests + user.SentGiftVipRequests >=
+                    (user.FollowVipRequest + user.SubVipRequests + user.ModGivenVipRequests +
+                     user.DonationOrBitsVipRequests + user.TokenVipRequests +
+                     user.ReceivedGiftVipRequests)) return false;
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("HasVip Exception:");
+                Console.WriteLine($"{e} - {e.InnerException}");
+                return false;
+            }
+        }
+
         private bool GiftVip(User donor, User receiver)
         {
             try
             {
+                if (!HasVip(donor.Username)) return false;
+
                 using (var context = chatbotContextFactory.Create())
                 {
                     var donorUser = context.Users.Find(donor.Username);
                     var receiverUser = context.Users.Find(receiver.Username);
+
+
 
                     donorUser.SentGiftVipRequests++;
                     receiverUser.ReceivedGiftVipRequests++;

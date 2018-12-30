@@ -10,6 +10,8 @@ using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Library.Models.Enums;
 using CoreCodedChatbot.Library.Models.SignalR;
 using CoreCodedChatbot.Library.Models.View;
+using Microsoft.AspNetCore.Mvc.Formatters.Xml;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace CoreCodedChatbot.Library.Services
@@ -116,6 +118,58 @@ namespace CoreCodedChatbot.Library.Services
             UpdatePlaylists();
 
             return (AddRequestResult.Success, songIndex);
+        }
+
+        public AddRequestResult AddWebRequest(RequestSongViewModel requestSongViewModel, string username)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(requestSongViewModel.Title) &&
+                    string.IsNullOrWhiteSpace(requestSongViewModel.Artist)) return AddRequestResult.NoRequestEntered;
+
+                var playlistState = GetPlaylistState();
+
+                switch (playlistState)
+                {
+                    case PlaylistState.VeryClosed:
+                        return AddRequestResult.PlaylistVeryClosed;
+                    case PlaylistState.Closed when !requestSongViewModel.IsVip:
+                        return AddRequestResult.PlaylistClosed;
+                }
+
+                using (var context = contextFactory.Create())
+                {
+                    if (!requestSongViewModel.IsVip)
+                    {
+                        var userSongCount = context.SongRequests.Count(sr =>
+                            !sr.Played && sr.RequestUsername == username && sr.VipRequestTime == null);
+
+                        if (userSongCount >= UserMaxSongCount) return AddRequestResult.NoMultipleRequests;
+                    }
+
+                    var request = new SongRequest
+                    {
+                        RequestTime = DateTime.UtcNow,
+                        RequestText =
+                            $"{requestSongViewModel.Artist} - {requestSongViewModel.Title} ({requestSongViewModel.SelectedInstrument})",
+                        RequestUsername = username,
+                        Played = false
+                    };
+
+                    if (requestSongViewModel.IsVip) request.VipRequestTime = DateTime.UtcNow;
+
+                    context.SongRequests.Add(request);
+                    context.SaveChanges();
+                }
+
+                UpdatePlaylists();
+            }
+            catch (Exception)
+            {
+                return AddRequestResult.UnSuccessful;
+            }
+
+            return AddRequestResult.Success;
         }
 
         public PlaylistState GetPlaylistState()
@@ -245,7 +299,7 @@ namespace CoreCodedChatbot.Library.Services
             }
         }
 
-        public PlaylistBrowserSource GetAllSongs(LoggedInTwitchUser twitchUser = null)
+        public PlaylistViewModel GetAllSongs(LoggedInTwitchUser twitchUser = null)
         {
             using (var context = contextFactory.Create())
             {
@@ -301,7 +355,7 @@ namespace CoreCodedChatbot.Library.Services
                     }
                 }
 
-                return new PlaylistBrowserSource
+                return new PlaylistViewModel
                 {
                     CurrentSong = CurrentRequest,
                     RegularList = regularRequests,
@@ -535,6 +589,83 @@ namespace CoreCodedChatbot.Library.Services
             return true;
         }
 
+        public EditRequestResult EditWebRequest(RequestSongViewModel editRequestModel, string username, bool isMod)
+        {
+            try
+            {
+
+                if (string.IsNullOrWhiteSpace(editRequestModel.Title) &&
+                    string.IsNullOrWhiteSpace(editRequestModel.Artist))
+                {
+                    return EditRequestResult.NoRequestEntered;
+                }
+
+                using (var context = contextFactory.Create())
+                {
+                    var songRequest =
+                        context.SongRequests.SingleOrDefault(sr => sr.SongRequestId == editRequestModel.SongRequestId);
+
+                    if (songRequest == null) return EditRequestResult.UnSuccessful;
+                    if (songRequest.Played) return EditRequestResult.RequestAlreadyRemoved;
+                    if (!isMod && songRequest.RequestUsername != username) return EditRequestResult.NotYourRequest;
+
+                    songRequest.RequestText =
+                        $"{editRequestModel.Artist} - {editRequestModel.Title} ({editRequestModel.SelectedInstrument}";
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Exception in EditWebRequest\n{e} - {e.InnerException}");
+                return EditRequestResult.UnSuccessful;
+            }
+            
+            UpdatePlaylists();
+
+            return EditRequestResult.Success;
+        }
+
+        public RequestSongViewModel GetNewRequestSongViewModel(string username)
+        {
+            return new RequestSongViewModel
+            {
+                ModalTitle = "Request a song",
+                IsNewRequest = true,
+                Title = string.Empty,
+                Artist = string.Empty,
+                Instruments = GetRequestInstruments(),
+                SelectedInstrument = string.Empty,
+                IsVip = false,
+                ShouldShowVip = vipService.HasVip(username)
+            };
+        }
+
+        public RequestSongViewModel GetEditRequestSongViewModel(string username, int songRequestId)
+        {
+            using (var context = contextFactory.Create())
+            {
+                var songRequest = context.SongRequests.SingleOrDefault(sr =>
+                    !sr.Played && sr.RequestUsername == username && sr.SongRequestId == songRequestId);
+
+                if (songRequest == null) return null;
+                
+                var formattedRequest = FormattedRequest.GetFormattedRequest(songRequest.RequestText);
+
+                return new RequestSongViewModel
+                {
+                    ModalTitle = "Edit your request",
+                    IsNewRequest = false,
+                    SongRequestId = songRequest.SongRequestId,
+                    Title = formattedRequest?.SongName ?? songRequest.RequestText,
+                    Artist = formattedRequest?.SongArtist ?? string.Empty,
+                    Instruments = GetRequestInstruments(formattedRequest?.InstrumentName),
+                    SelectedInstrument = formattedRequest?.InstrumentName ?? "guitar",
+                    IsVip = songRequest.VipRequestTime != null,
+                    ShouldShowVip = false,
+                };
+            }
+        }
+
         public bool OpenPlaylist()
         {
             using (var context = contextFactory.Create())
@@ -755,6 +886,21 @@ namespace CoreCodedChatbot.Library.Services
                     return false;
                 }
             }
+        }
+
+        public int GetMaxUserRequests()
+        {
+            return UserMaxSongCount;
+        }
+
+        private SelectListItem[] GetRequestInstruments(string selectedInstrumentName = "guitar")
+        {
+            var instrumentName = string.IsNullOrWhiteSpace(selectedInstrumentName) ? "guitar" : selectedInstrumentName;
+            return new []
+            {
+                new SelectListItem("Guitar", "guitar", instrumentName == "guitar"),
+                new SelectListItem("Bass", "bass", instrumentName == "bass"), 
+            };
         }
     }
 }

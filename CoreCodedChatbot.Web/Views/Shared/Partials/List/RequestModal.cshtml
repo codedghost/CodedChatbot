@@ -1,0 +1,108 @@
+﻿@model CoreCodedChatbot.Library.Models.View.RequestSongViewModel
+
+<div class="modal fade" id="requestModal" tabindex="-1" role="dialog" aria-labelledby="requestModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="requestModalLabel">@Model.ModalTitle</h5>
+                <button type="button" class="close" data-dismiss="modal" arial-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger" role="alert" id="validationMessage" style="display: none">
+
+                </div>
+                @Html.HiddenFor(m => m.SongRequestId, new {id = "songRequestId"})
+                <div class="row">
+                    <div class="col-md-4">
+                        @Html.LabelFor(m => m.Title)
+                    </div>
+                    <div class="col-md-8">
+                        @Html.TextBoxFor(m => m.Title, new {id = "requestTitle"})
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        @Html.LabelFor(m => m.Artist)
+                    </div>
+                    <div class="col-md-8">
+                        @Html.TextBoxFor(m => m.Artist, new {id = "requestArtist"})
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        @Html.LabelFor(m => m.Instruments)
+                    </div>
+                    <div class="col-md-8">
+                        @Html.DropDownListFor(m => m.SelectedInstrument, Model.Instruments, new {id = "requestInstrument"})
+                    </div>
+                </div>
+                @if (Model.ShouldShowVip && Model.IsNewRequest)
+                {
+                    <div class="row">
+                        <div class="col-md-4">
+                            @Html.LabelFor(m => m.IsVip)
+                        </div>
+                        <div class="col-md-8">
+                            @Html.CheckBoxFor(m => m.IsVip, new {id = "requestIsVip"})
+                        </div>
+                    </div>
+                }
+                @Html.HiddenFor(m => m.IsNewRequest, new {id = "isNewRequest"})
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="requestSong()">Submit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function requestSong() {
+        var requestData = JSON.stringify({
+            SongRequestId: $("#songRequestId").val(),
+            Title: $("#requestTitle").val(),
+            Artist: $("#requestArtist").val(),
+            SelectedInstrument: $("#requestInstrument").val(),
+            Instruments: null,
+            IsVip: $("#requestIsVip").prop('checked')
+        });
+
+        var isNewRequest = $("#isNewRequest").val() === "True" ? true : false;
+
+        debugger;
+
+        if (isNewRequest) {
+            $.ajax({
+                url: '@Url.Action("RequestSong", "Chatbot")',
+                type: "POST",
+                data: requestData,
+                contentType: "application/json",
+                success: function() {
+                    $("#requestModal").modal('hide');
+                },
+                error: function(err) {
+                    debugger;
+                    $("#validationMessage").text(err.responseJSON.message);
+                    $("#validationMessage").show();
+                }
+            });
+        } else {
+            $.ajax({
+                url: '@Url.Action("EditSong", "Chatbot")',
+                type: "POST",
+                data: requestData,
+                contentType: "application/json",
+                success: function() {
+                    $("#requestModal").modal('hide');
+                },
+                error: function(err) {
+                    $("#validationMessage").text(err.responseJSON.message);
+                    $("#validationMessage").show();
+                }
+            })
+        }
+    }
+</script>
