@@ -1,28 +1,25 @@
 ﻿.queueWrapper {
-	width: 1200px;
 	margin-right: auto;
 	margin-left: auto;
 	padding: 0;
 }
-.singleCol {
-	width: 600px;
-}
+
 .vipQueue {
 	display: table;
 	border-collapse: separate;
 	border-spacing: 5px;
+    width: 50%;
 	padding: 0;
 	margin: 0;
-	width: 590px;
 	float: left;
 }
 .regularQueue {
 	display: table;
 	border-collapse: separate;
 	border-spacing: 5px;
+    width: 50%;
 	padding: 0;
 	margin: 0;
-	width: 590px;
 	float: right;
 
 }
@@ -97,9 +94,9 @@
     display: table;
     border-collapse: separate;
     border-spacing: 5px;
+    width: 100%;
     padding: 0;
     margin: 0;
-    width: 1200px;
     float: left;
 }
 
