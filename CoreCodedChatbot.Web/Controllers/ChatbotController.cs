@@ -133,6 +133,20 @@ namespace CoreCodedChatbot.Web.Controllers
         {
             var requestToDelete = playlistService.GetRequestById(songId);
 
+            var chattersModel = chatterService.GetCurrentChatters();
+
+            var twitchUser = User.Identity.IsAuthenticated
+                ? new LoggedInTwitchUser
+                {
+                    Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
+                        ?.Value,
+                    IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
+                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false
+                }
+                : null;
+
+            ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
+
             try
             {
                 return PartialView("Partials/List/DeleteModal", requestToDelete);
@@ -147,6 +161,21 @@ namespace CoreCodedChatbot.Web.Controllers
         public IActionResult RenderRemoveCurrentSongModal([FromBody] int songId)
         {
             var requestToDelete = playlistService.GetRequestById(songId);
+
+            var chattersModel = chatterService.GetCurrentChatters();
+
+            var twitchUser = User.Identity.IsAuthenticated
+                ? new LoggedInTwitchUser
+                {
+                    Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
+                        ?.Value,
+                    IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
+                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false
+                }
+                : null;
+
+            ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
+
             try
             {
                 return PartialView("Partials/List/RemoveCurrentModal", requestToDelete);
@@ -204,6 +233,20 @@ namespace CoreCodedChatbot.Web.Controllers
                 return Json(new {Success = false, Message = "It looks like you aren't logged in!"});
             }
 
+            var chattersModel = chatterService.GetCurrentChatters();
+
+            var twitchUser = User.Identity.IsAuthenticated
+                ? new LoggedInTwitchUser
+                {
+                    Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
+                        ?.Value,
+                    IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
+                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false
+                }
+                : null;
+
+            ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
+
             try
             {
                 var requestViewModel =
@@ -224,6 +267,20 @@ namespace CoreCodedChatbot.Web.Controllers
             {
                 return Json(new {Success = false, Message = "It looks like you aren't logged in!"});
             }
+
+            var chattersModel = chatterService.GetCurrentChatters();
+
+            var twitchUser = User.Identity.IsAuthenticated
+                ? new LoggedInTwitchUser
+                {
+                    Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
+                        ?.Value,
+                    IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
+                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false
+                }
+                : null;
+
+            ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
 
             try
             {
