@@ -34,25 +34,34 @@ namespace CoreCodedChatbot.Commands
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            var randomPostResponse = await RedditCatClient.GetAsync(".json?limit=100");
-            if (!randomPostResponse.IsSuccessStatusCode)
+            try
             {
+                var randomPostResponse = await RedditCatClient.GetAsync(".json?limit=100");
+                if (!randomPostResponse.IsSuccessStatusCode)
+                {
+                    client.SendMessage(joinedChannel,
+                        $"Hey @{username}, I can't seem to talk to Reddit right now, try again in a few minutes :(");
+                }
+
+                // Ignore self posts, this should ideally leave us with images and video posts
+                var topCatPosts =
+                    JsonConvert.DeserializeObject<RedditRandomJsonModel>(
+                            await randomPostResponse.Content.ReadAsStringAsync()).data.children
+                        .Where(ch => !ch.data.domain.Contains("self.cats")).ToList();
+
+                // Get Random post
+                var randomPost = topCatPosts[Rand.Next(topCatPosts.Count)];
+
+                // Put post link in chat (should attribute reddit and poster rather than posting media directly)
                 client.SendMessage(joinedChannel,
-                    $"Hey @{username}, I can't seem to talk to Reddit right now, try again in a few minutes :(");
+                    $"Hey @{username}, {randomPost.data.title} - https://www.reddit.com{randomPost.data.permalink}");
             }
-
-            // Ignore self posts, this should ideally leave us with images and video posts
-            var topCatPosts =
-                JsonConvert.DeserializeObject<RedditRandomJsonModel>(
-                        await randomPostResponse.Content.ReadAsStringAsync()).data.children
-                    .Where(ch => !ch.data.domain.Contains("self.cats")).ToList();
-
-            // Get Random post
-            var randomPost = topCatPosts[Rand.Next(topCatPosts.Count)];
-
-            // Put post link in chat (should attribute reddit and poster rather than posting media directly)
-            client.SendMessage(joinedChannel,
-                $"Hey @{username}, {randomPost.data.title} - https://www.reddit.com{randomPost.data.permalink}");
+            catch (Exception e)
+            {
+                Console.WriteLine($"Exception in KittyCommand\n{e} - {e.InnerException}");
+                client.SendMessage(joinedChannel,
+                    $"Hey @{username}, I'm having some trouble talking to reddit right now, sorry :(");
+            }
         }
 
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)
