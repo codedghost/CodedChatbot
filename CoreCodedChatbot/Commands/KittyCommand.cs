@@ -4,16 +4,16 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using CoreCodedChatbot.CustomAttributes;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Models.Data;
 using Newtonsoft.Json;
 using Serilog.Debugging;
 using TwitchLib.Client;
+using TwitchLib.Client.Models;
 
 namespace CoreCodedChatbot.Commands
 {
-    [ChatCommand(new[] { "kitty" }, false)]
+    [CustomAttributes.ChatCommand(new[] { "kitty" }, false)]
     public class KittyCommand : ICommand
     {
         private ConfigModel Config;
@@ -32,12 +32,12 @@ namespace CoreCodedChatbot.Commands
             Rand = new Random();
         }
 
-        public async void Process(TwitchClient client, string username, string commandText, bool isMod)
+        public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
             var randomPostResponse = await RedditCatClient.GetAsync(".json?limit=100");
             if (!randomPostResponse.IsSuccessStatusCode)
             {
-                client.SendMessage(Config.StreamerChannel,
+                client.SendMessage(joinedChannel,
                     $"Hey @{username}, I can't seem to talk to Reddit right now, try again in a few minutes :(");
             }
 
@@ -51,13 +51,13 @@ namespace CoreCodedChatbot.Commands
             var randomPost = topCatPosts[Rand.Next(topCatPosts.Count)];
 
             // Put post link in chat (should attribute reddit and poster rather than posting media directly)
-            client.SendMessage(Config.StreamerChannel,
+            client.SendMessage(joinedChannel,
                 $"Hey @{username}, {randomPost.data.title} - https://www.reddit.com{randomPost.data.permalink}");
         }
 
-        public void ShowHelp(TwitchClient client, string username)
+        public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)
         {
-            client.SendMessage(Config.StreamerChannel,
+            client.SendMessage(joinedChannel,
                 $"Hey @{username}, This command will give you a picture of a friendly feline!");
         }
     }
