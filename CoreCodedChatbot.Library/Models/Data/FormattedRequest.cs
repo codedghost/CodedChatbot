@@ -24,8 +24,8 @@ namespace CoreCodedChatbot.Library.Models.Data
             return SongRequestRegex.IsMatch(requestText)
                 ? new FormattedRequest
                 {
-                    SongName = regMatch.Groups["songname"].Captures.FirstOrDefault()?.Value,
-                    SongArtist = regMatch.Groups["artistname"].Captures.FirstOrDefault()?.Value,
+                    SongName = regMatch.Groups["songname"].Captures.FirstOrDefault()?.Value.Trim(),
+                    SongArtist = regMatch.Groups["artistname"].Captures.FirstOrDefault()?.Value.Trim(),
                     InstrumentName = possibleInstrument
                 }
                 : null;
