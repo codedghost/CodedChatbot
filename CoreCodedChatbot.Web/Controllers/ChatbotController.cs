@@ -58,7 +58,7 @@ namespace CoreCodedChatbot.Web.Controllers
                 playlistModel.VipList.Where(r => r.songRequestId != playlistModel.CurrentSong.songRequestId)
                     .ToArray();
 
-            ViewBag.UserHasVip = vipService.HasVip(User.Identity.Name.ToLower());
+            ViewBag.UserHasVip = User.Identity.IsAuthenticated && vipService.HasVip(User.Identity.Name.ToLower());
 
             ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
             ViewBag.Username = twitchUser?.Username ?? string.Empty;
@@ -87,7 +87,7 @@ namespace CoreCodedChatbot.Web.Controllers
                     IsMod = chattersModel?.chatters?.moderators?.Any(mod => string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false
                 } : null;
 
-                ViewBag.UserHasVip = vipService.HasVip(User.Identity.Name.ToLower());
+                ViewBag.UserHasVip = User.Identity.IsAuthenticated && vipService.HasVip(User.Identity.Name.ToLower());
 
                 ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
                 ViewBag.Username = twitchUser?.Username ?? string.Empty;
@@ -116,7 +116,7 @@ namespace CoreCodedChatbot.Web.Controllers
                     }
                     : null;
 
-                ViewBag.UserHasVip = vipService.HasVip(User.Identity.Name.ToLower());
+                ViewBag.UserHasVip = User.Identity.IsAuthenticated && vipService.HasVip(User.Identity.Name.ToLower());
 
                 ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
                 ViewBag.Username = twitchUser?.Username ?? string.Empty;
@@ -170,7 +170,7 @@ namespace CoreCodedChatbot.Web.Controllers
                     IsMod = chattersModel?.chatters?.moderators?.Any(mod => string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false
                 } : null;
 
-                ViewBag.UserHasVip = vipService.HasVip(User.Identity.Name.ToLower());
+                ViewBag.UserHasVip = User.Identity.IsAuthenticated && vipService.HasVip(User.Identity.Name.ToLower());
 
                 ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
                 return PartialView("Partials/List/CurrentSong", data);
