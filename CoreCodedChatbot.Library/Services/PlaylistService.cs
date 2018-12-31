@@ -51,11 +51,10 @@ namespace CoreCodedChatbot.Library.Services
                     songRequester = request.RequestUsername,
                     isInChat = (context.Users.SingleOrDefault(u => u.Username == request.RequestUsername)
                                     ?.TimeLastInChat ?? DateTime.MinValue)
-                               .ToUniversalTime()
                                .AddMinutes(2) >= DateTime.UtcNow ||
-                               (request.VipRequestTime ?? DateTime.MinValue).ToUniversalTime().AddMinutes(2) >=
+                               (request.VipRequestTime ?? DateTime.MinValue).AddMinutes(2) >=
                                DateTime.UtcNow ||
-                               request.RequestTime.ToUniversalTime().AddMinutes(5) >= DateTime.UtcNow,
+                               request.RequestTime.AddMinutes(5) >= DateTime.UtcNow,
                     isVip = request.VipRequestTime != null
                 };
             }
@@ -314,9 +313,8 @@ namespace CoreCodedChatbot.Library.Services
                             songRequestText = sr.RequestText,
                             songRequester = sr.RequestUsername,
                             isInChat = (context.Users.SingleOrDefault(u => u.Username == sr.RequestUsername)?.TimeLastInChat ?? DateTime.MinValue)
-                                       .ToUniversalTime()
                                        .AddMinutes(2) >= DateTime.UtcNow ||
-                                       (sr.VipRequestTime ?? DateTime.MinValue).ToUniversalTime().AddMinutes(5) >= DateTime.UtcNow,
+                                       (sr.VipRequestTime ?? DateTime.MinValue).AddMinutes(5) >= DateTime.UtcNow,
                             isVip = sr.VipRequestTime != null,
                             isEvenIndex = index % 2 == 0
                         };
@@ -334,9 +332,8 @@ namespace CoreCodedChatbot.Library.Services
                             songRequester = sr.RequestUsername,
                             isInChat = (context.Users.SingleOrDefault(u => u.Username == sr.RequestUsername)
                                             ?.TimeLastInChat ?? DateTime.MinValue)
-                                       .ToUniversalTime()
                                        .AddMinutes(2) >= DateTime.UtcNow ||
-                                       sr.RequestTime.ToUniversalTime().AddMinutes(5) >= DateTime.UtcNow,
+                                       sr.RequestTime.AddMinutes(5) >= DateTime.UtcNow,
                             isVip = sr.VipRequestTime != null,
                             isEvenIndex = index % 2 == 0
                         };
