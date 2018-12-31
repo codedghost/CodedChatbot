@@ -250,7 +250,7 @@ namespace CoreCodedChatbot.Web.Controllers
             try
             {
                 var requestViewModel =
-                    playlistService.GetEditRequestSongViewModel(User.Identity.Name.ToLower(), songId);
+                    playlistService.GetEditRequestSongViewModel(User.Identity.Name.ToLower(), songId, twitchUser?.IsMod ?? false);
 
                     return PartialView("Partials/List/RequestModal", requestViewModel);
             }

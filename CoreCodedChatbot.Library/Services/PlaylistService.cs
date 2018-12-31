@@ -525,12 +525,12 @@ namespace CoreCodedChatbot.Library.Services
             };
         }
 
-        public RequestSongViewModel GetEditRequestSongViewModel(string username, int songRequestId)
+        public RequestSongViewModel GetEditRequestSongViewModel(string username, int songRequestId, bool isMod)
         {
             using (var context = contextFactory.Create())
             {
                 var songRequest = context.SongRequests.SingleOrDefault(sr =>
-                    !sr.Played && sr.RequestUsername == username && sr.SongRequestId == songRequestId);
+                    !sr.Played && (sr.RequestUsername == username || isMod) && sr.SongRequestId == songRequestId);
 
                 if (songRequest == null) return null;
                 

@@ -29,7 +29,7 @@ namespace CoreCodedChatbot.Library.Interfaces.Services
         PromoteRequestResult PromoteWebRequest(int songId, string username);
 
         RequestSongViewModel GetNewRequestSongViewModel(string username);
-        RequestSongViewModel GetEditRequestSongViewModel(string username, int songRequestId);
+        RequestSongViewModel GetEditRequestSongViewModel(string username, int songRequestId, bool isMod);
 
         bool OpenPlaylist();
         bool ClosePlaylist();
