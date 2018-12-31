@@ -516,29 +516,13 @@ namespace CoreCodedChatbot.Library.Services
                     return false;
                 }
 
-
-                if (isMod)
-                {
-                    var userRequest = userRequests.FirstOrDefault(x => x.Index == playlistIndex);
-
-                    if (userRequest == null)
-                    {
-                        syntaxError = true;
-                        return false;
-                    }
-
-                    userRequest.SongRequest.RequestText = songRequestText;
-
-                    context.SongRequests.Update(userRequest.SongRequest);
-                    context.SaveChanges();
-                } else if (userRequestCount == 1)
+                if (userRequestCount == 1)
                 {
                     if (playlistIndex != 0)
                     {
                         if (userVipRequestCount > 0)
                         {
                             var userRequest = userRequests?.Where(x => x.SongRequest.RequestUsername == username && x.Index == playlistIndex).FirstOrDefault();
-
 
                             userRequest.SongRequest.RequestText = songRequestText;
 
