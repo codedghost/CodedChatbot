@@ -9,7 +9,7 @@ namespace CoreCodedChatbot.Library.Models.Data
     public class FormattedRequest
     {
         private static Regex SongRequestRegex = new Regex(
-            "((?<artistname>[\\d\\w ,.!\"£$%^&*=+\\\\\\/|<>?`¬[\\]{};\'#:@~]*)(?<seperator2> - )(?<songname>[\\d\\w ,.!\"£$%^&*=+\\\\\\/|<>?`¬[\\]{};\'#:@~]*)(?<instrument>(( - )?\\(?(bass|guitar)?\\)?)?))");
+            "((?<artistname>[\\d\\w ,.!\"£$%^&*=+\\\\\\/|<>?`¬[\\]{};\'#:@~\\-]*)(?<seperator2> - )(?<songname>[\\d\\w ,.!\"£$%^&*=+\\\\\\/|<>?`¬[\\]{};\'#:@~\\-]*)(?<instrument>(( - )?\\(?(bass|guitar)?\\)?)?))");
 
         public string SongName { get; set; }
         public string SongArtist { get; set; }
