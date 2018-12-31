@@ -465,7 +465,7 @@ namespace CoreCodedChatbot.Library.Services
                     if (!isMod && songRequest.RequestUsername != username) return EditRequestResult.NotYourRequest;
 
                     songRequest.RequestText =
-                        $"{editRequestModel.Artist} - {editRequestModel.Title} ({editRequestModel.SelectedInstrument}";
+                        $"{editRequestModel.Artist} - {editRequestModel.Title} ({editRequestModel.SelectedInstrument})";
                     context.SaveChanges();
                 }
             }
