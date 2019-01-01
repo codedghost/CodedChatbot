@@ -23,6 +23,7 @@ namespace CoreCodedChatbot.Helpers
 
         public void GiveViewershipBytes(ChatViewersModel chatViewersModel)
         {
+
             using (var context = this.contextFactory.Create())
             {
                 if (chatViewersModel.chatters.moderators.Any()) vipHelper.AddUsersDeferSave(context, chatViewersModel.chatters.moderators);
@@ -54,6 +55,13 @@ namespace CoreCodedChatbot.Helpers
                 foreach (var admin in chatViewersModel.chatters.admins)
                 {
                     var user = vipHelper.FindUser(context, admin);
+                    user.TokenBytes++;
+                    user.TimeLastInChat = DateTime.UtcNow;
+                }
+
+                foreach (var vip in chatViewersModel.chatters.vips)
+                {
+                    var user = vipHelper.FindUser(context, vip);
                     user.TokenBytes++;
                     user.TimeLastInChat = DateTime.UtcNow;
                 }
