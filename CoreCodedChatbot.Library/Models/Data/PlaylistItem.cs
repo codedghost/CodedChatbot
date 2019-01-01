@@ -12,6 +12,8 @@ namespace CoreCodedChatbot.Library.Models.Data
         public bool isInChat { get; set; }
         public bool isVip { get; set; }
         public bool isEvenIndex { get; set; }
+        public DateTime? tempSongRequestTime { get; set; }
+        public DateTime? userLastInChat { get; set; }
 
         public FormattedRequest FormattedRequest => FormattedRequest.GetFormattedRequest(songRequestText);
     }

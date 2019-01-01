@@ -316,7 +316,9 @@ namespace CoreCodedChatbot.Library.Services
                                        .AddMinutes(2) >= DateTime.UtcNow ||
                                        (sr.VipRequestTime ?? DateTime.MinValue).AddMinutes(5) >= DateTime.UtcNow,
                             isVip = sr.VipRequestTime != null,
-                            isEvenIndex = index % 2 == 0
+                            isEvenIndex = index % 2 == 0,
+                            tempSongRequestTime = sr.VipRequestTime,
+                            userLastInChat = context.Users.SingleOrDefault(u => u.Username == sr.RequestUsername)?.TimeLastInChat
                         };
                     })
                     .ToArray();
@@ -335,9 +337,17 @@ namespace CoreCodedChatbot.Library.Services
                                        .AddMinutes(2) >= DateTime.UtcNow ||
                                        sr.RequestTime.AddMinutes(5) >= DateTime.UtcNow,
                             isVip = sr.VipRequestTime != null,
-                            isEvenIndex = index % 2 == 0
+                            isEvenIndex = index % 2 == 0,
+                            tempSongRequestTime = sr.VipRequestTime,
+                            userLastInChat = context.Users.SingleOrDefault(u => u.Username == sr.RequestUsername)?.TimeLastInChat
                         };
                     }).ToArray();
+
+                foreach (var request in vipRequests.Concat(regularRequests))
+                {
+                    Console.WriteLine(
+                        $"Requester: {request.songRequester}, Text: {request.songRequestText}\ntimeNow: {DateTime.UtcNow}\nuserLastInChat: {request.userLastInChat}\nrequestTime: {request.tempSongRequestTime}");
+                }
 
                 // Ensure if the playlist is populated then a request is made current
                 if (CurrentRequest == null)
