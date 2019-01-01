@@ -370,9 +370,13 @@ namespace CoreCodedChatbot.Services
                         if (currentChattersJson.IsSuccessStatusCode)
                         {
                             // process json into username list.
-                            var chattersModel = JsonConvert.DeserializeObject<ChatViewersModel>(currentChattersJson.Content.ReadAsStringAsync().Result);
+                            var chattersModel =
+                                JsonConvert.DeserializeObject<ChatViewersModel>(currentChattersJson.Content
+                                    .ReadAsStringAsync().Result);
                             bytesHelper.GiveViewershipBytes(chattersModel);
+                            Console.Out.WriteLine(chattersModel);
                         }
+                        else Console.Out.WriteLine("Could not retrieve Chatters JSON");
                     }
                     catch (Exception ex)
                     {
