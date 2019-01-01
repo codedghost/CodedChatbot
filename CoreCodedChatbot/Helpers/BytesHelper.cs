@@ -23,13 +23,13 @@ namespace CoreCodedChatbot.Helpers
 
         public void GiveViewershipBytes(ChatViewersModel chatViewersModel)
         {
-
             using (var context = this.contextFactory.Create())
             {
                 if (chatViewersModel.chatters.moderators.Any()) vipHelper.AddUsersDeferSave(context, chatViewersModel.chatters.moderators);
                 if (chatViewersModel.chatters.staff.Any()) vipHelper.AddUsersDeferSave(context, chatViewersModel.chatters.staff);
                 if (chatViewersModel.chatters.global_mods.Any()) vipHelper.AddUsersDeferSave(context, chatViewersModel.chatters.global_mods);
                 if (chatViewersModel.chatters.admins.Any()) vipHelper.AddUsersDeferSave(context, chatViewersModel.chatters.admins);
+                if (chatViewersModel.chatters.vips.Any()) vipHelper.AddUsersDeferSave(context, chatViewersModel.chatters.vips);
                 if (chatViewersModel.chatters.viewers.Any()) vipHelper.AddUsersDeferSave(context, chatViewersModel.chatters.viewers);
 
                 context.SaveChanges();
