@@ -20,6 +20,7 @@ using CoreCodedChatbot.Library.Services;
 using CoreCodedChatbot.Web.Interfaces;
 using CoreCodedChatbot.Web.Services;
 using CoreCodedChatbot.Web.SignalRHubs;
+using TwitchLib.Api;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
@@ -70,7 +71,25 @@ namespace CoreCodedChatbot.Web
             client.Initialize(creds, config.StreamerChannel);
             client.Connect();
 
+            var api = new TwitchAPI();
+            api.Settings.AccessToken = config.ChatbotAccessToken;
+
+
+            api.V5.Chat.GetChatRoomsByChannelAsync(config.ChannelId, config.ChatbotAccessToken)
+                .ContinueWith(
+                    rooms =>
+                    {
+                        if (!rooms.IsCompletedSuccessfully) return;
+                        var devRoomId = rooms.Result.Rooms.SingleOrDefault(r => r.Name == "dev")?.Id;
+                        if (!string.IsNullOrWhiteSpace(devRoomId))
+                        {
+                            client.JoinRoom(config.ChannelId, devRoomId);
+                        }
+                    });
+            
+
             services.AddSingleton(client);
+            services.AddSingleton(api);
             services.AddSingleton<IChatbotContextFactory, ChatbotContextFactory>();
             services.AddSingleton<IConfigService, ConfigService>();
             services.AddSingleton<IVipService, VipService>();

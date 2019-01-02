@@ -21,7 +21,7 @@ namespace CoreCodedChatbot.Helpers
             this.config = configHelper.GetConfig();
         }
 
-        public void GiveBytes(ChatViewersModel chatViewersModel)
+        public void GiveViewershipBytes(ChatViewersModel chatViewersModel)
         {
             using (var context = this.contextFactory.Create())
             {
@@ -29,6 +29,7 @@ namespace CoreCodedChatbot.Helpers
                 if (chatViewersModel.chatters.staff.Any()) vipHelper.AddUsersDeferSave(context, chatViewersModel.chatters.staff);
                 if (chatViewersModel.chatters.global_mods.Any()) vipHelper.AddUsersDeferSave(context, chatViewersModel.chatters.global_mods);
                 if (chatViewersModel.chatters.admins.Any()) vipHelper.AddUsersDeferSave(context, chatViewersModel.chatters.admins);
+                if (chatViewersModel.chatters.vips.Any()) vipHelper.AddUsersDeferSave(context, chatViewersModel.chatters.vips);
                 if (chatViewersModel.chatters.viewers.Any()) vipHelper.AddUsersDeferSave(context, chatViewersModel.chatters.viewers);
 
                 context.SaveChanges();
@@ -37,31 +38,38 @@ namespace CoreCodedChatbot.Helpers
                 {
                     var user = vipHelper.FindUser(context, mod);
                     user.TokenBytes++;
-                    user.TimeLastInChat = DateTime.Now;
+                    user.TimeLastInChat = DateTime.UtcNow;
                 }
                 foreach (var staff in chatViewersModel.chatters.staff)
                 {
                     var user = vipHelper.FindUser(context, staff);
                     user.TokenBytes++;
-                    user.TimeLastInChat = DateTime.Now;
+                    user.TimeLastInChat = DateTime.UtcNow;
                 }
                 foreach (var global_mod in chatViewersModel.chatters.global_mods)
                 {
                     var user = vipHelper.FindUser(context, global_mod);
                     user.TokenBytes++;
-                    user.TimeLastInChat = DateTime.Now;
+                    user.TimeLastInChat = DateTime.UtcNow;
                 }
                 foreach (var admin in chatViewersModel.chatters.admins)
                 {
                     var user = vipHelper.FindUser(context, admin);
                     user.TokenBytes++;
-                    user.TimeLastInChat = DateTime.Now;
+                    user.TimeLastInChat = DateTime.UtcNow;
+                }
+
+                foreach (var vip in chatViewersModel.chatters.vips)
+                {
+                    var user = vipHelper.FindUser(context, vip);
+                    user.TokenBytes++;
+                    user.TimeLastInChat = DateTime.UtcNow;
                 }
                 foreach (var viewer in chatViewersModel.chatters.viewers)
                 {
                     var user = vipHelper.FindUser(context, viewer);
                     user.TokenBytes++;
-                    user.TimeLastInChat = DateTime.Now;
+                    user.TimeLastInChat = DateTime.UtcNow;
                 }
 
                 context.SaveChanges();
@@ -123,6 +131,27 @@ namespace CoreCodedChatbot.Helpers
             }
 
             return ConvertByte(username, totalBytes);
+        }
+
+        public bool GiveGiftSubBytes(string username, int subCount = 1)
+        {
+            using (var context = contextFactory.Create())
+            {
+                try
+                {
+                    var user = vipHelper.FindUser(context, username);
+                    var totalBytes = (config.BytesToVip / 2) * subCount;
+
+                    user.TokenBytes += totalBytes;
+
+                    context.SaveChanges();
+                    return true;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
         }
     }
 }

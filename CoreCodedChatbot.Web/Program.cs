@@ -1,9 +1,11 @@
 ﻿
+using System.IO;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 
 using CoreCodedChatbot.Database.Context;
+using Microsoft.Extensions.Configuration;
 
 
 namespace CoreCodedChatbot.Web
@@ -17,11 +19,17 @@ namespace CoreCodedChatbot.Web
                 context.Database.Migrate();
             }
 
-            BuildWebHost(args).Run();
+            var config = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("hosting.json", optional: true)
+                .Build();
+
+            BuildWebHost(args, config).Run();
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
+        public static IWebHost BuildWebHost(string[] args, IConfigurationRoot config) =>
             WebHost.CreateDefaultBuilder(args)
+                .UseConfiguration(config)
                 .UseStartup<Startup>()
                 .Build();
     }

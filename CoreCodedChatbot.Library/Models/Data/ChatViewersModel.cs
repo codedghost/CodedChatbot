@@ -13,6 +13,7 @@
         public string[] staff { get; set; }
         public string[] admins { get; set; }
         public string[] global_mods { get; set; }
+        public string[] vips { get; set; }
         public string[] viewers { get; set; }
     }
 }

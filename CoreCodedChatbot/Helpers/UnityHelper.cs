@@ -1,4 +1,6 @@
-﻿using CoreCodedChatbot.Database.Context;
+﻿using System;
+using System.Linq;
+using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Helpers.Interfaces;
 
@@ -24,6 +26,7 @@ namespace CoreCodedChatbot.Helpers
             var creds = new ConnectionCredentials(config.ChatbotNick, config.ChatbotPass);
             var client = new TwitchClient();
             client.Initialize(creds, config.StreamerChannel);
+
             var api = new TwitchAPI();
             api.Settings.AccessToken = config.ChatbotAccessToken;
 

@@ -10,7 +10,10 @@ using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Library.Models.Enums;
 using CoreCodedChatbot.Library.Models.SignalR;
 using CoreCodedChatbot.Library.Models.View;
+using Microsoft.AspNetCore.Mvc.Formatters.Xml;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.SignalR.Client;
+using TwitchLib.Api.Helix.Models.Entitlements;
 
 namespace CoreCodedChatbot.Library.Services
 {
@@ -48,11 +51,10 @@ namespace CoreCodedChatbot.Library.Services
                     songRequester = request.RequestUsername,
                     isInChat = (context.Users.SingleOrDefault(u => u.Username == request.RequestUsername)
                                     ?.TimeLastInChat ?? DateTime.MinValue)
-                               .ToUniversalTime()
                                .AddMinutes(2) >= DateTime.UtcNow ||
-                               (request.VipRequestTime ?? DateTime.MinValue).ToUniversalTime().AddMinutes(2) >=
+                               (request.VipRequestTime ?? DateTime.MinValue).AddMinutes(2) >=
                                DateTime.UtcNow ||
-                               request.RequestTime.ToUniversalTime().AddMinutes(5) >= DateTime.UtcNow,
+                               request.RequestTime.AddMinutes(5) >= DateTime.UtcNow,
                     isVip = request.VipRequestTime != null
                 };
             }
@@ -66,7 +68,7 @@ namespace CoreCodedChatbot.Library.Services
             {
                 var request = new SongRequest
                 {
-                    RequestTime = DateTime.Now,
+                    RequestTime = DateTime.UtcNow,
                     RequestText = commandText,
                     RequestUsername = username,
                     Played = false
@@ -91,7 +93,7 @@ namespace CoreCodedChatbot.Library.Services
                     }
                 }
 
-                if (vipRequest) request.VipRequestTime = DateTime.Now;
+                if (vipRequest) request.VipRequestTime = DateTime.UtcNow;
 
                 context.SongRequests.Add(request);
                 context.SaveChanges();
@@ -116,6 +118,58 @@ namespace CoreCodedChatbot.Library.Services
             UpdatePlaylists();
 
             return (AddRequestResult.Success, songIndex);
+        }
+
+        public AddRequestResult AddWebRequest(RequestSongViewModel requestSongViewModel, string username)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(requestSongViewModel.Title) &&
+                    string.IsNullOrWhiteSpace(requestSongViewModel.Artist)) return AddRequestResult.NoRequestEntered;
+
+                var playlistState = GetPlaylistState();
+
+                switch (playlistState)
+                {
+                    case PlaylistState.VeryClosed:
+                        return AddRequestResult.PlaylistVeryClosed;
+                    case PlaylistState.Closed when !requestSongViewModel.IsVip:
+                        return AddRequestResult.PlaylistClosed;
+                }
+
+                using (var context = contextFactory.Create())
+                {
+                    if (!requestSongViewModel.IsVip)
+                    {
+                        var userSongCount = context.SongRequests.Count(sr =>
+                            !sr.Played && sr.RequestUsername == username && sr.VipRequestTime == null);
+
+                        if (userSongCount >= UserMaxSongCount) return AddRequestResult.NoMultipleRequests;
+                    }
+
+                    var request = new SongRequest
+                    {
+                        RequestTime = DateTime.UtcNow,
+                        RequestText =
+                            $"{requestSongViewModel.Artist} - {requestSongViewModel.Title} ({requestSongViewModel.SelectedInstrument})",
+                        RequestUsername = username,
+                        Played = false
+                    };
+
+                    if (requestSongViewModel.IsVip) request.VipRequestTime = DateTime.UtcNow;
+
+                    context.SongRequests.Add(request);
+                    context.SaveChanges();
+                }
+
+                UpdatePlaylists();
+            }
+            catch (Exception)
+            {
+                return AddRequestResult.UnSuccessful;
+            }
+
+            return AddRequestResult.Success;
         }
 
         public PlaylistState GetPlaylistState()
@@ -146,7 +200,7 @@ namespace CoreCodedChatbot.Library.Services
                 if (request.RequestUsername != username)
                     return -2; // Not this users request.
 
-                request.VipRequestTime = DateTime.Now;
+                request.VipRequestTime = DateTime.UtcNow;
                 context.SaveChanges();
 
                 newSongIndex = context.SongRequests.Where(sr => !sr.Played).OrderRequests()
@@ -190,13 +244,16 @@ namespace CoreCodedChatbot.Library.Services
             await connection.DisposeAsync();
         }
 
-        public void ArchiveCurrentRequest()
+        public void ArchiveCurrentRequest(int songId = 0)
         {
+            // SongId of zero indicates that the command has been called from twitch chat
+
             using (var context = contextFactory.Create())
             {
-                var currentRequest = CurrentRequest;
+                var currentRequest = songId == 0 ? CurrentRequest :
+                    songId == CurrentRequest.songRequestId ? CurrentRequest : null;
 
-                if (CurrentRequest == null)
+                if (currentRequest == null)
                     return;
 
                 var currentRequestDbModel = context.SongRequests.Find(currentRequest.songRequestId);
@@ -242,7 +299,7 @@ namespace CoreCodedChatbot.Library.Services
             }
         }
 
-        public PlaylistBrowserSource GetAllSongs(LoggedInTwitchUser twitchUser = null)
+        public PlaylistViewModel GetAllSongs(LoggedInTwitchUser twitchUser = null)
         {
             using (var context = contextFactory.Create())
             {
@@ -256,9 +313,8 @@ namespace CoreCodedChatbot.Library.Services
                             songRequestText = sr.RequestText,
                             songRequester = sr.RequestUsername,
                             isInChat = (context.Users.SingleOrDefault(u => u.Username == sr.RequestUsername)?.TimeLastInChat ?? DateTime.MinValue)
-                                       .ToUniversalTime()
                                        .AddMinutes(2) >= DateTime.UtcNow ||
-                                       (sr.VipRequestTime ?? DateTime.MinValue).ToUniversalTime().AddMinutes(5) >= DateTime.UtcNow,
+                                       (sr.VipRequestTime ?? DateTime.MinValue).AddMinutes(5) >= DateTime.UtcNow,
                             isVip = sr.VipRequestTime != null,
                             isEvenIndex = index % 2 == 0
                         };
@@ -276,9 +332,8 @@ namespace CoreCodedChatbot.Library.Services
                             songRequester = sr.RequestUsername,
                             isInChat = (context.Users.SingleOrDefault(u => u.Username == sr.RequestUsername)
                                             ?.TimeLastInChat ?? DateTime.MinValue)
-                                       .ToUniversalTime()
                                        .AddMinutes(2) >= DateTime.UtcNow ||
-                                       sr.RequestTime.ToUniversalTime().AddMinutes(5) >= DateTime.UtcNow,
+                                       sr.RequestTime.AddMinutes(5) >= DateTime.UtcNow,
                             isVip = sr.VipRequestTime != null,
                             isEvenIndex = index % 2 == 0
                         };
@@ -298,7 +353,7 @@ namespace CoreCodedChatbot.Library.Services
                     }
                 }
 
-                return new PlaylistBrowserSource
+                return new PlaylistViewModel
                 {
                     CurrentSong = CurrentRequest,
                     RegularList = regularRequests,
@@ -367,169 +422,133 @@ namespace CoreCodedChatbot.Library.Services
 
         public bool EditRequest(string username, string commandText, bool isMod, out string songRequestText, out bool syntaxError)
         {
-            using (var context = contextFactory.Create())
+            var currentSongs = GetAllSongs();
+
+            currentSongs.RegularList = currentSongs.RegularList.Where(r => r.songRequestId != CurrentRequest.songRequestId)
+                .ToArray();
+            currentSongs.VipList = currentSongs.VipList.Where(r => r.songRequestId != CurrentRequest.songRequestId).ToArray();
+
+            var processEditArgsResponse = ProcessEditArgs(username, commandText, currentSongs, out songRequestText);
+
+            if (processEditArgsResponse == ProcessEditArgsResult.ArgumentError ||
+                processEditArgsResponse == ProcessEditArgsResult.NoRequestInList ||
+                processEditArgsResponse == ProcessEditArgsResult.NoRequestProvided)
             {
-                var userRequests = context.SongRequests
-                    ?.Where(sr => !sr.Played)
-                    ?.OrderRequests()
-                    ?.Select((sr, index) => new { Index = index + 1, SongRequest = sr });
-
-                if (userRequests == null)
-                {
-                    songRequestText = string.Empty;
-                    syntaxError = false;
-                    return false;
-                }
-
-                var splitCommandText = commandText.Split(' ').ToList();
-                int.TryParse(splitCommandText[0].Trim(), out var playlistIndex);
-                if (playlistIndex != 0)
-                {
-                    splitCommandText.RemoveAt(0);
-                }
-
-                var userRequestCount = userRequests.Count(x => x.SongRequest.RequestUsername == username);
-                var isUserRegularRequestPreset = userRequests.Any(x =>
-                    x.SongRequest.RequestUsername == username && x.SongRequest.VipRequestTime == null);
-                var userVipRequestCount = userRequests.Count(x =>
-                    x.SongRequest.RequestUsername == username && x.SongRequest.VipRequestTime != null);
-
-                songRequestText = string.Join(" ", splitCommandText);
-
-                if (string.IsNullOrWhiteSpace(songRequestText))
-                {
-                    syntaxError = true;
-                    return false;
-                }
-
-                if (userRequestCount != 1 && playlistIndex == 0)
-                {
-                    if (isUserRegularRequestPreset)
-                    {
-                        // edit regular request
-                        var userRequest = userRequests.SingleOrDefault(x =>
-                            x.SongRequest.RequestUsername == username && x.SongRequest.VipRequestTime == null);
-                        if (userRequest == null)
-                        {
-                            songRequestText = string.Empty;
-                            syntaxError = false;
-                            return false;
-                        }
-
-
-                        userRequest.SongRequest.RequestText = songRequestText;
-
-                        context.SongRequests.Update(userRequest.SongRequest);
-                        context.SaveChanges();
-
-                        UpdatePlaylists();
-
-                        syntaxError = false;
-                        return true;
-                    } else if (userVipRequestCount > 1 || userVipRequestCount == 0)
-                    {
-                        songRequestText = string.Empty;
-                        syntaxError = true;
-                        return false;
-                    } else
-                    {
-                        // edit only vip request
-                        var userRequest = userRequests.FirstOrDefault(x => x.SongRequest.RequestUsername == username && x.SongRequest.VipRequestTime != null);
-                        if (userRequest == null)
-                        {
-                            songRequestText = string.Empty;
-                            syntaxError = true;
-                            return false;
-                        }
-
-                        userRequest.SongRequest.RequestText = songRequestText;
-
-                        context.SongRequests.Update(userRequest.SongRequest);
-                        context.SaveChanges();
-
-                        UpdatePlaylists();
-
-                        syntaxError = false;
-                        return true;
-                    }
-                } else if (userRequestCount > 1 && userVipRequestCount > 1 && playlistIndex == 0)
-                {
-                    songRequestText = string.Empty;
-                    syntaxError = true;
-                    return false;
-                }
-
-
-                if (isMod)
-                {
-                    var userRequest = userRequests.FirstOrDefault(x => x.Index == playlistIndex);
-
-                    if (userRequest == null)
-                    {
-                        syntaxError = true;
-                        return false;
-                    }
-
-                    userRequest.SongRequest.RequestText = songRequestText;
-
-                    context.SongRequests.Update(userRequest.SongRequest);
-                    context.SaveChanges();
-                } else if (userRequestCount == 1)
-                {
-                    if (playlistIndex != 0)
-                    {
-                        if (userVipRequestCount > 0)
-                        {
-                            var userRequest = userRequests?.Where(x => x.SongRequest.RequestUsername == username && x.Index == playlistIndex).FirstOrDefault();
-
-
-                            userRequest.SongRequest.RequestText = songRequestText;
-
-                            context.SongRequests.Update(userRequest.SongRequest);
-                            context.SaveChanges();
-
-                            if (userRequest != null)
-                            {
-                                songRequestText = string.Empty;
-                                syntaxError = false;
-                                return false;
-                            }
-                        } else
-                        {
-                            songRequestText = string.Empty;
-                            syntaxError = false;
-                            return false;
-                        }
-                    } else
-                    {
-                        var userRequest = userRequests?.Where(x => x.SongRequest.RequestUsername == username).FirstOrDefault();
-
-                        userRequest.SongRequest.RequestText = songRequestText;
-
-                        context.SongRequests.Update(userRequest.SongRequest);
-                        context.SaveChanges();
-                    }
-                } else
-                {
-                    // Vip edit
-                    var userRequest = userRequests.FirstOrDefault(x => x.SongRequest.RequestUsername == username && x.Index == playlistIndex);
-                    if (userRequest == null)
-                    {
-                        syntaxError = false;
-                        return false;
-                    }
-
-                    userRequest.SongRequest.RequestText = songRequestText;
-
-                    context.SongRequests.Update(userRequest.SongRequest);
-                    context.SaveChanges();
-                }
+                syntaxError = true;
+                return false;
             }
 
             UpdatePlaylists();
 
             syntaxError = false;
             return true;
+        }
+
+        public EditRequestResult EditWebRequest(RequestSongViewModel editRequestModel, string username, bool isMod)
+        {
+            try
+            {
+
+                if (string.IsNullOrWhiteSpace(editRequestModel.Title) &&
+                    string.IsNullOrWhiteSpace(editRequestModel.Artist))
+                {
+                    return EditRequestResult.NoRequestEntered;
+                }
+
+                using (var context = contextFactory.Create())
+                {
+                    var songRequest =
+                        context.SongRequests.SingleOrDefault(sr => sr.SongRequestId == editRequestModel.SongRequestId);
+
+                    if (songRequest == null) return EditRequestResult.UnSuccessful;
+                    if (songRequest.Played) return EditRequestResult.RequestAlreadyRemoved;
+                    if (!isMod && songRequest.RequestUsername != username) return EditRequestResult.NotYourRequest;
+
+                    songRequest.RequestText =
+                        $"{editRequestModel.Artist} - {editRequestModel.Title} ({editRequestModel.SelectedInstrument})";
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Exception in EditWebRequest\n{e} - {e.InnerException}");
+                return EditRequestResult.UnSuccessful;
+            }
+            
+            UpdatePlaylists();
+
+            return EditRequestResult.Success;
+        }
+
+        public PromoteRequestResult PromoteWebRequest(int songId, string username)
+        {
+            var vipIssued = false;
+            try
+            {
+                using (var context = contextFactory.Create())
+                {
+                    var songRequest = context.SongRequests.SingleOrDefault(sr => sr.SongRequestId == songId);
+
+                    if (songRequest == null) return PromoteRequestResult.UnSuccessful;
+                    if (songRequest.RequestUsername != username) return PromoteRequestResult.NotYourRequest;
+                    if (songRequest.VipRequestTime != null) return PromoteRequestResult.AlreadyVip;
+                    if (!vipService.UseVip(username)) return PromoteRequestResult.NoVipAvailable;
+
+                    vipIssued = true;
+                    songRequest.VipRequestTime = DateTime.UtcNow;
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception e)
+            {
+                if (vipIssued) vipService.RefundVip(username);
+                Console.WriteLine($"Exception in PromoteWebRequest\n{e} - {e.InnerException}");
+                return PromoteRequestResult.UnSuccessful;
+            }
+
+            UpdatePlaylists();
+            return PromoteRequestResult.Successful;
+        }
+
+        public RequestSongViewModel GetNewRequestSongViewModel(string username)
+        {
+            return new RequestSongViewModel
+            {
+                ModalTitle = "Request a song",
+                IsNewRequest = true,
+                Title = string.Empty,
+                Artist = string.Empty,
+                Instruments = GetRequestInstruments(),
+                SelectedInstrument = string.Empty,
+                IsVip = false,
+                ShouldShowVip = vipService.HasVip(username)
+            };
+        }
+
+        public RequestSongViewModel GetEditRequestSongViewModel(string username, int songRequestId, bool isMod)
+        {
+            using (var context = contextFactory.Create())
+            {
+                var songRequest = context.SongRequests.SingleOrDefault(sr =>
+                    !sr.Played && (sr.RequestUsername == username || isMod) && sr.SongRequestId == songRequestId);
+
+                if (songRequest == null) return null;
+                
+                var formattedRequest = FormattedRequest.GetFormattedRequest(songRequest.RequestText);
+
+                return new RequestSongViewModel
+                {
+                    ModalTitle = "Edit your request",
+                    IsNewRequest = false,
+                    SongRequestId = songRequest.SongRequestId,
+                    Title = formattedRequest?.SongName ?? songRequest.RequestText,
+                    Artist = formattedRequest?.SongArtist ?? string.Empty,
+                    Instruments = GetRequestInstruments(formattedRequest?.InstrumentName),
+                    SelectedInstrument = formattedRequest?.InstrumentName ?? "guitar",
+                    IsVip = songRequest.VipRequestTime != null,
+                    ShouldShowVip = false,
+                };
+            }
         }
 
         public bool OpenPlaylist()
@@ -639,7 +658,7 @@ namespace CoreCodedChatbot.Library.Services
                         .OrderRequests()
                         .Count(sr => allViewers.Contains(sr.RequestUsername));
 
-                    var estimatedFinishTime = DateTime.Now.AddMinutes(requests * 6d).ToString("HH:mm:ss");
+                    var estimatedFinishTime = DateTime.UtcNow.AddMinutes(requests * 6d).ToString("HH:mm:ss");
                     return $"Estimated time to finish: {estimatedFinishTime}";
                 }
                 catch (Exception e)
@@ -654,7 +673,8 @@ namespace CoreCodedChatbot.Library.Services
         {
             RequestTypes updateDecision;
 
-            if (!regularRequests.Any() && !vipRequests.Any())
+            var inChatRegularRequests = regularRequests.Where(r => r.isInChat).ToList();
+            if (!inChatRegularRequests.Any() && !vipRequests.Any())
             {
                 CurrentRequest = null;
                 return;
@@ -668,7 +688,7 @@ namespace CoreCodedChatbot.Library.Services
                 {
                     updateDecision = RequestTypes.Vip;
                 }
-                else if (regularRequests.Any())
+                else if (inChatRegularRequests.Any())
                 {
                     CurrentVipRequestsPlayed = 0;
                     updateDecision = RequestTypes.Regular;
@@ -688,7 +708,7 @@ namespace CoreCodedChatbot.Library.Services
                 {
                     updateDecision = RequestTypes.Vip;
                 }
-                else if (regularRequests.Any())
+                else if (inChatRegularRequests.Any())
                 {
                     updateDecision = RequestTypes.Regular;
                 }
@@ -701,7 +721,7 @@ namespace CoreCodedChatbot.Library.Services
             switch (updateDecision)
             {
                 case RequestTypes.Regular:
-                    CurrentRequest = regularRequests[rand.Next(0, regularRequests.Length)];
+                    CurrentRequest = inChatRegularRequests[rand.Next(inChatRegularRequests.Count)];
                     break;
                 case RequestTypes.Vip:
                     CurrentRequest = vipRequests.FirstOrDefault();
@@ -750,6 +770,141 @@ namespace CoreCodedChatbot.Library.Services
                     Console.Out.WriteLine(e.ToString());
                     return false;
                 }
+            }
+        }
+
+        public int GetMaxUserRequests()
+        {
+            return UserMaxSongCount;
+        }
+
+        private SelectListItem[] GetRequestInstruments(string selectedInstrumentName = "guitar")
+        {
+            var instrumentName = string.IsNullOrWhiteSpace(selectedInstrumentName) ? "guitar" : selectedInstrumentName;
+            return new []
+            {
+                new SelectListItem("Guitar", "guitar", instrumentName == "guitar"),
+                new SelectListItem("Bass", "bass", instrumentName == "bass"), 
+            };
+        }
+
+        private bool ProcessEdit(string songRequestText, PlaylistViewModel currentSongs, string username, ProcessEditArgsResult action, int songIndex = 0)
+        {
+            var vipRequestsWithIndex =
+                currentSongs.VipList.Select((sr, index) => new { Index = index + 1, SongRequest = sr }).ToList();
+
+            using (var context = contextFactory.Create())
+            {
+                PlaylistItem request;
+                switch (action)
+                {
+                    case ProcessEditArgsResult.OneRequestEdit:
+                        request = currentSongs.RegularList.SingleOrDefault(rs => rs.songRequester == username) ??
+                                      currentSongs.VipList.SingleOrDefault(vs => vs.songRequester == username);
+
+                        break;
+                    case ProcessEditArgsResult.RegularRequest:
+                        request = currentSongs.RegularList.SingleOrDefault(rs => rs.songRequester == username);
+
+                        break;
+                    case ProcessEditArgsResult.VipRequestNoIndex:
+                        request = currentSongs.VipList.SingleOrDefault(rs => rs.songRequester == username);
+
+                        break;
+                    case ProcessEditArgsResult.VipRequestWithIndex:
+                        request = vipRequestsWithIndex
+                            .SingleOrDefault(rs => rs.SongRequest.songRequester == username && rs.Index == songIndex)?
+                            .SongRequest;
+
+                        break;
+                    default:
+                        request = null;
+                        break;
+                }
+
+                if (request == null) return false;
+
+                var dbReq = context.SongRequests.SingleOrDefault(
+                    sr => sr.SongRequestId == request.songRequestId);
+
+                if (dbReq == null) return false;
+
+                dbReq.RequestText = songRequestText;
+                context.SaveChanges();
+
+                return true;
+            }
+
+        }
+
+        private ProcessEditArgsResult ProcessEditArgs(string username, string commandText, PlaylistViewModel currentSongs, out string songRequestText)
+        {
+            var vipRequestsWithIndex =
+                currentSongs.VipList.Select((sr, index) => new { Index = index + 1, SongRequest = sr }).ToList();
+
+            songRequestText = string.Empty;
+
+            if (currentSongs.RegularList.All(rs => rs.songRequester != username) &&
+                currentSongs.VipList.All(vs => vs.songRequester != username))
+            {
+                return ProcessEditArgsResult.NoRequestInList;
+            }
+
+            var splitCommandText = commandText.Split(' ').ToList();
+            int.TryParse(splitCommandText[0].Trim(), out var playlistIndex);
+            if (playlistIndex != 0)
+            {
+                splitCommandText.RemoveAt(0);
+            }
+
+            songRequestText = string.Join(" ", splitCommandText);
+
+            var totalRequestCount = (currentSongs.RegularList.Count(rs => rs.songRequester == username) +
+                                    vipRequestsWithIndex.Count(vs => vs.SongRequest.songRequester == username));
+
+            var doesUserHaveRegularRequest = currentSongs.RegularList.Any(rs => rs.songRequester == username);
+            var userVips = vipRequestsWithIndex.Where(req => req.SongRequest.songRequester == username).ToList();
+
+            if (string.IsNullOrWhiteSpace(songRequestText))
+            {
+                return ProcessEditArgsResult.NoRequestProvided;
+            }
+
+            if (totalRequestCount == 1)
+            {
+                return ProcessEdit(songRequestText, currentSongs, username, ProcessEditArgsResult.OneRequestEdit)
+                    ? ProcessEditArgsResult.OneRequestEdit
+                    : ProcessEditArgsResult.ArgumentError; // We can change this request regardless
+            }
+
+            if (playlistIndex != 0)
+            {
+                if (userVips.Count == 0)
+                {
+                    return ProcessEditArgsResult.ArgumentError;
+                }
+
+                return ProcessEdit(songRequestText, currentSongs, username, ProcessEditArgsResult.VipRequestWithIndex,
+                    playlistIndex)
+                    ? ProcessEditArgsResult.VipRequestWithIndex
+                    : ProcessEditArgsResult.ArgumentError;
+            }
+
+
+            if (doesUserHaveRegularRequest)
+            {
+                return ProcessEdit(songRequestText, currentSongs, username, ProcessEditArgsResult.RegularRequest)
+                    ? ProcessEditArgsResult.RegularRequest
+                    : ProcessEditArgsResult.ArgumentError;
+            }
+            switch (userVips.Count)
+            {
+                case 1:
+                    return ProcessEdit(songRequestText, currentSongs, username, ProcessEditArgsResult.VipRequestNoIndex)
+                        ? ProcessEditArgsResult.VipRequestNoIndex
+                        : ProcessEditArgsResult.ArgumentError;
+                default:
+                    return ProcessEditArgsResult.ArgumentError;
             }
         }
     }

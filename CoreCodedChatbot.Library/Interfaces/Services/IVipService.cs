@@ -8,5 +8,7 @@ namespace CoreCodedChatbot.Library.Interfaces.Services
     {
         bool GiftVip(string donorUsername, string receiverUsername);
         bool RefundVip(string username);
+        bool HasVip(string username);
+        bool UseVip(string username);
     }
 }

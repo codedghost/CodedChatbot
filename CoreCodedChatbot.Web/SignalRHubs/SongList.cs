@@ -31,6 +31,30 @@ namespace CoreCodedChatbot.Web.SignalRHubs
             }
         }
 
+        public async Task UpdateById(SongListSingleSongModel updateModel)
+        {
+            var psk = config.SignalRKey;
+
+            if (psk == updateModel.psk)
+            {
+                var updateSong = updateModel.PlaylistItem;
+
+                await Clients.All.SendCoreAsync("UpdateSong", new object[] { updateSong });
+            }
+        }
+        
+        public async Task RemoveById(SongListSingleSongModel removeModel)
+        {
+            var psk = config.SignalRKey;
+
+            if (psk == removeModel.psk)
+            {
+                var removeSong = removeModel.PlaylistItem.songRequestId;
+
+                await Clients.All.SendCoreAsync("RemoveSong", new object[] { removeSong });
+            }
+        }
+
         public override Task OnConnectedAsync()
         {
             Console.WriteLine("Client {0} Connected", Context.ConnectionId);
