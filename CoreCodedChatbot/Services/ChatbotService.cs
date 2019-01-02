@@ -374,8 +374,6 @@ namespace CoreCodedChatbot.Services
                                 JsonConvert.DeserializeObject<ChatViewersModel>(currentChattersJson.Content
                                     .ReadAsStringAsync().Result);
                             bytesHelper.GiveViewershipBytes(chattersModel);
-                            Console.Out.WriteLine(currentChattersJson.Content
-                                .ReadAsStringAsync().Result);
                         }
                         else Console.Out.WriteLine("Could not retrieve Chatters JSON");
                     }
