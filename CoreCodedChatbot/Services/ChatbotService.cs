@@ -52,7 +52,7 @@ namespace CoreCodedChatbot.Services
 
         private static readonly HttpClient httpClient = new HttpClient();
 
-        private string DevelopmentRoomId; // Only for use in debug mode
+        private string DevelopmentRoomId = string.Empty; // Only for use in debug mode
 
         public ChatbotService(CommandHelper commandHelper, TwitchClient client, TwitchAPI api, TwitchPubSub pubsub, LiveStreamMonitorService liveStreamMonitor,
             VipHelper vipHelper, BytesHelper bytesHelper, StreamLabsHelper streamLabsHelper, IConfigHelper configHelper)
