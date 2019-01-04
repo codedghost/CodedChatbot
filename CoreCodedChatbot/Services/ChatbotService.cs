@@ -124,7 +124,7 @@ namespace CoreCodedChatbot.Services
             try
             {
                 if ((config.DevelopmentBuild && !e.Command.ChatMessage.Channel.Contains(DevelopmentRoomId)) ||
-                     (!config.DevelopmentBuild && e.Command.ChatMessage.Channel.Contains(DevelopmentRoomId)))
+                     (!config.DevelopmentBuild && e.Command.ChatMessage.Channel.Contains(DevelopmentRoomId) && !string.IsNullOrWhiteSpace(DevelopmentRoomId)))
                     return;
 
                 if (config.DevelopmentBuild && !client.JoinedChannels.Select(jc => jc.Channel)
