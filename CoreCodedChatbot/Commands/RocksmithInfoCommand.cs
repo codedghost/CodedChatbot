@@ -22,6 +22,7 @@ namespace CoreCodedChatbot.Commands
         public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
             // Run all Rocksmith info commands at once
+            commandHelper.ProcessCommand("rsinfo", client, "Chatbot", string.Empty, true, joinedChannel);
             commandHelper.ProcessCommand("list", client, "Chatbot", string.Empty, true, joinedChannel);
             commandHelper.ProcessCommand("howtorequest", client, "Chatbot", string.Empty, true, joinedChannel);
             commandHelper.ProcessCommand("cf", client, "Chatbot", string.Empty, true, joinedChannel);
