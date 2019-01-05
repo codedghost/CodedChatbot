@@ -9,12 +9,12 @@ using TwitchLib.Client.Models;
 
 namespace CoreCodedChatbot.Commands
 {
-    [CustomAttributes.ChatCommand(new []{"instagram", "insta"}, false)]
-    public class InstagramCommand : ICommand
+    [CustomAttributes.ChatCommand(new []{"rocksmith", "rs"}, false)]
+    public class RocksmithCommand : ICommand
     {
         private ConfigModel config;
 
-        public InstagramCommand(ConfigModel config)
+        public RocksmithCommand(ConfigModel config)
         {
             this.config = config;
         }
@@ -23,13 +23,13 @@ namespace CoreCodedChatbot.Commands
         {
             client.SendMessage(joinedChannel,
                 username == "Chatbot"
-                    ? $"Check me out on insta: {config.InstagramLink}"
-                    : $"Hey {username}, check me out on insta: {config.InstagramLink}");
+                    ? $"This is Rocksmith 2014 Remastered Edition! Check it out here: {config.RocksmithLink}"
+                    : $"Hey @{username}, this is Rocksmith 2014 Remastered Edition! Check it out here: {config.RocksmithLink}");
         }
 
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)
         {
-            client.SendMessage(joinedChannel, $"Hey {username}, this command will output {config.StreamerChannel}'s instagram link");
+            client.SendMessage(joinedChannel, $"Hey @{username}, this command will tell you about Rocksmith!");
         }
     }
 }
