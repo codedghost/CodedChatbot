@@ -21,8 +21,8 @@ namespace CoreCodedChatbot.Commands
         {
             client.SendMessage(joinedChannel,
                 username == "Chatbot"
-                    ? $"The full playlist can be found at: {config.WebPlaylistUrl}/Chatbot/List. You can now request/edit/remove requests over there too!"
-                    : $"Hey @{username}, the full playlist can be found at: {config.WebPlaylistUrl}/Chatbot/List. You can now request/edit/remove requests over there too!");
+                    ? $"The full playlist can be found at: {config.WebPlaylistUrl}/Chatbot/List You can now request/edit/remove requests over there too!"
+                    : $"Hey @{username}, the full playlist can be found at: {config.WebPlaylistUrl}/Chatbot/List You can now request/edit/remove requests over there too!");
         }
 
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)
