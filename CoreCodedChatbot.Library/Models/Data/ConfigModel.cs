@@ -39,5 +39,6 @@
         public string RocksnifferSongDetailsLocation;
         public string GuessingGameApiUrl;
         public bool DevelopmentBuild;
+        public string InstagramLink;
     }
 }
