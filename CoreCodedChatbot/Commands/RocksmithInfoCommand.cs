@@ -7,13 +7,13 @@ using TwitchLib.Client.Models;
 
 namespace CoreCodedChatbot.Commands
 {
-    [CustomAttributes.ChatCommand(new []{"info"}, false)]
-    public class InfoCommand : ICommand
+    [CustomAttributes.ChatCommand(new []{"rsinfo"}, false)]
+    public class RocksmithInfoCommand : ICommand
     {
         private readonly CommandHelper commandHelper;
         private readonly ConfigModel config;
 
-        public InfoCommand(CommandHelper commandHelper, ConfigModel config)
+        public RocksmithInfoCommand(CommandHelper commandHelper, ConfigModel config)
         {
             this.commandHelper = commandHelper;
             this.config = config;
@@ -21,11 +21,10 @@ namespace CoreCodedChatbot.Commands
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            // Run all stream info commands at once
-            commandHelper.ProcessCommand("discord", client, "Chatbot", string.Empty, true, joinedChannel);
-            commandHelper.ProcessCommand("twitter", client, "Chatbot", string.Empty, true, joinedChannel);
-            commandHelper.ProcessCommand("yt", client, "Chatbot", string.Empty, true, joinedChannel);
-            commandHelper.ProcessCommand("merch", client, "Chatbot", string.Empty, true, joinedChannel);
+            // Run all Rocksmith info commands at once
+            commandHelper.ProcessCommand("list", client, "Chatbot", string.Empty, true, joinedChannel);
+            commandHelper.ProcessCommand("howtorequest", client, "Chatbot", string.Empty, true, joinedChannel);
+            commandHelper.ProcessCommand("cf", client, "Chatbot", string.Empty, true, joinedChannel);
         }
 
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)
