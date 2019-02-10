@@ -10,7 +10,7 @@
             @{
                 if (!Model.isVip && ViewContext.ViewBag.UserHasVip && ViewContext.ViewBag.Username.ToLower() == Model.songRequester.ToLower())
                 {
-                    <span id="@Model.songRequestId" class="requestBadge promoteSongBadge" data-toggle="tooltip" data-placement="top" title="Promote to VIP" onclick="showPromoteRequestModal()"><span class="tooltiptext">Promote to VIP</span></span>
+                    <span id="@Model.songRequestId" class="requestBadge promoteSongBadge" data-toggle="tooltip" data-placement="top" title="Promote to VIP" onclick="showPromoteRequestModal()"></span>
                 }
                 if (ViewContext.ViewBag.UserIsMod)
                 {
