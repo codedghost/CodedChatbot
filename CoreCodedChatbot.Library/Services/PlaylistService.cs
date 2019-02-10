@@ -65,6 +65,8 @@ namespace CoreCodedChatbot.Library.Services
         {
             var songIndex = 0;
             var playlistState = this.GetPlaylistState();
+            if (playlistState == PlaylistState.VeryClosed) return (AddRequestResult.PlaylistVeryClosed, 0);
+
             using (var context = contextFactory.Create())
             {
                 var request = new SongRequest
@@ -83,9 +85,6 @@ namespace CoreCodedChatbot.Library.Services
                     if (playlistState == PlaylistState.Closed)
                     {
                         return (AddRequestResult.PlaylistClosed, 0);
-                    } else if (playlistState == PlaylistState.VeryClosed)
-                    {
-                        return (AddRequestResult.PlaylistVeryClosed, 0);
                     }
 
                     if (userSongCount >= UserMaxSongCount)
