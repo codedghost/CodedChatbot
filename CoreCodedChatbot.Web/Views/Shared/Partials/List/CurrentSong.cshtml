@@ -40,11 +40,16 @@
             {
                 if (ViewContext.ViewBag.UserIsMod)
                 {
+                    <span id="@Model.songRequestId" 
+                          class="requestBadge @(Model.isInDrive ? "inDriveBadge" : "notInDriveBadge")" 
+                          title="@(Model.isInDrive ? "Request is in drive" : "Add Request to Drive")"
+                          onclick="@(Model.isInDrive ? string.Empty : "showAddDriveModal()")"
+                          data-toggle="tooltip" data-placement="top"></span>
                     <span id="@Model.songRequestId" class="requestBadge removeSongBadge" data-toggle="tooltip" data-placement="top" title="Remove Request" onclick="showDeleteModal(true)"></span>
                 }
                 if (!Model.isInChat)
                 {
-                    <span class="requestBadge leftBadge"></span>
+                    <span class="requestBadge leftBadge" data-toggle="tooltip" data-placement="top" title="User has left chat"></span>
                 }
             }
         }

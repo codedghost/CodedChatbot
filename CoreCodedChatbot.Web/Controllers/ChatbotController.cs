@@ -27,7 +27,8 @@ namespace CoreCodedChatbot.Web.Controllers
 
         private readonly IChatterService chatterService;
 
-        public ChatbotController(IPlaylistService playlistService, IVipService vipService, IChatterService chatterService)
+        public ChatbotController(IPlaylistService playlistService, IVipService vipService,
+            IChatterService chatterService)
         {
             this.playlistService = playlistService;
             this.vipService = vipService;
@@ -44,11 +45,15 @@ namespace CoreCodedChatbot.Web.Controllers
         {
             var chattersModel = chatterService.GetCurrentChatters();
 
-            var twitchUser = User.Identity.IsAuthenticated ? new LoggedInTwitchUser
-            {
-                Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)?.Value,
-                IsMod = chattersModel?.chatters?.moderators?.Any(mod => string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false
-            } : null;
+            var twitchUser = User.Identity.IsAuthenticated
+                ? new LoggedInTwitchUser
+                {
+                    Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)?.Value,
+                    IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
+                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ??
+                            false
+                }
+                : null;
 
             var playlistModel = playlistService.GetAllSongs(twitchUser);
             playlistModel.RegularList =
@@ -75,17 +80,22 @@ namespace CoreCodedChatbot.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult RenderRegularList([FromBody]PlaylistItem[] data)
+        public IActionResult RenderRegularList([FromBody] PlaylistItem[] data)
         {
             try
             {
                 var chattersModel = chatterService.GetCurrentChatters();
 
-                var twitchUser = User.Identity.IsAuthenticated ? new LoggedInTwitchUser
-                {
-                    Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)?.Value,
-                    IsMod = chattersModel?.chatters?.moderators?.Any(mod => string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false
-                } : null;
+                var twitchUser = User.Identity.IsAuthenticated
+                    ? new LoggedInTwitchUser
+                    {
+                        Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
+                            ?.Value,
+                        IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
+                                    string.Equals(mod, User.Identity.Name,
+                                        StringComparison.CurrentCultureIgnoreCase)) ?? false
+                    }
+                    : null;
 
                 ViewBag.UserHasVip = User.Identity.IsAuthenticated && vipService.HasVip(User.Identity.Name.ToLower());
 
@@ -95,7 +105,7 @@ namespace CoreCodedChatbot.Web.Controllers
             }
             catch (Exception)
             {
-                return Json(new { Success = false, Message = "Encountered an error" });
+                return Json(new {Success = false, Message = "Encountered an error"});
             }
         }
 
@@ -112,7 +122,8 @@ namespace CoreCodedChatbot.Web.Controllers
                         Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
                             ?.Value,
                         IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
-                            string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false
+                                    string.Equals(mod, User.Identity.Name,
+                                        StringComparison.CurrentCultureIgnoreCase)) ?? false
                     }
                     : null;
 
@@ -124,7 +135,7 @@ namespace CoreCodedChatbot.Web.Controllers
             }
             catch (Exception)
             {
-                return Json(new { Success = false, Message = "Encountered an error" });
+                return Json(new {Success = false, Message = "Encountered an error"});
             }
         }
 
@@ -141,7 +152,8 @@ namespace CoreCodedChatbot.Web.Controllers
                     Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
                         ?.Value,
                     IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
-                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false
+                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ??
+                            false
                 }
                 : null;
 
@@ -153,7 +165,7 @@ namespace CoreCodedChatbot.Web.Controllers
             }
             catch (Exception)
             {
-                return Json(new { Success = false, Message = "Encountered an error" });
+                return Json(new {Success = false, Message = "Encountered an error"});
             }
         }
 
@@ -170,7 +182,8 @@ namespace CoreCodedChatbot.Web.Controllers
                     Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
                         ?.Value,
                     IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
-                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false
+                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ??
+                            false
                 }
                 : null;
 
@@ -193,11 +206,16 @@ namespace CoreCodedChatbot.Web.Controllers
             {
                 var chattersModel = chatterService.GetCurrentChatters();
 
-                var twitchUser = User.Identity.IsAuthenticated ? new LoggedInTwitchUser
-                {
-                    Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)?.Value,
-                    IsMod = chattersModel?.chatters?.moderators?.Any(mod => string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false
-                } : null;
+                var twitchUser = User.Identity.IsAuthenticated
+                    ? new LoggedInTwitchUser
+                    {
+                        Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
+                            ?.Value,
+                        IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
+                                    string.Equals(mod, User.Identity.Name,
+                                        StringComparison.CurrentCultureIgnoreCase)) ?? false
+                    }
+                    : null;
 
                 ViewBag.UserHasVip = User.Identity.IsAuthenticated && vipService.HasVip(User.Identity.Name.ToLower());
 
@@ -219,7 +237,7 @@ namespace CoreCodedChatbot.Web.Controllers
 
                 return PartialView("Partials/List/RequestModal", requestViewModel);
             }
-            catch (Exception )
+            catch (Exception)
             {
                 return Json(new {Success = false, Message = "Encountered an error"});
             }
@@ -241,7 +259,8 @@ namespace CoreCodedChatbot.Web.Controllers
                     Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
                         ?.Value,
                     IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
-                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false
+                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ??
+                            false
                 }
                 : null;
 
@@ -250,9 +269,10 @@ namespace CoreCodedChatbot.Web.Controllers
             try
             {
                 var requestViewModel =
-                    playlistService.GetEditRequestSongViewModel(User.Identity.Name.ToLower(), songId, twitchUser?.IsMod ?? false);
+                    playlistService.GetEditRequestSongViewModel(User.Identity.Name.ToLower(), songId,
+                        twitchUser?.IsMod ?? false);
 
-                    return PartialView("Partials/List/RequestModal", requestViewModel);
+                return PartialView("Partials/List/RequestModal", requestViewModel);
             }
             catch (Exception)
             {
@@ -276,7 +296,8 @@ namespace CoreCodedChatbot.Web.Controllers
                     Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
                         ?.Value,
                     IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
-                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false
+                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ??
+                            false
                 }
                 : null;
 
@@ -311,7 +332,7 @@ namespace CoreCodedChatbot.Web.Controllers
                 }
             }
 
-            return Json(new { Success = false, Message = "Encountered an error, are you certain you're logged in?" });
+            return Json(new {Success = false, Message = "Encountered an error, are you certain you're logged in?"});
         }
 
         [HttpPost]
@@ -322,7 +343,7 @@ namespace CoreCodedChatbot.Web.Controllers
                 var chattersModel = chatterService.GetCurrentChatters();
 
                 if (chattersModel?.chatters?.moderators?.Any(mod =>
-                    string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false)
+                        string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false)
                 {
                     try
                     {
@@ -331,12 +352,13 @@ namespace CoreCodedChatbot.Web.Controllers
                     }
                     catch (Exception)
                     {
-                        return Json(new { Success = false, Message = "Encountered an error, or you are not a moderator" });
+                        return Json(new
+                            {Success = false, Message = "Encountered an error, or you are not a moderator"});
                     }
                 }
             }
 
-            return Json(new { Success = false, Message = "Encountered an error, or you are not a moderator" });
+            return Json(new {Success = false, Message = "Encountered an error, or you are not a moderator"});
         }
 
         [HttpPost]
@@ -460,6 +482,74 @@ namespace CoreCodedChatbot.Web.Controllers
             }
 
             return BadRequest(new {Message = "It looks like you're not logged in, log in and try again"});
+        }
+
+        public IActionResult RenderAddToDriveModal([FromBody] int songId)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Json(new {Success = false, Message = "It looks like you aren't logged in!"});
+            }
+
+            var chattersModel = chatterService.GetCurrentChatters();
+
+            var twitchUser = User.Identity.IsAuthenticated
+                ? new LoggedInTwitchUser
+                {
+                    Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
+                        ?.Value,
+                    IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
+                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ??
+                            false
+                }
+                : null;
+
+            ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
+
+            try
+            {
+                var requestToAddToDrive = playlistService.GetRequestById(songId);
+
+                return PartialView("Partials/List/AddToDriveModal", requestToAddToDrive);
+            }
+            catch (Exception)
+            {
+                return Json(new {Success = false, Message = "Encountered an error"});
+            }
+        }
+
+        public IActionResult AddSongToDrive([FromBody] int songId)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Json(new { Success = false, Message = "It looks like you aren't logged in!" });
+            }
+
+            var chattersModel = chatterService.GetCurrentChatters();
+
+            var twitchUser = User.Identity.IsAuthenticated
+                ? new LoggedInTwitchUser
+                {
+                    Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
+                        ?.Value,
+                    IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
+                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ??
+                            false
+                }
+                : null;
+
+            ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
+
+            try
+            {
+                playlistService.AddSongToDrive(songId);
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                Console.Error.Write($"{e} - {e.InnerException}");
+                return Json(new {Success = false, Message = "Encountered an error"});
+            }
         }
     }
 }

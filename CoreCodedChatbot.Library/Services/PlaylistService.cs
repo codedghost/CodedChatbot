@@ -55,7 +55,8 @@ namespace CoreCodedChatbot.Library.Services
                                (request.VipRequestTime ?? DateTime.MinValue).AddMinutes(2) >=
                                DateTime.UtcNow ||
                                request.RequestTime.AddMinutes(5) >= DateTime.UtcNow,
-                    isVip = request.VipRequestTime != null
+                    isVip = request.VipRequestTime != null,
+                    isInDrive = request.InDrive
                 };
             }
         }
@@ -110,7 +111,8 @@ namespace CoreCodedChatbot.Library.Services
                         songRequester = request.RequestUsername,
                         isEvenIndex = false,
                         isInChat = true,
-                        isVip = vipRequest
+                        isVip = vipRequest,
+                        isInDrive = request.InDrive
                     };
                 }
             }
@@ -316,7 +318,8 @@ namespace CoreCodedChatbot.Library.Services
                                        .AddMinutes(2) >= DateTime.UtcNow ||
                                        (sr.VipRequestTime ?? DateTime.MinValue).AddMinutes(5) >= DateTime.UtcNow,
                             isVip = sr.VipRequestTime != null,
-                            isEvenIndex = index % 2 == 0
+                            isEvenIndex = index % 2 == 0,
+                            isInDrive = sr.InDrive
                         };
                     })
                     .ToArray();
@@ -335,7 +338,8 @@ namespace CoreCodedChatbot.Library.Services
                                        .AddMinutes(2) >= DateTime.UtcNow ||
                                        sr.RequestTime.AddMinutes(5) >= DateTime.UtcNow,
                             isVip = sr.VipRequestTime != null,
-                            isEvenIndex = index % 2 == 0
+                            isEvenIndex = index % 2 == 0,
+                            isInDrive = sr.InDrive
                         };
                     }).ToArray();
 
@@ -466,6 +470,7 @@ namespace CoreCodedChatbot.Library.Services
 
                     songRequest.RequestText =
                         $"{editRequestModel.Artist} - {editRequestModel.Title} ({editRequestModel.SelectedInstrument})";
+                    songRequest.InDrive = false;
                     context.SaveChanges();
                 }
             }
@@ -508,6 +513,25 @@ namespace CoreCodedChatbot.Library.Services
 
             UpdatePlaylists();
             return PromoteRequestResult.Successful;
+        }
+
+        public bool AddSongToDrive(int songId)
+        {
+            using (var context = contextFactory.Create())
+            {
+                var songRequest = context.SongRequests.SingleOrDefault(sr => sr.SongRequestId == songId);
+
+                if (songRequest == null) return false;
+                songRequest.InDrive = true;
+
+                if (songRequest.SongRequestId == CurrentRequest.songRequestId)
+                    CurrentRequest.isInDrive = true;
+
+                context.SaveChanges();
+            }
+
+            UpdatePlaylists();
+            return true;
         }
 
         public RequestSongViewModel GetNewRequestSongViewModel(string username)
@@ -830,6 +854,7 @@ namespace CoreCodedChatbot.Library.Services
                 if (dbReq == null) return false;
 
                 dbReq.RequestText = songRequestText;
+                dbReq.InDrive = false;
                 context.SaveChanges();
 
                 return true;

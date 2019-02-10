@@ -12,6 +12,7 @@ namespace CoreCodedChatbot.Library.Models.Data
         public bool isInChat { get; set; }
         public bool isVip { get; set; }
         public bool isEvenIndex { get; set; }
+        public bool isInDrive { get; set; }
 
         public FormattedRequest FormattedRequest => FormattedRequest.GetFormattedRequest(songRequestText);
     }

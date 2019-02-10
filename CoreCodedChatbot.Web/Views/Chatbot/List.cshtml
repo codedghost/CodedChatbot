@@ -117,6 +117,21 @@
         }
     }
 
+    function showAddDriveModal() {
+        $("#modalContainer").empty();
+        var songId = JSON.stringify(event.target.id);
+        $.ajax({
+            url: '@Url.Action("RenderAddToDriveModal", "Chatbot")',
+            type: "POST",
+            data: songId,
+            contentType: "application/json",
+            success: function(html) {
+                $("#modalContainer").html(html);
+                $("#addToDriveModal").modal('show');
+            }
+        });
+    }
+
     function showRequestModal() {
         $("#modalContainer").empty();
         $.ajax({

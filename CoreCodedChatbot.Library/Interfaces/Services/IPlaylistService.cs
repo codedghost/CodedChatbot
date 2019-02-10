@@ -28,6 +28,8 @@ namespace CoreCodedChatbot.Library.Interfaces.Services
         EditRequestResult EditWebRequest(RequestSongViewModel editRequestModel, string username, bool isMod);
         PromoteRequestResult PromoteWebRequest(int songId, string username);
 
+        bool AddSongToDrive(int songId);
+
         RequestSongViewModel GetNewRequestSongViewModel(string username);
         RequestSongViewModel GetEditRequestSongViewModel(string username, int songRequestId, bool isMod);
 
