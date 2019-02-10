@@ -49,7 +49,7 @@ namespace CoreCodedChatbot.Services
         private int MaxTimerMinutesGaming = 35;
 
         private int ChattyTimerCounter = 0;
-        private int MinutesBetweenChattyCommands = 7;
+        private int MinutesBetweenChattyCommands = 10;
 
         private readonly ConfigModel config;
 
