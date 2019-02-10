@@ -48,6 +48,9 @@ namespace CoreCodedChatbot.Services
         private int MaxTimerMinutesRocksmith = 56;
         private int MaxTimerMinutesGaming = 35;
 
+        private int ChattyTimerCounter = 0;
+        private int MinutesBetweenChattyCommands = 7;
+
         private readonly ConfigModel config;
 
         private static readonly HttpClient httpClient = new HttpClient();
@@ -325,37 +328,37 @@ namespace CoreCodedChatbot.Services
                 HowToRequestTimer = new Timer(
                     e => commandHelper.ProcessCommand("howtorequest", client, "Chatbot", string.Empty, true, joinedRoom),
                     null,
-                    TimeSpan.Zero, maxTimerMinutes);
+                    AssignChattyTimer(), maxTimerMinutes);
                 CustomsForgeTimer = new Timer(
                     e => commandHelper.ProcessCommand("customsforge", client, "Chatbot", string.Empty, true, joinedRoom),
                     null,
-                    TimeSpan.FromMinutes(7), maxTimerMinutes);
+                    AssignChattyTimer(), maxTimerMinutes);
                 PlaylistTimer = new Timer(
                     e => commandHelper.ProcessCommand("list", client, "Chatbot", string.Empty, true, joinedRoom),
                     null,
-                    TimeSpan.FromMinutes(14), maxTimerMinutes);
+                    AssignChattyTimer(), maxTimerMinutes);
             }
 
             FollowTimer = new Timer(
                 e => commandHelper.ProcessCommand("followme", client, "Chatbot", string.Empty, true, joinedRoom),
                 null,
-                TimeSpan.FromMinutes(isStreamingRocksmith ? 21 : 0), maxTimerMinutes);
+                AssignChattyTimer(), maxTimerMinutes);
             DiscordTimer = new Timer(
                 e => commandHelper.ProcessCommand("discord", client, "Chatbot", string.Empty, true, joinedRoom),
                 null,
-                TimeSpan.FromMinutes(isStreamingRocksmith ? 28 : 7), maxTimerMinutes);
+                AssignChattyTimer(), maxTimerMinutes);
             TwitterTimer = new Timer(
                 e => commandHelper.ProcessCommand("twitter", client, "Chatbot", string.Empty, true, joinedRoom),
                 null,
-                TimeSpan.FromMinutes(isStreamingRocksmith ? 35 : 14), maxTimerMinutes);
+                AssignChattyTimer(), maxTimerMinutes);
             YoutubeTimer = new Timer(
                 e => commandHelper.ProcessCommand("youtube", client, "Chatbot", string.Empty, true, joinedRoom),
                 null,
-                TimeSpan.FromMinutes(isStreamingRocksmith ? 42 : 21), maxTimerMinutes);
+                AssignChattyTimer(), maxTimerMinutes);
             MerchTimer = new Timer(
                 e => commandHelper.ProcessCommand("merch", client, "Chatbot", string.Empty, true, joinedRoom),
                 null,
-                TimeSpan.FromMinutes(isStreamingRocksmith ? 49 : 28), maxTimerMinutes);
+                AssignChattyTimer(), maxTimerMinutes);
 
 
             // Set thread for checking viewers in chat and giving out Bytes.
@@ -417,6 +420,14 @@ namespace CoreCodedChatbot.Services
             MerchTimer?.Dispose();
             BytesTimer?.Dispose();
             DonationsTimer?.Dispose();
+        }
+
+        private TimeSpan AssignChattyTimer()
+        {
+            var timer = TimeSpan.FromMinutes(ChattyTimerCounter);
+            ChattyTimerCounter += MinutesBetweenChattyCommands;
+
+            return timer;
         }
 
         public void Main()
