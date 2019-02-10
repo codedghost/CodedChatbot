@@ -2,16 +2,26 @@
 
 
 <br />
-<div class="alert alert-dark">
-    @if (User.Identity.IsAuthenticated)
-    {
-        <text>Welcome </text>@Model.Username<text>!</text>
-        <span class="float-right">
-            <button type="button" class="btn btn-sm btn-success" onclick="showRequestModal()">Request</button>
-        </span>
-    }
-    else
-    {
-        @Html.ActionLink("Login", "Index", "Login") <text> with Twitch to access more features!</text>
-    }
+<div class="alert alert-dark" role="alert">
+        @if (User.Identity.IsAuthenticated)
+        {
+            <p><text>Welcome </text>
+                @Model.Username<text>!</text>
+                <span class="float-right">
+                    <button type="button" class="btn btn-sm btn-success" onclick="showRequestModal()">Request</button>
+                </span>
+                @if (ViewContext.ViewBag.UserIsMod)
+                {
+                    <br/>
+                    <br/>
+                        <button type="button" class="btn btn-sm btn-success" onclick="showEmptyPlaylistModal()">Empty Playlist</button>
+                    <br/>
+                }
+            </p>
+        }
+        else
+        {
+            @Html.ActionLink("Login", "Index", "Login")
+            <text> with Twitch to access more features!</text>
+        }
 </div>

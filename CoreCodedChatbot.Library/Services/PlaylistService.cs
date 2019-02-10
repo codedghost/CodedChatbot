@@ -373,7 +373,14 @@ namespace CoreCodedChatbot.Library.Services
                 var requests = context.SongRequests.Where(sr => !sr.Played);
 
                 foreach (var request in requests)
+                {
+                    if (request.VipRequestTime != null && request.SongRequestId != CurrentRequest?.songRequestId)
+                        vipService.RefundVip(request.RequestUsername);
+                    if (request.SongRequestId == CurrentRequest?.songRequestId)
+                        CurrentRequest = null;
+
                     request.Played = true;
+                }
 
                 context.SaveChanges();
             }

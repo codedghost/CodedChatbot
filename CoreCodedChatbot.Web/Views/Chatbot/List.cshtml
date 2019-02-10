@@ -174,4 +174,17 @@
         });
     }
 
+    function showEmptyPlaylistModal() {
+        $("#modalContainer").empty();
+        $.ajax({
+            url: '@Url.Action("RenderEmptyPlaylistModal", "Chatbot")',
+            type: "POST",
+            contentType: "application/json",
+            success: function(html) {
+                $("#modalContainer").html(html);
+                $("#emptyPlaylistModal").modal('show');
+            }
+        });
+    }
+
 </script>

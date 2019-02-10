@@ -551,5 +551,76 @@ namespace CoreCodedChatbot.Web.Controllers
                 return Json(new {Success = false, Message = "Encountered an error"});
             }
         }
+
+        public IActionResult RenderEmptyPlaylistModal()
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Json(new {Success = false, Message = "It looks like you aren't logged in!"});
+            }
+
+            var chattersModel = chatterService.GetCurrentChatters();
+
+            var twitchUser = User.Identity.IsAuthenticated
+                ? new LoggedInTwitchUser
+                {
+                    Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
+                        ?.Value,
+                    IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
+                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ??
+                            false
+                }
+                : null;
+
+            ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
+
+            if (!ViewBag.UserIsMod) return BadRequest();
+
+            try
+            {
+                return PartialView("Partials/List/EmptyPlaylistModal");
+            }
+            catch (Exception e)
+            {
+                Console.Write($"{e} - {e.InnerException}");
+                return BadRequest();
+            }
+        }
+
+        public IActionResult EmptyPlaylist()
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return Json(new { Success = false, Message = "It looks like you aren't logged in!" });
+            }
+
+            var chattersModel = chatterService.GetCurrentChatters();
+
+            var twitchUser = User.Identity.IsAuthenticated
+                ? new LoggedInTwitchUser
+                {
+                    Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
+                        ?.Value,
+                    IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
+                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ??
+                            false
+                }
+                : null;
+
+            ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
+
+            if (!ViewBag.UserIsMod) return BadRequest();
+
+            try
+            {
+                playlistService.ClearRockRequests();
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                Console.Write($"{e} - {e.InnerException}");
+                return BadRequest();
+            }
+        }
     }
 }
