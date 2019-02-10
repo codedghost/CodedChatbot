@@ -43,9 +43,9 @@
                     <span id="@Model.songRequestId" 
                           class="requestBadge @(Model.isInDrive ? "inDriveBadge" : "notInDriveBadge")" 
                           title="@(Model.isInDrive ? "Request is in drive" : "Add Request to Drive")"
-                          onclick="@(Model.isInDrive ? string.Empty : "showAddDriveModal()")"
+                          onclick="@(Model.isInDrive ? string.Empty : "showAddDriveModal(event)")"
                           data-toggle="tooltip" data-placement="top"></span>
-                    <span id="@Model.songRequestId" class="requestBadge removeSongBadge" data-toggle="tooltip" data-placement="top" title="Remove Request" onclick="showDeleteModal(true)"></span>
+                    <span id="@Model.songRequestId" class="requestBadge removeSongBadge" data-toggle="tooltip" data-placement="top" title="Remove Request" onclick="showDeleteModal(event,true)"></span>
                 }
                 if (!Model.isInChat)
                 {

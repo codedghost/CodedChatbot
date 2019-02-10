@@ -10,20 +10,20 @@
             @{
                 if (!Model.isVip && ViewContext.ViewBag.UserHasVip && ViewContext.ViewBag.Username.ToLower() == Model.songRequester.ToLower())
                 {
-                    <span id="@Model.songRequestId" class="requestBadge promoteSongBadge" data-toggle="tooltip" data-placement="top" title="Promote to VIP" onclick="showPromoteRequestModal()"></span>
+                    <span id="@Model.songRequestId" class="requestBadge promoteSongBadge" data-toggle="tooltip" data-placement="top" title="Promote to VIP" onclick="showPromoteRequestModal(event)"></span>
                 }
                 if (ViewContext.ViewBag.UserIsMod)
                 {
                     <span id="@Model.songRequestId" 
                           class="requestBadge @(Model.isInDrive ? "inDriveBadge" : "notInDriveBadge")" 
                           title="@(Model.isInDrive ? "Request is in drive" : "Add Request to Drive")"
-                          onclick="@(Model.isInDrive ? string.Empty : "showAddDriveModal()")"
+                          onclick="@(Model.isInDrive ? string.Empty : "showAddDriveModal(event)")"
                           data-toggle="tooltip" data-placement="top"></span>
                 }
                 if (ViewContext.ViewBag.UserIsMod || ViewContext.ViewBag.Username.ToLower() == Model.songRequester.ToLower())
                 {
-                    <span id="@Model.songRequestId" class="requestBadge editSongBadge" data-toggle="tooltip" data-placement="top" title="Edit Request" onclick="showEditRequestModal()"></span>
-                    <span id="@Model.songRequestId" class="requestBadge removeSongBadge" data-toggle="tooltip" data-placement="top" title="Remove Request" onclick="showDeleteModal()"></span>
+                    <span id="@Model.songRequestId" class="requestBadge editSongBadge" data-toggle="tooltip" data-placement="top" title="Edit Request" onclick="showEditRequestModal(event)"></span>
+                    <span id="@Model.songRequestId" class="requestBadge removeSongBadge" data-toggle="tooltip" data-placement="top" title="Remove Request" onclick="showDeleteModal(event)"></span>
                 }
                 if (!Model.isInChat)
                 {
