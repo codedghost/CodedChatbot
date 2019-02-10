@@ -318,41 +318,42 @@ namespace CoreCodedChatbot.Services
             if (config.DevelopmentBuild && !client.JoinedChannels.Any(jc => jc.Channel.Contains(DevelopmentRoomId)))
                 client.JoinRoom(config.ChannelId, DevelopmentRoomId);
 
+            var joinedRoom = client.JoinedChannels.FirstOrDefault(jc => jc.Channel.Contains(roomId));
             // Set threads for sending out stream info to the chat.
             if (isStreamingRocksmith)
             {
                 HowToRequestTimer = new Timer(
-                    e => commandHelper.ProcessCommand("howtorequest", client, "Chatbot", string.Empty, true, client.JoinedChannels.FirstOrDefault(jc => jc.Channel == roomId)),
+                    e => commandHelper.ProcessCommand("howtorequest", client, "Chatbot", string.Empty, true, joinedRoom),
                     null,
                     TimeSpan.Zero, maxTimerMinutes);
                 CustomsForgeTimer = new Timer(
-                    e => commandHelper.ProcessCommand("customsforge", client, "Chatbot", string.Empty, true, client.JoinedChannels.FirstOrDefault(jc => jc.Channel == roomId)),
+                    e => commandHelper.ProcessCommand("customsforge", client, "Chatbot", string.Empty, true, joinedRoom),
                     null,
                     TimeSpan.FromMinutes(7), maxTimerMinutes);
                 PlaylistTimer = new Timer(
-                    e => commandHelper.ProcessCommand("list", client, "Chatbot", string.Empty, true, client.JoinedChannels.FirstOrDefault(jc => jc.Channel == roomId)),
+                    e => commandHelper.ProcessCommand("list", client, "Chatbot", string.Empty, true, joinedRoom),
                     null,
                     TimeSpan.FromMinutes(14), maxTimerMinutes);
             }
 
             FollowTimer = new Timer(
-                e => commandHelper.ProcessCommand("followme", client, "Chatbot", string.Empty, true, client.JoinedChannels.FirstOrDefault(jc => jc.Channel == roomId)),
+                e => commandHelper.ProcessCommand("followme", client, "Chatbot", string.Empty, true, joinedRoom),
                 null,
                 TimeSpan.FromMinutes(isStreamingRocksmith ? 21 : 0), maxTimerMinutes);
             DiscordTimer = new Timer(
-                e => commandHelper.ProcessCommand("discord", client, "Chatbot", string.Empty, true, client.JoinedChannels.FirstOrDefault(jc => jc.Channel == roomId)),
+                e => commandHelper.ProcessCommand("discord", client, "Chatbot", string.Empty, true, joinedRoom),
                 null,
                 TimeSpan.FromMinutes(isStreamingRocksmith ? 28 : 7), maxTimerMinutes);
             TwitterTimer = new Timer(
-                e => commandHelper.ProcessCommand("twitter", client, "Chatbot", string.Empty, true, client.JoinedChannels.FirstOrDefault(jc => jc.Channel == roomId)),
+                e => commandHelper.ProcessCommand("twitter", client, "Chatbot", string.Empty, true, joinedRoom),
                 null,
                 TimeSpan.FromMinutes(isStreamingRocksmith ? 35 : 14), maxTimerMinutes);
             YoutubeTimer = new Timer(
-                e => commandHelper.ProcessCommand("youtube", client, "Chatbot", string.Empty, true, client.JoinedChannels.FirstOrDefault(jc => jc.Channel == roomId)),
+                e => commandHelper.ProcessCommand("youtube", client, "Chatbot", string.Empty, true, joinedRoom),
                 null,
                 TimeSpan.FromMinutes(isStreamingRocksmith ? 42 : 21), maxTimerMinutes);
             MerchTimer = new Timer(
-                e => commandHelper.ProcessCommand("merch", client, "Chatbot", string.Empty, true, client.JoinedChannels.FirstOrDefault(jc => jc.Channel == roomId)),
+                e => commandHelper.ProcessCommand("merch", client, "Chatbot", string.Empty, true, joinedRoom),
                 null,
                 TimeSpan.FromMinutes(isStreamingRocksmith ? 49 : 28), maxTimerMinutes);
 
