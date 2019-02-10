@@ -25,19 +25,18 @@ namespace CoreCodedChatbot.Commands
         {
             try
             {
-                var user = await twitchApi.V5.Users.GetUserByNameAsync(username);
-                var userId = user.Matches[0]?.Id;
+                var users = await twitchApi.Helix.Users.GetUsersAsync(logins: new List<string>(new[] {username}));
+                var userId = users.Users[0].Id;
 
                 if (userId == null) return;
 
-                var follows = await twitchApi.V5.Users.GetUserFollowsAsync(userId);
-                if (follows == null) return;
+                var follows = await twitchApi.Helix.Users.GetUsersFollowsAsync(fromId:userId, toId:config.ChannelId);
 
-                var followedChannel = follows.Follows?.FirstOrDefault(f => f.Channel.Name == config.StreamerChannel);
+                var followedChannel = follows?.Follows?.SingleOrDefault();
                 if (followedChannel == null) return;
 
-                var monthsFollowed = Math.Abs(12 * (followedChannel.CreatedAt.Year - DateTime.UtcNow.Year) +
-                                              followedChannel.CreatedAt.Month - DateTime.UtcNow.Year);
+                var monthsFollowed = Math.Abs(12 * (followedChannel.FollowedAt.Year - DateTime.UtcNow.Year) +
+                                              followedChannel.FollowedAt.Month - DateTime.UtcNow.Month);
 
                 client.SendMessage(joinedChannel,
                     $"Hey @{username}, you have followed {config.StreamerChannel} for {monthsFollowed} months!");
