@@ -38,6 +38,7 @@ namespace CoreCodedChatbot.Services
         private Timer CustomsForgeTimer { get; set; }
         private Timer DiscordTimer { get; set; }
         private Timer TwitterTimer { get; set; }
+        private Timer InstagramTimer { get; set; }
         private Timer BytesTimer { get; set; }
         private Timer DonationsTimer { get; set; }
         private Timer PlaylistTimer { get; set; }
@@ -342,6 +343,10 @@ namespace CoreCodedChatbot.Services
                 e => commandHelper.ProcessCommand("discord", client, "Chatbot", string.Empty, true, joinedRoom),
                 null,
                 AssignChattyTimer(), maxTimerMinutes);
+            InstagramTimer = new Timer(
+                e => commandHelper.ProcessCommand("instagram", client, "Chatbot", string.Empty, true, joinedRoom),
+                null,
+                AssignChattyTimer(), maxTimerMinutes);
             TwitterTimer = new Timer(
                 e => commandHelper.ProcessCommand("twitter", client, "Chatbot", string.Empty, true, joinedRoom),
                 null,
@@ -410,6 +415,7 @@ namespace CoreCodedChatbot.Services
             CustomsForgeTimer?.Dispose();
             PlaylistTimer?.Dispose();
             DiscordTimer?.Dispose();
+            InstagramTimer?.Dispose();
             TwitterTimer?.Dispose();
             YoutubeTimer?.Dispose();
             MerchTimer?.Dispose();
