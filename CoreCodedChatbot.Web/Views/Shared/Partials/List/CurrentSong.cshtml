@@ -40,7 +40,7 @@
             {
                 if (ViewContext.ViewBag.UserIsMod)
                 {
-                    <span id="@Model.songRequestId" class="requestBadge removeSongBadge" onclick="showDeleteModal(true)"></span>
+                    <span id="@Model.songRequestId" class="requestBadge removeSongBadge" data-toggle="tooltip" data-placement="top" title="Remove Request" onclick="showDeleteModal(true)"></span>
                 }
                 if (!Model.isInChat)
                 {
