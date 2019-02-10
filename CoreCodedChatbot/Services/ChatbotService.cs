@@ -44,6 +44,7 @@ namespace CoreCodedChatbot.Services
         private Timer PlaylistTimer { get; set; }
         private Timer YoutubeTimer { get; set; }
         private Timer MerchTimer { get; set; }
+        private Timer RocksmithChallengeTimer { get; set; }
 
         private int MaxTimerMinutesRocksmith = 56;
         private int MaxTimerMinutesGaming = 35;
@@ -355,7 +356,10 @@ namespace CoreCodedChatbot.Services
                 e => commandHelper.ProcessCommand("youtube", client, "Chatbot", string.Empty, true, joinedRoom),
                 null,
                 AssignChattyTimer(), maxTimerMinutes);
-            
+            RocksmithChallengeTimer = new Timer(
+                e => commandHelper.ProcessCommand("challenge", client, "Chatbot", string.Empty, true, joinedRoom),
+                null,
+                AssignChattyTimer(), maxTimerMinutes);
             MerchTimer = new Timer(
                 e => commandHelper.ProcessCommand("merch", client, "Chatbot", string.Empty, true, joinedRoom),
                 null,
@@ -419,6 +423,7 @@ namespace CoreCodedChatbot.Services
             TwitterTimer?.Dispose();
             YoutubeTimer?.Dispose();
             MerchTimer?.Dispose();
+            RocksmithChallengeTimer?.Dispose();
             BytesTimer?.Dispose();
             DonationsTimer?.Dispose();
         }
