@@ -38,7 +38,6 @@ namespace CoreCodedChatbot.Services
         private Timer CustomsForgeTimer { get; set; }
         private Timer DiscordTimer { get; set; }
         private Timer TwitterTimer { get; set; }
-        private Timer FollowTimer { get; set; }
         private Timer BytesTimer { get; set; }
         private Timer DonationsTimer { get; set; }
         private Timer PlaylistTimer { get; set; }
@@ -338,11 +337,7 @@ namespace CoreCodedChatbot.Services
                     null,
                     AssignChattyTimer(), maxTimerMinutes);
             }
-
-            FollowTimer = new Timer(
-                e => commandHelper.ProcessCommand("followme", client, "Chatbot", string.Empty, true, joinedRoom),
-                null,
-                AssignChattyTimer(), maxTimerMinutes);
+            
             DiscordTimer = new Timer(
                 e => commandHelper.ProcessCommand("discord", client, "Chatbot", string.Empty, true, joinedRoom),
                 null,
@@ -355,6 +350,7 @@ namespace CoreCodedChatbot.Services
                 e => commandHelper.ProcessCommand("youtube", client, "Chatbot", string.Empty, true, joinedRoom),
                 null,
                 AssignChattyTimer(), maxTimerMinutes);
+            
             MerchTimer = new Timer(
                 e => commandHelper.ProcessCommand("merch", client, "Chatbot", string.Empty, true, joinedRoom),
                 null,
@@ -413,7 +409,6 @@ namespace CoreCodedChatbot.Services
             HowToRequestTimer?.Dispose();
             CustomsForgeTimer?.Dispose();
             PlaylistTimer?.Dispose();
-            FollowTimer?.Dispose();
             DiscordTimer?.Dispose();
             TwitterTimer?.Dispose();
             YoutubeTimer?.Dispose();
