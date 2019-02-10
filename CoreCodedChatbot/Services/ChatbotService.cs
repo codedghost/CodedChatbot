@@ -315,8 +315,7 @@ namespace CoreCodedChatbot.Services
             }
 
             var roomId = config.DevelopmentBuild ? DevelopmentRoomId : config.ChannelId;
-            if (config.DevelopmentBuild && !client.JoinedChannels.Select(jc => jc.Channel)
-                    .Any(jc => jc.Contains(DevelopmentRoomId)))
+            if (config.DevelopmentBuild && !client.JoinedChannels.Any(jc => jc.Channel.Contains(DevelopmentRoomId)))
                 client.JoinRoom(config.ChannelId, DevelopmentRoomId);
 
             // Set threads for sending out stream info to the chat.
