@@ -187,4 +187,30 @@
         });
     }
 
+    function showOpenPlaylistModal() {
+        $("#modalContainer").empty();
+        $.ajax({
+            url: '@Url.Action("RenderOpenPlaylistModal", "Chatbot")',
+            type: "POST",
+            contentType: "application/json",
+            success: function(html) {
+                $("#modalContainer").html(html);
+                $("#openPlaylistModal").modal('show');
+            }
+        });
+    }
+
+    function showVeryClosePlaylistModal() {
+        $("#modalContainer").empty();
+        $.ajax({
+            url: '@Url.Action("RenderVeryClosePlaylistModal", "Chatbot")',
+            type: "POST",
+            contentType: "application/json",
+            success: function(html) {
+                $("#modalContainer").html(html);
+                $("#veryClosePlaylistModal").modal('show');
+            }
+        });
+    }
+
 </script>

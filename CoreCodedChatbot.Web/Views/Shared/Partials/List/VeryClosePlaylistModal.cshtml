@@ -1,0 +1,32 @@
+﻿<div class="modal fade" id="veryClosePlaylistModal" tabindex="-1" role="dialog" aria-labelledby="veryClosePlaylistModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="veryClosePlaylistModalLabel">Would you like to close the playlist completely?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to close the playlist completely?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                <button type="button" class="btn btn-primary" onclick="veryClosePlaylist()">Yes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function veryClosePlaylist() {
+        $.ajax({
+            url: '@Url.Action("VeryClosePlaylist", "Chatbot")',
+            type: "POST",
+            contentType: "application/json",
+            success: function () {
+                location.reload();
+            }
+        });
+    }
+</script>

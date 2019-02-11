@@ -13,7 +13,9 @@ using CoreCodedChatbot.Library.Models.View;
 using Microsoft.AspNetCore.Mvc.Formatters.Xml;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.SignalR.Client;
+using TwitchLib.Api;
 using TwitchLib.Api.Helix.Models.Entitlements;
+using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Library.Services
 {
@@ -24,19 +26,38 @@ namespace CoreCodedChatbot.Library.Services
         private readonly ConfigModel config;
         private readonly IChatbotContextFactory contextFactory;
         private readonly IVipService vipService;
+        private readonly TwitchAPI twitchApi;
+        private readonly TwitchClient client;
+
+        private string DevelopmentRoomId;
 
         private PlaylistItem CurrentRequest;
         private int CurrentVipRequestsPlayed;
         private int ConcurrentVipSongsToPlay;
         private Random rand = new Random();
 
-        public PlaylistService(IChatbotContextFactory contextFactory, IConfigService configService, IVipService vipService)
+        public PlaylistService(IChatbotContextFactory contextFactory, IConfigService configService, IVipService vipService,
+            TwitchAPI twitchApi, TwitchClient client)
         {
             this.contextFactory = contextFactory;
             this.config = configService.GetConfig();
             this.vipService = vipService;
+            
+            this.twitchApi = twitchApi;
+            this.client = client;
 
             this.ConcurrentVipSongsToPlay = config.ConcurrentRegularSongsToPlay;
+            
+            if (config.DevelopmentBuild)
+            {
+                twitchApi.V5.Chat.GetChatRoomsByChannelAsync(config.ChannelId, config.ChatbotAccessToken)
+                    .ContinueWith(
+                        rooms =>
+                        {
+                            if (!rooms.IsCompletedSuccessfully) return;
+                            DevelopmentRoomId = rooms.Result.Rooms.SingleOrDefault(r => r.Name == "dev")?.Id;
+                        });
+            }
         }
 
         public PlaylistItem GetRequestById(int songId)
@@ -579,6 +600,34 @@ namespace CoreCodedChatbot.Library.Services
                     ShouldShowVip = false,
                 };
             }
+        }
+
+        public bool OpenPlaylistWeb()
+        {
+            if (config.DevelopmentBuild && !client.JoinedChannels.Select(jc => jc.Channel)
+                    .Any(jc => jc.Contains(DevelopmentRoomId)))
+                client.JoinRoom(config.ChannelId, DevelopmentRoomId);
+
+            var isPlaylistOpened = OpenPlaylist();
+
+            client.SendMessage(string.IsNullOrEmpty(DevelopmentRoomId) ? config.StreamerChannel : DevelopmentRoomId,
+                isPlaylistOpened ? "The playlist is now open!" : "I couldn't open the playlist :(");
+
+            return true;
+        }
+
+        public bool VeryClosePlaylistWeb()
+        {
+            if (config.DevelopmentBuild && !client.JoinedChannels.Select(jc => jc.Channel)
+                    .Any(jc => jc.Contains(DevelopmentRoomId)))
+                client.JoinRoom(config.ChannelId, DevelopmentRoomId);
+
+            var isPlaylistClosed = VeryClosePlaylist();
+
+            client.SendMessage(string.IsNullOrEmpty(DevelopmentRoomId) ? config.StreamerChannel : DevelopmentRoomId,
+                isPlaylistClosed ? "The playlist is now closed!" : "I couldn't close the playlist :(");
+
+            return true;
         }
 
         public bool OpenPlaylist()

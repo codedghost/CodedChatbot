@@ -5,19 +5,28 @@
 <div class="alert alert-dark" role="alert">
         @if (User.Identity.IsAuthenticated)
         {
-            <p><text>Welcome </text>
-                @Model.Username<text>!</text>
-                <span class="float-right">
-                    <button type="button" class="btn btn-sm btn-success" onclick="showRequestModal()">Request</button>
-                </span>
-                @if (ViewContext.ViewBag.UserIsMod)
-                {
-                    <br/>
-                    <br/>
-                        <button type="button" class="btn btn-sm btn-success" onclick="showEmptyPlaylistModal()">Empty Playlist</button>
-                    <br/>
-                }
-            </p>
+    <p>
+        <text>Welcome </text>
+        @Model.Username<text>!</text>
+        <span class="float-right">
+            <button type="button" class="btn btn-sm btn-success" onclick="showRequestModal()">Request</button>
+        </span>
+        @if (ViewContext.ViewBag.UserIsMod)
+        {
+            <br />
+            <br />
+            if (ViewContext.ViewBag.IsPlaylistOpen)
+            {
+                <button type="button" class="btn btn-sm btn-success" onclick="showVeryClosePlaylistModal()">Close Playlist</button>
+            }
+            else
+            {
+                <button type="button" class="btn btn-sm btn-success" onclick="showOpenPlaylistModal()">Open Playlist</button>
+            }
+            <button type="button" class="btn btn-sm btn-success" onclick="showEmptyPlaylistModal()">Empty Playlist</button>
+            <br />
+        }
+    </p>
         }
         else
         {

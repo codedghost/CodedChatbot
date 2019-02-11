@@ -65,6 +65,8 @@ namespace CoreCodedChatbot.Web.Controllers
 
             ViewBag.UserHasVip = User.Identity.IsAuthenticated && vipService.HasVip(User.Identity.Name.ToLower());
 
+            ViewBag.IsPlaylistOpen = playlistService.GetPlaylistState() == PlaylistState.Open;
+
             ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
             ViewBag.Username = twitchUser?.Username ?? string.Empty;
             return View(playlistModel);
@@ -99,6 +101,7 @@ namespace CoreCodedChatbot.Web.Controllers
 
                 ViewBag.UserHasVip = User.Identity.IsAuthenticated && vipService.HasVip(User.Identity.Name.ToLower());
 
+                ViewBag.IsPlaylistOpen = playlistService.GetPlaylistState() == PlaylistState.Open;
                 ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
                 ViewBag.Username = twitchUser?.Username ?? string.Empty;
                 return PartialView("Partials/List/RegularList", data);
@@ -129,6 +132,7 @@ namespace CoreCodedChatbot.Web.Controllers
 
                 ViewBag.UserHasVip = User.Identity.IsAuthenticated && vipService.HasVip(User.Identity.Name.ToLower());
 
+                ViewBag.IsPlaylistOpen = playlistService.GetPlaylistState() == PlaylistState.Open;
                 ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
                 ViewBag.Username = twitchUser?.Username ?? string.Empty;
                 return PartialView("Partials/List/VipList", data);
@@ -142,23 +146,11 @@ namespace CoreCodedChatbot.Web.Controllers
         [HttpPost]
         public IActionResult RenderRemoveSongModal([FromBody] int songId)
         {
+            CheckAndSetUserModStatus();
+            if (!User.Identity.IsAuthenticated) return BadRequest();
+
             var requestToDelete = playlistService.GetRequestById(songId);
-
-            var chattersModel = chatterService.GetCurrentChatters();
-
-            var twitchUser = User.Identity.IsAuthenticated
-                ? new LoggedInTwitchUser
-                {
-                    Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
-                        ?.Value,
-                    IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
-                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ??
-                            false
-                }
-                : null;
-
-            ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
-
+            
             try
             {
                 return PartialView("Partials/List/DeleteModal", requestToDelete);
@@ -172,22 +164,9 @@ namespace CoreCodedChatbot.Web.Controllers
         [HttpPost]
         public IActionResult RenderRemoveCurrentSongModal([FromBody] int songId)
         {
+            if (!CheckAndSetUserModStatus()) return BadRequest();
+
             var requestToDelete = playlistService.GetRequestById(songId);
-
-            var chattersModel = chatterService.GetCurrentChatters();
-
-            var twitchUser = User.Identity.IsAuthenticated
-                ? new LoggedInTwitchUser
-                {
-                    Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
-                        ?.Value,
-                    IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
-                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ??
-                            false
-                }
-                : null;
-
-            ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
 
             try
             {
@@ -219,6 +198,7 @@ namespace CoreCodedChatbot.Web.Controllers
 
                 ViewBag.UserHasVip = User.Identity.IsAuthenticated && vipService.HasVip(User.Identity.Name.ToLower());
 
+                ViewBag.IsPlaylistOpen = playlistService.GetPlaylistState() == PlaylistState.Open;
                 ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
                 return PartialView("Partials/List/CurrentSong", data);
             }
@@ -246,31 +226,14 @@ namespace CoreCodedChatbot.Web.Controllers
         [HttpPost]
         public IActionResult RenderEditRequestModal([FromBody] int songId)
         {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return Json(new {Success = false, Message = "It looks like you aren't logged in!"});
-            }
-
-            var chattersModel = chatterService.GetCurrentChatters();
-
-            var twitchUser = User.Identity.IsAuthenticated
-                ? new LoggedInTwitchUser
-                {
-                    Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
-                        ?.Value,
-                    IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
-                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ??
-                            false
-                }
-                : null;
-
-            ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
+            CheckAndSetUserModStatus();
+            if (!User.Identity.IsAuthenticated) return BadRequest();
 
             try
             {
                 var requestViewModel =
                     playlistService.GetEditRequestSongViewModel(User.Identity.Name.ToLower(), songId,
-                        twitchUser?.IsMod ?? false);
+                        ViewBag.UserIsMod ?? false);
 
                 return PartialView("Partials/List/RequestModal", requestViewModel);
             }
@@ -283,25 +246,8 @@ namespace CoreCodedChatbot.Web.Controllers
         [HttpPost]
         public IActionResult RenderPromoteSongModal([FromBody] int songId)
         {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return Json(new {Success = false, Message = "It looks like you aren't logged in!"});
-            }
-
-            var chattersModel = chatterService.GetCurrentChatters();
-
-            var twitchUser = User.Identity.IsAuthenticated
-                ? new LoggedInTwitchUser
-                {
-                    Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
-                        ?.Value,
-                    IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
-                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ??
-                            false
-                }
-                : null;
-
-            ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
+            CheckAndSetUserModStatus();
+            if (!User.Identity.IsAuthenticated) return BadRequest();
 
             try
             {
@@ -486,25 +432,7 @@ namespace CoreCodedChatbot.Web.Controllers
 
         public IActionResult RenderAddToDriveModal([FromBody] int songId)
         {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return Json(new {Success = false, Message = "It looks like you aren't logged in!"});
-            }
-
-            var chattersModel = chatterService.GetCurrentChatters();
-
-            var twitchUser = User.Identity.IsAuthenticated
-                ? new LoggedInTwitchUser
-                {
-                    Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
-                        ?.Value,
-                    IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
-                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ??
-                            false
-                }
-                : null;
-
-            ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
+            if (!CheckAndSetUserModStatus()) return BadRequest();
 
             try
             {
@@ -520,25 +448,7 @@ namespace CoreCodedChatbot.Web.Controllers
 
         public IActionResult AddSongToDrive([FromBody] int songId)
         {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return Json(new { Success = false, Message = "It looks like you aren't logged in!" });
-            }
-
-            var chattersModel = chatterService.GetCurrentChatters();
-
-            var twitchUser = User.Identity.IsAuthenticated
-                ? new LoggedInTwitchUser
-                {
-                    Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
-                        ?.Value,
-                    IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
-                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ??
-                            false
-                }
-                : null;
-
-            ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
+            if (!CheckAndSetUserModStatus()) return BadRequest();
 
             try
             {
@@ -554,27 +464,7 @@ namespace CoreCodedChatbot.Web.Controllers
 
         public IActionResult RenderEmptyPlaylistModal()
         {
-            if (!User.Identity.IsAuthenticated)
-            {
-                return Json(new {Success = false, Message = "It looks like you aren't logged in!"});
-            }
-
-            var chattersModel = chatterService.GetCurrentChatters();
-
-            var twitchUser = User.Identity.IsAuthenticated
-                ? new LoggedInTwitchUser
-                {
-                    Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
-                        ?.Value,
-                    IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
-                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ??
-                            false
-                }
-                : null;
-
-            ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
-
-            if (!ViewBag.UserIsMod) return BadRequest();
+            if (!CheckAndSetUserModStatus()) return BadRequest();
 
             try
             {
@@ -589,9 +479,95 @@ namespace CoreCodedChatbot.Web.Controllers
 
         public IActionResult EmptyPlaylist()
         {
+            if (!CheckAndSetUserModStatus()) return BadRequest();
+
+            try
+            {
+                playlistService.ClearRockRequests();
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                Console.Write($"{e} - {e.InnerException}");
+                return BadRequest();
+            }
+        }
+
+        public IActionResult RenderOpenPlaylistModal()
+        {
+            if (!CheckAndSetUserModStatus()) return BadRequest();
+
+            try
+            {
+                return PartialView("Partials/List/OpenPlaylistModal");
+            }
+            catch (Exception e)
+            {
+                Console.Write($"{e} - {e.InnerException}");
+                return BadRequest();
+            }
+        }
+
+        public IActionResult RenderVeryClosePlaylistModal()
+        {
+            if (!CheckAndSetUserModStatus()) return BadRequest();
+
+            try
+            {
+                return PartialView("Partials/List/VeryClosePlaylistModal");
+            }
+            catch (Exception e)
+            {
+                Console.Write($"{e} - {e.InnerException}");
+                return BadRequest();
+            }
+        }
+
+        public IActionResult OpenPlaylist()
+        {
+            if (!CheckAndSetUserModStatus()) return BadRequest();
+
+            try
+            {
+                if (playlistService.OpenPlaylistWeb())
+                {
+                    return Ok();
+                }
+
+                return BadRequest();
+            }
+            catch (Exception e)
+            {
+                Console.Write($"{e} - {e.InnerException}");
+                return BadRequest();
+            }
+        }
+
+        public IActionResult VeryClosePlaylist()
+        {
+            if (!CheckAndSetUserModStatus()) return BadRequest();
+
+            try
+            {
+                if (playlistService.VeryClosePlaylistWeb())
+                {
+                    return Ok();
+                }
+
+                return BadRequest();
+            }
+            catch (Exception e)
+            {
+                Console.Write($"{e} - {e.InnerException}");
+                return BadRequest();
+            }
+        }
+
+        private bool CheckAndSetUserModStatus()
+        {
             if (!User.Identity.IsAuthenticated)
             {
-                return Json(new { Success = false, Message = "It looks like you aren't logged in!" });
+                return false;
             }
 
             var chattersModel = chatterService.GetCurrentChatters();
@@ -609,18 +585,7 @@ namespace CoreCodedChatbot.Web.Controllers
 
             ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
 
-            if (!ViewBag.UserIsMod) return BadRequest();
-
-            try
-            {
-                playlistService.ClearRockRequests();
-                return Ok();
-            }
-            catch (Exception e)
-            {
-                Console.Write($"{e} - {e.InnerException}");
-                return BadRequest();
-            }
+            return ViewBag.UserIsMod;
         }
     }
 }
