@@ -13,6 +13,7 @@ namespace CoreCodedChatbot.Database.Context.Models
         public DateTime RequestTime { get; set; }
         
         public bool Played { get; set; }
+        public bool InDrive { get; set; }
         public DateTime? VipRequestTime { get; set; }
         public string RequestText { get; set; } // This is temporary functionality until we are hooked up to CustomsForge
 

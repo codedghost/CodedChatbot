@@ -89,7 +89,7 @@
         console.log('connection error');
     });
 
-    function showDeleteModal(isCurrentSong) {
+    function showDeleteModal(event, isCurrentSong) {
         $("#modalContainer").empty();
         var songId = JSON.stringify(event.target.id);
         if (isCurrentSong) {
@@ -117,6 +117,21 @@
         }
     }
 
+    function showAddDriveModal(event) {
+        $("#modalContainer").empty();
+        var songId = JSON.stringify(event.target.id);
+        $.ajax({
+            url: '@Url.Action("RenderAddToDriveModal", "Chatbot")',
+            type: "POST",
+            data: songId,
+            contentType: "application/json",
+            success: function(html) {
+                $("#modalContainer").html(html);
+                $("#addToDriveModal").modal('show');
+            }
+        });
+    }
+
     function showRequestModal() {
         $("#modalContainer").empty();
         $.ajax({
@@ -129,7 +144,7 @@
         });
     }
 
-    function showEditRequestModal() {
+    function showEditRequestModal(event) {
         $("#modalContainer").empty();
         var songId = JSON.stringify(event.target.id);
         $.ajax({
@@ -144,7 +159,7 @@
         });
     }
 
-    function showPromoteRequestModal() {
+    function showPromoteRequestModal(event) {
         $("#modalContainer").empty();
         var songId = JSON.stringify(event.target.id);
         $.ajax({
@@ -155,6 +170,45 @@
             success: function(html) {
                 $("#modalContainer").html(html);
                 $("#promoteModal").modal('show');
+            }
+        });
+    }
+
+    function showEmptyPlaylistModal() {
+        $("#modalContainer").empty();
+        $.ajax({
+            url: '@Url.Action("RenderEmptyPlaylistModal", "Chatbot")',
+            type: "POST",
+            contentType: "application/json",
+            success: function(html) {
+                $("#modalContainer").html(html);
+                $("#emptyPlaylistModal").modal('show');
+            }
+        });
+    }
+
+    function showOpenPlaylistModal() {
+        $("#modalContainer").empty();
+        $.ajax({
+            url: '@Url.Action("RenderOpenPlaylistModal", "Chatbot")',
+            type: "POST",
+            contentType: "application/json",
+            success: function(html) {
+                $("#modalContainer").html(html);
+                $("#openPlaylistModal").modal('show');
+            }
+        });
+    }
+
+    function showVeryClosePlaylistModal() {
+        $("#modalContainer").empty();
+        $.ajax({
+            url: '@Url.Action("RenderVeryClosePlaylistModal", "Chatbot")',
+            type: "POST",
+            contentType: "application/json",
+            success: function(html) {
+                $("#modalContainer").html(html);
+                $("#veryClosePlaylistModal").modal('show');
             }
         });
     }

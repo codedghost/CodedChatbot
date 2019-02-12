@@ -13,7 +13,9 @@ using CoreCodedChatbot.Library.Models.View;
 using Microsoft.AspNetCore.Mvc.Formatters.Xml;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.SignalR.Client;
+using TwitchLib.Api;
 using TwitchLib.Api.Helix.Models.Entitlements;
+using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Library.Services
 {
@@ -24,19 +26,38 @@ namespace CoreCodedChatbot.Library.Services
         private readonly ConfigModel config;
         private readonly IChatbotContextFactory contextFactory;
         private readonly IVipService vipService;
+        private readonly TwitchAPI twitchApi;
+        private readonly TwitchClient client;
+
+        private string DevelopmentRoomId;
 
         private PlaylistItem CurrentRequest;
         private int CurrentVipRequestsPlayed;
         private int ConcurrentVipSongsToPlay;
         private Random rand = new Random();
 
-        public PlaylistService(IChatbotContextFactory contextFactory, IConfigService configService, IVipService vipService)
+        public PlaylistService(IChatbotContextFactory contextFactory, IConfigService configService, IVipService vipService,
+            TwitchAPI twitchApi, TwitchClient client)
         {
             this.contextFactory = contextFactory;
             this.config = configService.GetConfig();
             this.vipService = vipService;
+            
+            this.twitchApi = twitchApi;
+            this.client = client;
 
             this.ConcurrentVipSongsToPlay = config.ConcurrentRegularSongsToPlay;
+            
+            if (config.DevelopmentBuild)
+            {
+                twitchApi.V5.Chat.GetChatRoomsByChannelAsync(config.ChannelId, config.ChatbotAccessToken)
+                    .ContinueWith(
+                        rooms =>
+                        {
+                            if (!rooms.IsCompletedSuccessfully) return;
+                            DevelopmentRoomId = rooms.Result.Rooms.SingleOrDefault(r => r.Name == "dev")?.Id;
+                        });
+            }
         }
 
         public PlaylistItem GetRequestById(int songId)
@@ -55,7 +76,8 @@ namespace CoreCodedChatbot.Library.Services
                                (request.VipRequestTime ?? DateTime.MinValue).AddMinutes(2) >=
                                DateTime.UtcNow ||
                                request.RequestTime.AddMinutes(5) >= DateTime.UtcNow,
-                    isVip = request.VipRequestTime != null
+                    isVip = request.VipRequestTime != null,
+                    isInDrive = request.InDrive
                 };
             }
         }
@@ -64,6 +86,8 @@ namespace CoreCodedChatbot.Library.Services
         {
             var songIndex = 0;
             var playlistState = this.GetPlaylistState();
+            if (playlistState == PlaylistState.VeryClosed) return (AddRequestResult.PlaylistVeryClosed, 0);
+
             using (var context = contextFactory.Create())
             {
                 var request = new SongRequest
@@ -82,9 +106,6 @@ namespace CoreCodedChatbot.Library.Services
                     if (playlistState == PlaylistState.Closed)
                     {
                         return (AddRequestResult.PlaylistClosed, 0);
-                    } else if (playlistState == PlaylistState.VeryClosed)
-                    {
-                        return (AddRequestResult.PlaylistVeryClosed, 0);
                     }
 
                     if (userSongCount >= UserMaxSongCount)
@@ -110,7 +131,8 @@ namespace CoreCodedChatbot.Library.Services
                         songRequester = request.RequestUsername,
                         isEvenIndex = false,
                         isInChat = true,
-                        isVip = vipRequest
+                        isVip = vipRequest,
+                        isInDrive = request.InDrive
                     };
                 }
             }
@@ -316,7 +338,8 @@ namespace CoreCodedChatbot.Library.Services
                                        .AddMinutes(2) >= DateTime.UtcNow ||
                                        (sr.VipRequestTime ?? DateTime.MinValue).AddMinutes(5) >= DateTime.UtcNow,
                             isVip = sr.VipRequestTime != null,
-                            isEvenIndex = index % 2 == 0
+                            isEvenIndex = index % 2 == 0,
+                            isInDrive = sr.InDrive
                         };
                     })
                     .ToArray();
@@ -335,7 +358,8 @@ namespace CoreCodedChatbot.Library.Services
                                        .AddMinutes(2) >= DateTime.UtcNow ||
                                        sr.RequestTime.AddMinutes(5) >= DateTime.UtcNow,
                             isVip = sr.VipRequestTime != null,
-                            isEvenIndex = index % 2 == 0
+                            isEvenIndex = index % 2 == 0,
+                            isInDrive = sr.InDrive
                         };
                     }).ToArray();
 
@@ -370,7 +394,14 @@ namespace CoreCodedChatbot.Library.Services
                 var requests = context.SongRequests.Where(sr => !sr.Played);
 
                 foreach (var request in requests)
+                {
+                    if (request.VipRequestTime != null && request.SongRequestId != CurrentRequest?.songRequestId)
+                        vipService.RefundVip(request.RequestUsername);
+                    if (request.SongRequestId == CurrentRequest?.songRequestId)
+                        CurrentRequest = null;
+
                     request.Played = true;
+                }
 
                 context.SaveChanges();
             }
@@ -466,6 +497,7 @@ namespace CoreCodedChatbot.Library.Services
 
                     songRequest.RequestText =
                         $"{editRequestModel.Artist} - {editRequestModel.Title} ({editRequestModel.SelectedInstrument})";
+                    songRequest.InDrive = false;
                     context.SaveChanges();
                 }
             }
@@ -510,6 +542,25 @@ namespace CoreCodedChatbot.Library.Services
             return PromoteRequestResult.Successful;
         }
 
+        public bool AddSongToDrive(int songId)
+        {
+            using (var context = contextFactory.Create())
+            {
+                var songRequest = context.SongRequests.SingleOrDefault(sr => sr.SongRequestId == songId);
+
+                if (songRequest == null) return false;
+                songRequest.InDrive = true;
+
+                if (songRequest.SongRequestId == CurrentRequest.songRequestId)
+                    CurrentRequest.isInDrive = true;
+
+                context.SaveChanges();
+            }
+
+            UpdatePlaylists();
+            return true;
+        }
+
         public RequestSongViewModel GetNewRequestSongViewModel(string username)
         {
             return new RequestSongViewModel
@@ -549,6 +600,34 @@ namespace CoreCodedChatbot.Library.Services
                     ShouldShowVip = false,
                 };
             }
+        }
+
+        public bool OpenPlaylistWeb()
+        {
+            if (config.DevelopmentBuild && !client.JoinedChannels.Select(jc => jc.Channel)
+                    .Any(jc => jc.Contains(DevelopmentRoomId)))
+                client.JoinRoom(config.ChannelId, DevelopmentRoomId);
+
+            var isPlaylistOpened = OpenPlaylist();
+
+            client.SendMessage(string.IsNullOrEmpty(DevelopmentRoomId) ? config.StreamerChannel : DevelopmentRoomId,
+                isPlaylistOpened ? "The playlist is now open!" : "I couldn't open the playlist :(");
+
+            return true;
+        }
+
+        public bool VeryClosePlaylistWeb()
+        {
+            if (config.DevelopmentBuild && !client.JoinedChannels.Select(jc => jc.Channel)
+                    .Any(jc => jc.Contains(DevelopmentRoomId)))
+                client.JoinRoom(config.ChannelId, DevelopmentRoomId);
+
+            var isPlaylistClosed = VeryClosePlaylist();
+
+            client.SendMessage(string.IsNullOrEmpty(DevelopmentRoomId) ? config.StreamerChannel : DevelopmentRoomId,
+                isPlaylistClosed ? "The playlist is now closed!" : "I couldn't close the playlist :(");
+
+            return true;
         }
 
         public bool OpenPlaylist()
@@ -830,6 +909,7 @@ namespace CoreCodedChatbot.Library.Services
                 if (dbReq == null) return false;
 
                 dbReq.RequestText = songRequestText;
+                dbReq.InDrive = false;
                 context.SaveChanges();
 
                 return true;
