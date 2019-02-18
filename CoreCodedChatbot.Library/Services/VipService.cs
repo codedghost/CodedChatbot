@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Database.Context.Models;
@@ -33,13 +34,13 @@ namespace CoreCodedChatbot.Library.Services
         {
             try
             {
-                var user = GetUser(username);
-
                 using (var context = chatbotContextFactory.Create())
                 {
-                    var refundUser = context.Users.Find(user.Username);
+                    var user = context.Users.SingleOrDefault(u => u.Username == username);
 
-                    refundUser.ModGivenVipRequests++;
+                    if (user == null) return false;
+
+                    user.ModGivenVipRequests++;
 
                     context.SaveChanges();
                 }
