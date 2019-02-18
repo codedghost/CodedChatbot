@@ -114,11 +114,7 @@ namespace CoreCodedChatbot.Library.Services
                     }
                 }
 
-                if (vipRequest)
-                {
-                    request.VipRequestTime = DateTime.UtcNow;
-                    if (!vipService.UseVip(username)) return (AddRequestResult.UnSuccessful, 0);
-                }
+                if (vipRequest) request.VipRequestTime = DateTime.UtcNow;
 
                 context.SongRequests.Add(request);
                 context.SaveChanges();
