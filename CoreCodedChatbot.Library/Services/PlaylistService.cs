@@ -114,7 +114,11 @@ namespace CoreCodedChatbot.Library.Services
                     }
                 }
 
-                if (vipRequest) request.VipRequestTime = DateTime.UtcNow;
+                if (vipRequest)
+                {
+                    request.VipRequestTime = DateTime.UtcNow;
+                    if (!vipService.UseVip(username)) return (AddRequestResult.UnSuccessful, 0);
+                }
 
                 context.SongRequests.Add(request);
                 context.SaveChanges();
@@ -178,7 +182,11 @@ namespace CoreCodedChatbot.Library.Services
                         Played = false
                     };
 
-                    if (requestSongViewModel.IsVip) request.VipRequestTime = DateTime.UtcNow;
+                    if (requestSongViewModel.IsVip)
+                    {
+                        request.VipRequestTime = DateTime.UtcNow;
+                        if (!vipService.UseVip(username)) return AddRequestResult.UnSuccessful;
+                    }
 
                     context.SongRequests.Add(request);
                     context.SaveChanges();
