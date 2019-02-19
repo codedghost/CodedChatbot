@@ -30,7 +30,7 @@ namespace CoreCodedChatbot.Library.Services
             return GiftVip(donorUser, receiverUser);
         }
 
-        public bool RefundVip(string username)
+        public bool RefundVip(string username, bool deferSave = false)
         {
             try
             {
@@ -42,7 +42,7 @@ namespace CoreCodedChatbot.Library.Services
 
                     user.ModGivenVipRequests++;
 
-                    context.SaveChanges();
+                    if (!deferSave) context.SaveChanges();
                 }
 
                 return true;

@@ -400,7 +400,7 @@ namespace CoreCodedChatbot.Library.Services
                 foreach (var request in requests)
                 {
                     if (request.VipRequestTime != null && request.SongRequestId != CurrentRequest?.songRequestId)
-                        vipService.RefundVip(request.RequestUsername);
+                        vipService.RefundVip(request.RequestUsername, true);
                     if (request.SongRequestId == CurrentRequest?.songRequestId)
                         CurrentRequest = null;
 
