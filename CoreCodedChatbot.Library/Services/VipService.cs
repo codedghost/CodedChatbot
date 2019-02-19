@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Database.Context.Models;
@@ -29,19 +30,19 @@ namespace CoreCodedChatbot.Library.Services
             return GiftVip(donorUser, receiverUser);
         }
 
-        public bool RefundVip(string username)
+        public bool RefundVip(string username, bool deferSave = false)
         {
             try
             {
-                var user = GetUser(username);
-
                 using (var context = chatbotContextFactory.Create())
                 {
-                    var refundUser = context.Users.Find(user.Username);
+                    var user = context.Users.SingleOrDefault(u => u.Username == username);
 
-                    refundUser.ModGivenVipRequests++;
+                    if (user == null) return false;
 
-                    context.SaveChanges();
+                    user.ModGivenVipRequests++;
+
+                    if (!deferSave) context.SaveChanges();
                 }
 
                 return true;

@@ -178,7 +178,11 @@ namespace CoreCodedChatbot.Library.Services
                         Played = false
                     };
 
-                    if (requestSongViewModel.IsVip) request.VipRequestTime = DateTime.UtcNow;
+                    if (requestSongViewModel.IsVip)
+                    {
+                        request.VipRequestTime = DateTime.UtcNow;
+                        if (!vipService.UseVip(username)) return AddRequestResult.UnSuccessful;
+                    }
 
                     context.SongRequests.Add(request);
                     context.SaveChanges();
@@ -396,7 +400,7 @@ namespace CoreCodedChatbot.Library.Services
                 foreach (var request in requests)
                 {
                     if (request.VipRequestTime != null && request.SongRequestId != CurrentRequest?.songRequestId)
-                        vipService.RefundVip(request.RequestUsername);
+                        vipService.RefundVip(request.RequestUsername, true);
                     if (request.SongRequestId == CurrentRequest?.songRequestId)
                         CurrentRequest = null;
 
