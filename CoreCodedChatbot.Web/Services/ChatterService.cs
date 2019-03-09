@@ -39,6 +39,9 @@ namespace CoreCodedChatbot.Web.Services
             var currentChattersJson = await request.Content.ReadAsStringAsync();
             // process json into username list.
             Chatters = JsonConvert.DeserializeObject<ChatViewersModel>(currentChattersJson);
+
+            // Add broadcaster to modlist
+            Chatters.chatters.moderators = Chatters.chatters.moderators.Union(Chatters.chatters.broadcaster).ToArray();
         }
 
         public ChatViewersModel GetCurrentChatters()
