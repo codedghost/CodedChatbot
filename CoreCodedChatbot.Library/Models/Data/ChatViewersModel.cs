@@ -9,6 +9,7 @@
 
     public class ChattersModel
     {
+        public string[] broadcaster { get; set; }
         public string[] moderators { get; set; }
         public string[] staff { get; set; }
         public string[] admins { get; set; }
