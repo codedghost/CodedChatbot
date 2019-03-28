@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using CoreCodedChatbot.Commands;
+using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Models.Data;
 using Unity;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 using ChatCommand = CoreCodedChatbot.CustomAttributes.ChatCommand;
+using CoreCodedChatbot.Database.Context.Interfaces;
 
 namespace CoreCodedChatbot.Helpers
 {
@@ -21,11 +23,13 @@ namespace CoreCodedChatbot.Helpers
         private System.Threading.Timer ModCommandTimeout { get; set; }
 
         private readonly ConfigModel config;
+        private IChatbotContextFactory chatbotContextFactory;
 
-        public CommandHelper(IUnityContainer container, ConfigModel config)
+        public CommandHelper(IUnityContainer container, ConfigModel config, IChatbotContextFactory chatbotContextFactory)
         {
             this.container = container;
             this.config = config;
+            this.chatbotContextFactory = chatbotContextFactory;
         }
 
         public void Init()
@@ -44,12 +48,6 @@ namespace CoreCodedChatbot.Helpers
         public void ProcessCommand(string userCommand, TwitchClient client, string username,
             string userParameters, bool userIsModOrBroadcaster, JoinedChannel joinedRoom)
         {
-            var command = Commands.SingleOrDefault(c =>
-                c.GetType().GetTypeInfo().GetCustomAttributes<ChatCommand>()
-                    .Any(m => m.CommandAliases.Contains(userCommand.ToLower())));
-
-            if (command == null) return;
-
             if (userParameters.Contains("www.") || userParameters.Contains("http"))
             {
                 client.SendMessage(joinedRoom, $"Hey @{username}, no links in the chatbot, just request the track you want!");
@@ -61,6 +59,33 @@ namespace CoreCodedChatbot.Helpers
                 ProcessHelp(client, userParameters.ToLower(), username, joinedRoom);
                 return;
             }
+            
+            var command = Commands.SingleOrDefault(c =>
+                c.GetType().GetTypeInfo().GetCustomAttributes<ChatCommand>()
+                    .Any(m => m.CommandAliases.Contains(userCommand.ToLower())));
+
+            // Check if this command exists in the db as an info command
+            using (var context = chatbotContextFactory.Create())
+            {
+                var selectedInfoCommand = context.InfoCommandKeywords.FirstOrDefault(ik =>
+                    string.Equals(ik.InfoCommandKeywordText, userCommand, StringComparison.CurrentCultureIgnoreCase));
+
+                if (selectedInfoCommand != null)
+                {
+                    command = Commands.Single(c => c.GetType().GetTypeInfo().GetCustomAttributes<ChatCommand>()
+                        .Any(m => m.CommandAliases.Contains("chatbotinfocommand")));
+
+                    var infoCommand =
+                        context.InfoCommands.Single(ic => ic.InfoCommandId == selectedInfoCommand.InfoCommandId);
+
+                    command.Process(client, userParameters, infoCommand.InfoText, userIsModOrBroadcaster,
+                        joinedRoom);
+
+                    return;
+                }
+            }
+
+            if (command == null) return;
 
             var isCommandModOnly = command.GetType().GetTypeInfo().GetCustomAttributes<ChatCommand>().Any(m => m.ModOnly);
 
@@ -106,6 +131,18 @@ namespace CoreCodedChatbot.Helpers
 
             if (command == null)
             {
+                using (var context = chatbotContextFactory.Create())
+                {
+                    var selectedInfoCommand = context.InfoCommandKeywords.FirstOrDefault(ik =>
+                        string.Equals(ik.InfoCommandKeywordText, commandName,
+                            StringComparison.CurrentCultureIgnoreCase));
+
+                    if (selectedInfoCommand != null)
+                    {
+                        client.SendMessage(joinedChannel, string.Format(selectedInfoCommand.InfoCommand.InfoHelpText, username));
+                    }
+                }
+
                 client.SendMessage(joinedChannel, "Sorry, I can't help with that :(");
                 return;
             }

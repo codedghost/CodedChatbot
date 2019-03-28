@@ -28,6 +28,8 @@ namespace CoreCodedChatbot.Database.Context
         public DbSet<Setting> Settings { get; set; }
         public DbSet<SongGuessingRecord> SongGuessingRecords { get; set; }
         public DbSet<SongPercentageGuess> SongPercentageGuesses { get; set; }
+        public DbSet<InfoCommand> InfoCommands { get; set; }
+        public DbSet<InfoCommandKeyword> InfoCommandKeywords { get; set; }
 
         private IConfigurationRoot ConfigRoot { get; set; }
 
@@ -54,6 +56,8 @@ namespace CoreCodedChatbot.Database.Context
             modelBuilder.AddConfiguration(new SettingMap());
             modelBuilder.AddConfiguration(new SongGuessingRecordMap());
             modelBuilder.AddConfiguration(new SongPercentageGuessMap());
+            modelBuilder.AddConfiguration(new InfoCommandMap());
+            modelBuilder.AddConfiguration(new InfoCommandKeywordMap());
         }
     }
 }

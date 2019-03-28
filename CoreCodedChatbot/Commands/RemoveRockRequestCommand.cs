@@ -11,7 +11,7 @@ using TwitchLib.Client.Models;
 
 namespace CoreCodedChatbot.Commands
 {
-    [CustomAttributes.ChatCommand(new[] { "removerequest", "rrr", "removerockrequest", "removesong", "rs", "removerequest" }, false)]
+    [CustomAttributes.ChatCommand(new[] { "removerequest", "rrr", "removerockrequest", "removesong", "removerequest" }, false)]
     public class RemoveRockRequestCommand : ICommand
     {
         private HttpClient playlistClient;

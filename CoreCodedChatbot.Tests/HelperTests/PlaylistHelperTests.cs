@@ -10,7 +10,10 @@ using CoreCodedChatbot.Library.Services;
 using Microsoft.EntityFrameworkCore;
 
 using NSubstitute;
-
+using TwitchLib.Api;
+using TwitchLib.Api.Interfaces;
+using TwitchLib.Client;
+using TwitchLib.Client.Interfaces;
 using Xunit;
 
 namespace CoreCodedChatbot.Tests.HelperTests
@@ -36,7 +39,11 @@ namespace CoreCodedChatbot.Tests.HelperTests
             var vipService = Substitute.For<IVipService>();
             vipService.RefundVip(string.Empty).ReturnsForAnyArgs(true);
 
-            return new PlaylistService(contextFactory, configService, vipService);
+            var api = Substitute.For<TwitchAPI>();
+
+            var client = Substitute.For<TwitchClient>();
+
+            return new PlaylistService(contextFactory, configService, vipService, api, client);
         }
 
         [Fact]
