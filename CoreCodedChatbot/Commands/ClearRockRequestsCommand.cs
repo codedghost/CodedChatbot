@@ -10,7 +10,7 @@ using TwitchLib.Client.Models;
 
 namespace CoreCodedChatbot.Commands
 {
-    [CustomAttributes.ChatCommand(new []{"clearrequests", "clearrockrequests" }, true)]
+    [CustomAttributes.ChatCommand(new []{"clearrequests", "emptylist", "foop" }, true)]
     public class ClearRockRequestsCommand : ICommand
     {
         private readonly ConfigModel config;
@@ -32,7 +32,7 @@ namespace CoreCodedChatbot.Commands
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            var response = await playlistClient.GetAsync("ClearRockRequests");
+            var response = await playlistClient.GetAsync("ClearRequests");
 
             client.SendMessage(joinedChannel,
                 response.IsSuccessStatusCode
