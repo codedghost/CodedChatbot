@@ -186,48 +186,43 @@ namespace CoreCodedChatbot.Library.Services
             var potentialWinnerModels = context.SongPercentageGuesses
                 .Where(g => g.SongGuessingRecord.SongGuessingRecordId == currentGuessingRecord.SongGuessingRecordId).ToList()
                 .Select(pg =>
-                (Math.Floor(Math.Abs(currentGuessingRecord.FinalPercentage - pg.Guess) * 10) / 10, pg));
+                (Math.Floor(Math.Abs(currentGuessingRecord.FinalPercentage - pg.Guess) * 10) / 10, pg)).ToList();
 
-            var orderedWinners = potentialWinnerModels.OrderBy(w => w.Item1).ToList();
-
-            var firstWinner = orderedWinners.FirstOrDefault();
-            var winners = orderedWinners.Where(w => w.Item1 == firstWinner.Item1).ToList();
             // No-one guessed?
-            if (!winners.Any())
+            if (!potentialWinnerModels.Any())
                 Client.SendMessage(string.IsNullOrEmpty(DevelopmentRoomId) ? Config.StreamerChannel : DevelopmentRoomId, "Nobody guessed! Good luck next time :)");
 
-            var result = new GuessingGameWinner
-            {
-                Usernames = winners.Select(w => w.Item2.Username).ToArray(),
-                Difference = firstWinner.Item1,
-                BytesWon = (decimal)(firstWinner.Item1 == 0 ? 1.0 / winners.Count :
-                    firstWinner.Item1 <= 1 ? 0.5 / winners.Count :
-                    0.25 / winners.Count)
-            };
+            var winners = GuessingGameWinner.Create(potentialWinnerModels);
 
             // TODO: URGENT -> Refactor this to own service when bytes service is brought over to library project.
-            GiveBytes(result);
-
+            GiveBytes(winners.Where(w => w.Difference <= 20).ToList());
+            
             Client.SendMessage(string.IsNullOrEmpty(DevelopmentRoomId) ? Config.StreamerChannel : DevelopmentRoomId,
-                result.Difference == 0
-                    ? $"{result.FormattedUsernames} has won! You were spot on! You've received {result.BytesWon} bytes"
-                    : $"{result.FormattedUsernames} has won! You were {result.Difference} away from the actual score. You've received {result.BytesWon} bytes");
+                winners[0].Difference > 20 ?
+                    $"@{string.Join(", @", winners.Select(w=> w.Username))} has won... nothing!" +
+                    $" {string.Join(", ", winners.Select(w => $"{w.Username} guessed {w.Guess}%"))} " +
+                    $"You were {winners[0].Difference} away from the actual score. Do you even know {Config.StreamerChannel}?"
+                    : winners[0].Difference == 0
+                        ? $"@{string.Join(", @", winners.Select(w => w.Username))} has won! You guessed {winners[0].Guess}. You were spot on! You've received {winners[0].BytesWon} bytes"
+                        : $"@{string.Join(", @", winners.Select(w => w.Username))} has won! " +
+                            $"{string.Join(", ", winners.Select(w => $"{w.Username} guessed {w.Guess}% "))}" +
+                            $"You were {winners[0].Difference} away from the actual score. You've received {winners[0].BytesWon} bytes");
         }
 
-        private void GiveBytes(GuessingGameWinner winner)
+        private void GiveBytes(List<GuessingGameWinner> winners)
         {
             using (var context = contextFactory.Create())
             {
-                foreach (var username in winner.Usernames)
+                foreach (var winner in winners)
                 {
                     // Find or add user
-                    var user = context.Users.Find(username);
+                    var user = context.Users.Find(winner.Username);
 
                     if (user == null)
                     {
                         user = new User
                         {
-                            Username = username.ToLower(),
+                            Username = winner.Username.ToLower(),
                             UsedVipRequests = 0,
                             ModGivenVipRequests = 0,
                             FollowVipRequest = 0,
