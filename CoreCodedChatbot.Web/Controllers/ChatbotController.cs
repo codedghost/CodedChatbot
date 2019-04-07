@@ -24,14 +24,16 @@ namespace CoreCodedChatbot.Web.Controllers
     {
         private readonly IPlaylistService playlistService;
         private readonly IVipService vipService;
+        private readonly IUserService userService;
 
         private readonly IChatterService chatterService;
 
         public ChatbotController(IPlaylistService playlistService, IVipService vipService,
-            IChatterService chatterService)
+            IChatterService chatterService, IUserService userService)
         {
             this.playlistService = playlistService;
             this.vipService = vipService;
+            this.userService = userService;
 
             this.chatterService = chatterService;
         }
@@ -43,17 +45,7 @@ namespace CoreCodedChatbot.Web.Controllers
 
         public IActionResult List()
         {
-            var chattersModel = chatterService.GetCurrentChatters();
-
-            var twitchUser = User.Identity.IsAuthenticated
-                ? new LoggedInTwitchUser
-                {
-                    Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)?.Value,
-                    IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
-                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ??
-                            false
-                }
-                : null;
+            var twitchUser = GetTwitchUser();
 
             var playlistModel = playlistService.GetAllSongs(twitchUser);
             playlistModel.RegularList =
@@ -69,6 +61,7 @@ namespace CoreCodedChatbot.Web.Controllers
 
             ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
             ViewBag.Username = twitchUser?.Username ?? string.Empty;
+
             return View(playlistModel);
         }
 
@@ -86,18 +79,7 @@ namespace CoreCodedChatbot.Web.Controllers
         {
             try
             {
-                var chattersModel = chatterService.GetCurrentChatters();
-
-                var twitchUser = User.Identity.IsAuthenticated
-                    ? new LoggedInTwitchUser
-                    {
-                        Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
-                            ?.Value,
-                        IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
-                                    string.Equals(mod, User.Identity.Name,
-                                        StringComparison.CurrentCultureIgnoreCase)) ?? false
-                    }
-                    : null;
+                var twitchUser = GetTwitchUser();
 
                 ViewBag.UserHasVip = User.Identity.IsAuthenticated && vipService.HasVip(User.Identity.Name.ToLower());
 
@@ -117,18 +99,7 @@ namespace CoreCodedChatbot.Web.Controllers
         {
             try
             {
-                var chattersModel = chatterService.GetCurrentChatters();
-
-                var twitchUser = User.Identity.IsAuthenticated
-                    ? new LoggedInTwitchUser
-                    {
-                        Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
-                            ?.Value,
-                        IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
-                                    string.Equals(mod, User.Identity.Name,
-                                        StringComparison.CurrentCultureIgnoreCase)) ?? false
-                    }
-                    : null;
+                var twitchUser = GetTwitchUser();
 
                 ViewBag.UserHasVip = User.Identity.IsAuthenticated && vipService.HasVip(User.Identity.Name.ToLower());
 
@@ -183,18 +154,7 @@ namespace CoreCodedChatbot.Web.Controllers
         {
             try
             {
-                var chattersModel = chatterService.GetCurrentChatters();
-
-                var twitchUser = User.Identity.IsAuthenticated
-                    ? new LoggedInTwitchUser
-                    {
-                        Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
-                            ?.Value,
-                        IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
-                                    string.Equals(mod, User.Identity.Name,
-                                        StringComparison.CurrentCultureIgnoreCase)) ?? false
-                    }
-                    : null;
+                var twitchUser = GetTwitchUser();
 
                 ViewBag.UserHasVip = User.Identity.IsAuthenticated && vipService.HasVip(User.Identity.Name.ToLower());
 
@@ -446,6 +406,22 @@ namespace CoreCodedChatbot.Web.Controllers
             }
         }
 
+        public IActionResult RenderConvertBytesModal()
+        {
+            try
+            {
+                var twitchUser = GetTwitchUser();
+
+                if (twitchUser == null) return BadRequest();
+
+                return PartialView("Partials/List/ConvertBytesModal", twitchUser);
+            }
+            catch (Exception)
+            {
+                return Json(new {Success = false, message = "Encountered an error"});
+            }
+        }
+
         public IActionResult AddSongToDrive([FromBody] int songId)
         {
             if (!CheckAndSetUserModStatus()) return BadRequest();
@@ -563,6 +539,26 @@ namespace CoreCodedChatbot.Web.Controllers
             }
         }
 
+        public IActionResult ConvertBytes([FromBody] int bytesToConvert)
+        {
+            try
+            {
+                var twitchUser = GetTwitchUser();
+
+                if (twitchUser == null) BadRequest();
+
+                // convert bytes
+
+                return Ok();
+
+            }
+            catch (Exception e)
+            {
+                Console.Write($"{e} - {e.InnerException}");
+                return BadRequest();
+            }
+        }
+
         private bool CheckAndSetUserModStatus()
         {
             if (!User.Identity.IsAuthenticated)
@@ -586,6 +582,28 @@ namespace CoreCodedChatbot.Web.Controllers
             ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
 
             return ViewBag.UserIsMod;
+        }
+
+        private LoggedInTwitchUser GetTwitchUser()
+        {
+            if (!User.Identity.IsAuthenticated)
+                return null;
+
+            var chattersModel = chatterService.GetCurrentChatters();
+            var username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)?.Value;
+            var userBalance = userService.GetUserVipByteBalance(username);
+
+            var twitchUser = new LoggedInTwitchUser
+            {
+                Username = username,
+                IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
+                            string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ??
+                        false,
+                Vips = userBalance.Vips,
+                Bytes = userBalance.Bytes
+            };
+
+            return twitchUser;
         }
     }
 }

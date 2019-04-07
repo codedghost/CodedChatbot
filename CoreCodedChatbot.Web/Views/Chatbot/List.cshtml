@@ -213,4 +213,18 @@
         });
     }
 
+    function showConvertBytesModal() {
+        $("#modalContainer").empty();
+        $.ajax({
+            url: '@Url.Action("RenderConvertBytesModal", "Chatbot")',
+            type: "POST",
+            contentType: "application/json",
+            success: function(html) {
+                $("#modalContainer").html(html);
+                $("#convertBytesModal").modal('show');
+            }
+
+        })
+    }
+
 </script>

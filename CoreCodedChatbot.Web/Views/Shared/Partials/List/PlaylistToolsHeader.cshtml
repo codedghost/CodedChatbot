@@ -11,6 +11,13 @@
         <span class="float-right">
             <button type="button" class="btn btn-sm btn-success" onclick="showRequestModal()">Request</button>
         </span>
+        <br />
+        <text>Your VIPs: @Model.Vips</text> 
+        <br />
+        <text>Your Bytes: @Model.Bytes</text>
+        <br />
+        <button type="button" class="btn btn-sm btn-success" onclick="showConvertBytesModal()">Convert</button>
+
         @if (ViewContext.ViewBag.UserIsMod)
         {
             <br />

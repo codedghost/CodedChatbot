@@ -9,5 +9,7 @@ namespace CoreCodedChatbot.Library.Models.View
     {
         public bool IsMod { get; set; }
         public string Username { get; set; }
+        public int Vips { get; set; }
+        public string Bytes { get; set; }
     }
 }
