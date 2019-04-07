@@ -7,7 +7,7 @@ using TwitchLib.Client.Models;
 
 namespace CoreCodedChatbot.Commands
 {
-    [CustomAttributes.ChatCommand(new []{ "songlist", "playlist", "requests", "list", "songs" }, false)]
+    [CustomAttributes.ChatCommand(new []{ "songlist", "playlist", "requests", "list", "songs", "sl" }, false)]
     public class SongListCommand: ICommand
     {
         private readonly ConfigModel config;

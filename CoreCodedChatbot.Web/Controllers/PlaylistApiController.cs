@@ -133,5 +133,19 @@ namespace CoreCodedChatbot.Web.Controllers
         {
             return new JsonResult(playlistService.PromoteRequest(promoteSongRequest.username));
         }
+
+        [HttpGet]
+        public IActionResult ClearRequests()
+        {
+            try
+            {
+                playlistService.ClearRockRequests();
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
     }
 }

@@ -42,7 +42,9 @@ namespace CoreCodedChatbot.Helpers
 
             container.RegisterType<IChatbotContextFactory, ChatbotContextFactory>();
 
-            var commandHelper = new CommandHelper(container, config);
+            var chatbotContextFactory = container.Resolve<IChatbotContextFactory>();
+
+            var commandHelper = new CommandHelper(container, config, chatbotContextFactory);
             container.RegisterInstance(commandHelper);
 
             return container;
