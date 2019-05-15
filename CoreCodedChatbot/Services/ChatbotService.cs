@@ -50,7 +50,7 @@ namespace CoreCodedChatbot.Services
         private int MaxTimerMinutesGaming = 35;
 
         private int ChattyTimerCounter = 0;
-        private int MinutesBetweenChattyCommands = 10;
+        private int MinutesBetweenChattyCommands = 15;
 
         private readonly ConfigModel config;
 
@@ -318,11 +318,11 @@ namespace CoreCodedChatbot.Services
                 Console.Out.WriteLine("Not a partner. Skipping sub setup.");
             }
 
-            var roomId = config.DevelopmentBuild ? DevelopmentRoomId : config.ChannelId;
             if (config.DevelopmentBuild && !client.JoinedChannels.Any(jc => jc.Channel.Contains(DevelopmentRoomId)))
                 client.JoinRoom(config.ChannelId, DevelopmentRoomId);
 
-            var joinedRoom = client.JoinedChannels.FirstOrDefault(jc => jc.Channel.Contains(roomId));
+            var joinedRoom = client.JoinedChannels.FirstOrDefault(jc =>
+                config.DevelopmentBuild ? jc.Channel.Contains(DevelopmentRoomId) : jc.Channel == config.StreamerChannel);
             // Set threads for sending out stream info to the chat.
             if (isStreamingRocksmith)
             {
