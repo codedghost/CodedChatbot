@@ -40,14 +40,14 @@ namespace CoreCodedChatbot.Web
             services.AddOptions();
             services.AddMemoryCache();
 
-            var builder = new ConfigurationBuilder().SetBasePath(Environment.GetEnvironmentVariable("ASPNETCORE_CONTENTROOT"));
-            var configuration = builder.Build();
+            //var builder = new ConfigurationBuilder().SetBasePath(Environment.GetEnvironmentVariable("ASPNETCORE_CONTENTROOT"));
+            //var configuration = builder.Build();
 
-            services.Configure<IpRateLimitOptions>(configuration.GetSection("IpRateLimiting"));
-            services.Configure<IpRateLimitPolicies>(configuration.GetSection("IpRateLimitPolicies"));
+            //services.Configure<IpRateLimitOptions>(configuration.GetSection("IpRateLimiting"));
+            //services.Configure<IpRateLimitPolicies>(configuration.GetSection("IpRateLimitPolicies"));
 
-            services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
-            services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
+            //services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+            //.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
 
             services.AddAuthentication(op =>
                 {
@@ -103,8 +103,8 @@ namespace CoreCodedChatbot.Web
                         }
                     });
 
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+            //services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            //services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 
             services.AddSingleton(client);
             services.AddSingleton(api);
@@ -130,7 +130,7 @@ namespace CoreCodedChatbot.Web
                 app.UseExceptionHandler("/Home/Error");
             }
 
-            app.UseIpRateLimiting();
+            //app.UseIpRateLimiting();
 
             app.UseStaticFiles();
 
