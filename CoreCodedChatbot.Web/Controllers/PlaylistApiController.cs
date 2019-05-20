@@ -129,6 +129,17 @@ namespace CoreCodedChatbot.Web.Controllers
         }
 
         [HttpPost]
+        public IActionResult AddSuperRequest([FromBody] AddSuperVipRequest requestModel)
+        {
+            var addSuperVipResult = playlistService.AddSuperVipRequest(requestModel.username, requestModel.commandText);
+
+            return new JsonResult(new AddRequestResponse
+            {
+                Result = addSuperVipResult
+            });
+        }
+
+        [HttpPost]
         public IActionResult PromoteRequest([FromBody] PromoteSongRequest promoteSongRequest)
         {
             return new JsonResult(playlistService.PromoteRequest(promoteSongRequest.username));
