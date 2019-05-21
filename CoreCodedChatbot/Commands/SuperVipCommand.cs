@@ -15,7 +15,7 @@ using TwitchLib.Client.Models;
 
 namespace CoreCodedChatbot.Commands
 {
-    [CustomAttributes.ChatCommand(new []{"svip", "super", "supervip"}, false)]
+    [CustomAttributes.ChatCommand(new []{"supervip", "svip", "super"}, false)]
     public class SuperVipCommand : ICommand
     {
         private HttpClient _playlistClient;
@@ -56,19 +56,22 @@ namespace CoreCodedChatbot.Commands
                 if (addSuperRequest.IsSuccessStatusCode)
                 {
                     var addResult =
-                        JsonConvert.DeserializeObject<AddRequestResponse>(await addSuperRequest.Content.ReadAsStringAsync());
-                    if (addResult.Result == AddRequestResult.PlaylistVeryClosed)
+                        JsonConvert.DeserializeObject<AddSuperVipResponse>(await addSuperRequest.Content.ReadAsStringAsync());
+                    switch (addResult.Result)
                     {
-                        client.SendMessage(joinedChannel,
-                            $"Hey @{username}, the playlist is currently very closed. No Requests allowed.");
-                        return;
+                        case AddRequestResult.PlaylistVeryClosed:
+                            client.SendMessage(joinedChannel,
+                                $"Hey @{username}, the playlist is currently very closed. No Requests allowed.");
+                            return;
+                        case AddRequestResult.OnlyOneSuper:
+                            client.SendMessage(joinedChannel,
+                                $"Hey @{username}, sorry but there can only be one SuperVIP in the queue at a time!");
+                            return;
                     }
-
-                    var playlistPosition = addResult.PlaylistPosition;
 
                     _vipHelper.UseSuperVipRequest(username);
                     client.SendMessage(joinedChannel,
-                        $"Hey @{username}, I have queued {commandText} for you, you're #{playlistPosition} in the queue!");
+                        $"Hey @{username}, I have queued {commandText} for you, your request will be played next!");
 
                     return;
                 }

@@ -42,5 +42,8 @@ namespace CoreCodedChatbot.Library.Interfaces.Services
         string GetEstimatedTime(ChatViewersModel chattersModel);
         bool VeryClosePlaylist();
         int GetMaxUserRequests();
+        bool IsSuperRequestInQueue();
+        string EditSuperVipRequest(string username, string songText);
+        bool RemoveSuperRequest(string username);
     }
 }

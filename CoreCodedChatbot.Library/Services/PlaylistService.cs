@@ -151,8 +151,7 @@ namespace CoreCodedChatbot.Library.Services
 
             using (var context = contextFactory.Create())
             {
-                if (context.SongRequests.SingleOrDefault(sr => sr.Played && sr.SuperVipRequestTime != null) != null)
-                    return AddRequestResult.OnlyOneSuper;
+                if (IsSuperRequestInQueue()) return AddRequestResult.OnlyOneSuper;
 
                 var request = new SongRequest
                 {
@@ -207,7 +206,7 @@ namespace CoreCodedChatbot.Library.Services
 
                 using (var context = contextFactory.Create())
                 {
-                    if (!requestSongViewModel.IsVip)
+                    if (!requestSongViewModel.IsVip && !requestSongViewModel.IsSuperVip)
                     {
                         var userSongCount = context.SongRequests.Count(sr =>
                             !sr.Played && sr.RequestUsername == username && sr.VipRequestTime == null);
@@ -224,7 +223,14 @@ namespace CoreCodedChatbot.Library.Services
                         Played = false
                     };
 
-                    if (requestSongViewModel.IsVip)
+                    if (requestSongViewModel.IsSuperVip)
+                    {
+                        request.VipRequestTime = DateTime.UtcNow;
+                        request.SuperVipRequestTime = DateTime.UtcNow;
+
+                        if (!vipService.UseSuperVip(username)) return AddRequestResult.UnSuccessful;
+                    }
+                    else if (requestSongViewModel.IsVip)
                     {
                         request.VipRequestTime = DateTime.UtcNow;
                         if (!vipService.UseVip(username)) return AddRequestResult.UnSuccessful;
@@ -447,7 +453,9 @@ namespace CoreCodedChatbot.Library.Services
 
                 foreach (var request in requests)
                 {
-                    if (request.VipRequestTime != null && request.SongRequestId != CurrentRequest?.songRequestId)
+                    if (request.SuperVipRequestTime != null && request.SongRequestId != CurrentRequest?.songRequestId)
+                        vipService.RefundSuperVip(request.RequestUsername, true);
+                    else if (request.VipRequestTime != null && request.SongRequestId != CurrentRequest?.songRequestId)
                         vipService.RefundVip(request.RequestUsername, true);
                     if (request.SongRequestId == CurrentRequest?.songRequestId)
                         CurrentRequest = null;
@@ -624,8 +632,77 @@ namespace CoreCodedChatbot.Library.Services
                 Instruments = GetRequestInstruments(),
                 SelectedInstrument = string.Empty,
                 IsVip = false,
-                ShouldShowVip = vipService.HasVip(username)
+                IsSuperVip = false,
+                ShouldShowVip = vipService.HasVip(username),
+                ShouldShowSuperVip = vipService.HasSuperVip(username) && !IsSuperRequestInQueue()
             };
+        }
+
+        public bool IsSuperRequestInQueue()
+        {
+            using (var context = contextFactory.Create())
+            {
+                return context.SongRequests.Any(sr => !sr.Played && sr.SuperVipRequestTime != null);
+            }
+        }
+
+        public string EditSuperVipRequest(string username, string songText)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(songText)) return string.Empty;
+
+                using (var context = contextFactory.Create())
+                {
+                    var usersSuperVip = context.SongRequests.SingleOrDefault(sr =>
+                        !sr.Played && sr.RequestUsername == username && sr.SuperVipRequestTime != null);
+
+                    if (usersSuperVip == null || usersSuperVip.SongRequestId == CurrentRequest.songRequestId) return string.Empty;
+                    
+                    usersSuperVip.RequestText = songText;
+                    context.SaveChanges();
+                }
+
+                UpdatePlaylists();
+
+                return songText;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"{e} - {e.InnerException}");
+                return string.Empty;
+            }
+        }
+
+        public bool RemoveSuperRequest(string username)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(username)) return false;
+
+                using (var context = contextFactory.Create())
+                {
+                    var usersSuperVip = context.SongRequests.SingleOrDefault(sr =>
+                        !sr.Played && sr.RequestUsername == username && sr.SuperVipRequestTime != null);
+
+                    if (usersSuperVip == null || usersSuperVip.SongRequestId == CurrentRequest.songRequestId)
+                        return false;
+
+                    if (!vipService.RefundSuperVip(username)) return false;
+
+                    usersSuperVip.Played = true;
+                    context.SaveChanges();
+
+                    UpdatePlaylists();
+
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"{e} - {e.InnerException}");
+                return false;
+            }
         }
 
         public RequestSongViewModel GetEditRequestSongViewModel(string username, int songRequestId, bool isMod)
@@ -650,6 +727,8 @@ namespace CoreCodedChatbot.Library.Services
                     SelectedInstrument = formattedRequest?.InstrumentName ?? "guitar",
                     IsVip = songRequest.VipRequestTime != null,
                     ShouldShowVip = false,
+                    IsSuperVip = songRequest.SuperVipRequestTime != null,
+                    ShouldShowSuperVip = false,
                 };
             }
         }
@@ -759,6 +838,10 @@ namespace CoreCodedChatbot.Library.Services
 
                 request.Played = true;
 
+                if (request.SuperVipRequestTime != null)
+                {
+                    vipService.RefundSuperVip(request.RequestUsername);
+                }
                 if (request.VipRequestTime != null)
                 {
                     vipService.RefundVip(request.RequestUsername);

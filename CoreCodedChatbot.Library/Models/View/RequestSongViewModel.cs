@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using CoreCodedChatbot.Library.Helpers;
+using CoreCodedChatbot.Library.Models.Data;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace CoreCodedChatbot.Library.Models.View
@@ -28,6 +30,11 @@ namespace CoreCodedChatbot.Library.Models.View
         [Display(Name="Use a VIP token?")]
         public bool IsVip { get; set; }
 
+        [Display(Name="Use a Super VIP token?")]
+        public bool IsSuperVip { get; set; }
+
         public bool ShouldShowVip { get; set; }
+
+        public bool ShouldShowSuperVip { get; set; }
     }
 }
