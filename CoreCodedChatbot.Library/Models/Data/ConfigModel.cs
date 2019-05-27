@@ -42,5 +42,9 @@
         public string InstagramLink;
         public string RocksmithLink;
         public int SuperVipCost;
+        public string CFUsername;
+        public string CFPassword;
+        public string CFAuthLink;
+        public string CFLoginLink;
     }
 }

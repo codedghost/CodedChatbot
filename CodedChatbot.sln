@@ -17,7 +17,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreCodedChatbot.Tests", "C
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreCodedChatbot.Library", "CoreCodedChatbot.Library\CoreCodedChatbot.Library.csproj", "{E1476D93-373F-479E-8870-D07F6906F82E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreCodedChatbot.Client", "CoreCodedChatbot.Client\CoreCodedChatbot.Client.csproj", "{32CB5CCA-246C-4E91-BBF7-D36F199F35B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CoreCodedChatbot.Client", "CoreCodedChatbot.Client\CoreCodedChatbot.Client.csproj", "{32CB5CCA-246C-4E91-BBF7-D36F199F35B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreCodedChatbot.CF", "CoreCodedChatbot.CF\CoreCodedChatbot.CF.csproj", "{8832E16E-784F-43AA-B620-EBAC9DA8CB06}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -101,6 +103,18 @@ Global
 		{32CB5CCA-246C-4E91-BBF7-D36F199F35B0}.Release|x64.Build.0 = Release|Any CPU
 		{32CB5CCA-246C-4E91-BBF7-D36F199F35B0}.Release|x86.ActiveCfg = Release|Any CPU
 		{32CB5CCA-246C-4E91-BBF7-D36F199F35B0}.Release|x86.Build.0 = Release|Any CPU
+		{8832E16E-784F-43AA-B620-EBAC9DA8CB06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8832E16E-784F-43AA-B620-EBAC9DA8CB06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8832E16E-784F-43AA-B620-EBAC9DA8CB06}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8832E16E-784F-43AA-B620-EBAC9DA8CB06}.Debug|x64.Build.0 = Debug|Any CPU
+		{8832E16E-784F-43AA-B620-EBAC9DA8CB06}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8832E16E-784F-43AA-B620-EBAC9DA8CB06}.Debug|x86.Build.0 = Debug|Any CPU
+		{8832E16E-784F-43AA-B620-EBAC9DA8CB06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8832E16E-784F-43AA-B620-EBAC9DA8CB06}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8832E16E-784F-43AA-B620-EBAC9DA8CB06}.Release|x64.ActiveCfg = Release|Any CPU
+		{8832E16E-784F-43AA-B620-EBAC9DA8CB06}.Release|x64.Build.0 = Release|Any CPU
+		{8832E16E-784F-43AA-B620-EBAC9DA8CB06}.Release|x86.ActiveCfg = Release|Any CPU
+		{8832E16E-784F-43AA-B620-EBAC9DA8CB06}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
