@@ -13,6 +13,9 @@ namespace CoreCodedChatbot.Database.Context.Models.Mapping
 
             builder.Property(t => t.Username).HasColumnName("Username").IsRequired();
             builder.Property(t => t.UsedVipRequests).HasColumnName("UsedVipRequests").IsRequired();
+            builder.Property(t => t.UsedSuperVipRequests).HasColumnName("UsedSuperVipRequests")
+                .IsRequired()
+                .HasDefaultValue(0);
             builder.Property(t => t.SentGiftVipRequests).HasColumnName("SendgiftVipRequests")
                 .IsRequired()
                 .HasDefaultValue(0);

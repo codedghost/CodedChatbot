@@ -49,6 +49,17 @@
                         </div>
                     </div>
                 }
+                @if (Model.ShouldShowSuperVip && Model.IsNewRequest)
+                {
+                    <div class="row">
+                        <div class="col-md-4">
+                            @Html.LabelFor(m => m.IsSuperVip)
+                        </div>
+                        <div class="col-md-8">
+                            @Html.CheckBoxFor(m => m.IsSuperVip, new {id = "requestIsSuperVip"})
+                        </div>
+                    </div>
+                }
                 @Html.HiddenFor(m => m.IsNewRequest, new {id = "isNewRequest"})
             </div>
             <div class="modal-footer">
@@ -67,7 +78,8 @@
             Artist: $("#requestArtist").val(),
             SelectedInstrument: $("#requestInstrument").val(),
             Instruments: null,
-            IsVip: $("#requestIsVip").prop('checked')
+            IsVip: $("#requestIsVip").prop('checked'),
+            IsSuperVip: $("#requestIsSuperVip").prop('checked')
         });
 
         var isNewRequest = $("#isNewRequest").val() === "True" ? true : false;
