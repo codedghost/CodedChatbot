@@ -1,33 +1,7 @@
-﻿using CoreCodedChatbot.Database.Context.Models;
-using CoreCodedChatbot.Library.Helpers;
-
-namespace CoreCodedChatbot.Library.Models.Data
+﻿namespace CoreCodedChatbot.Library.Models.Data
 {
     public class VipRequests
     {
-        private ConfigModel _config;
-
-        public VipRequests(ConfigModel config)
-        {
-            _config = config;
-        }
-
-        public static VipRequests Create(User user)
-        {
-            return new VipRequests(ConfigHelper.GetConfig())
-            {
-                Donations = user.DonationOrBitsVipRequests,
-                Follow = user.FollowVipRequest,
-                ModGiven = user.ModGivenVipRequests,
-                Sub = user.SubVipRequests,
-                Byte = user.TokenVipRequests,
-                ReceivedGift = user.ReceivedGiftVipRequests,
-                Used = user.UsedVipRequests,
-                SentGift = user.SentGiftVipRequests,
-                UsedSuperVipRequests = user.UsedSuperVipRequests
-            };
-        }
-
         public int Donations { get; set; }
         public int Follow { get; set; }
         public int ModGiven { get; set; }
@@ -36,8 +10,7 @@ namespace CoreCodedChatbot.Library.Models.Data
         public int Used { get; set; }
         public int SentGift { get; set; }
         public int ReceivedGift { get; set; }
-        public int UsedSuperVipRequests { get; set; }
 
-        public int TotalRemaining => (Donations + Follow + ModGiven + Sub + Byte + ReceivedGift) - (UsedSuperVipRequests * _config.SuperVipCost) - Used - SentGift;
+        public int TotalRemaining => (Donations + Follow + ModGiven + Sub + Byte + ReceivedGift) - Used - SentGift;
     }
 }

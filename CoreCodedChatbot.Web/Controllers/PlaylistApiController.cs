@@ -118,14 +118,6 @@ namespace CoreCodedChatbot.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult RemoveSuperVipCommand([FromBody] RemoveSuperVipRequest requestModel)
-        {
-            if (playlistService.RemoveSuperRequest(requestModel.username)) return Ok();
-
-            return BadRequest();
-        }
-
-        [HttpPost]
         public IActionResult AddRequest([FromBody] AddSongRequest requestModel)
         {
             var addRequestResult = playlistService.AddRequest(requestModel.username, requestModel.commandText, requestModel.isVipRequest);
@@ -133,30 +125,6 @@ namespace CoreCodedChatbot.Web.Controllers
             {
                 Result = addRequestResult.Item1,
                 PlaylistPosition = addRequestResult.Item2
-            });
-        }
-
-        [HttpPost]
-        public IActionResult AddSuperRequest([FromBody] AddSuperVipRequest requestModel)
-        {
-            var addSuperVipResult = playlistService.AddSuperVipRequest(requestModel.username, requestModel.commandText);
-
-            return new JsonResult(new AddRequestResponse
-            {
-                Result = addSuperVipResult
-            });
-        }
-
-        [HttpPost]
-        public IActionResult EditSuperVipRequest([FromBody] EditSuperVipRequest requestModel)
-        {
-            var editSuperVipResult =
-                playlistService.EditSuperVipRequest(requestModel.username, requestModel.commandText);
-
-            return new JsonResult(new EditRequestResponse
-            {
-                SongRequestText = editSuperVipResult,
-                SyntaxError = string.IsNullOrWhiteSpace(editSuperVipResult)
             });
         }
 

@@ -41,6 +41,5 @@
         public bool DevelopmentBuild;
         public string InstagramLink;
         public string RocksmithLink;
-        public int SuperVipCost;
     }
 }

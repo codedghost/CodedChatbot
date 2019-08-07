@@ -39,9 +39,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CoreCodedChatbot.Database\CoreCodedChatbot.Database.csproj" />
     <ProjectReference Include="..\CoreCodedChatbot.Library\CoreCodedChatbot.Library.csproj" />
     <ProjectReference Include="..\CoreCodedChatbot\CoreCodedChatbot.csproj" />
+    <ProjectReference Include="..\CoreCordedChatbot.Database\CoreCodedChatbot.Database.csproj" />
   </ItemGroup>
 
   <ItemGroup>
