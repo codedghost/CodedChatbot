@@ -252,12 +252,16 @@ namespace CoreCodedChatbot.Helpers
             using (var context = this.contextFactory.Create())
             {
                 var user = this.FindUser(context, username);
-                if (user == null ||
-                    user.UsedVipRequests + user.SentGiftVipRequests >=
-                    (user.FollowVipRequest + user.SubVipRequests + user.ModGivenVipRequests +
-                        user.DonationOrBitsVipRequests + user.TokenVipRequests + user.ReceivedGiftVipRequests)) return false;
+                return user != null && VipRequests.Create(user).TotalRemaining > 0;
+            }
+        }
 
-                return true;
+        public bool CanUseSuperVipRequest(string username)
+        {
+            using (var context = contextFactory.Create())
+            {
+                var user = FindUser(context, username);
+                return user != null && (VipRequests.Create(user)).TotalRemaining >= config.SuperVipCost;
             }
         }
 
@@ -276,36 +280,47 @@ namespace CoreCodedChatbot.Helpers
                     user.UsedVipRequests++;
                     context.SaveChanges();
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
+                    Console.WriteLine($"{e} - {e.InnerException}");
                     return false;
                 }
             }
             return true;
         }
 
+        public bool UseSuperVipRequest(string username)
+        {
+            if (!CanUseSuperVipRequest(username))
+            {
+                return false;
+            }
+
+            using (var context = contextFactory.Create())
+            {
+                try
+                {
+                    var user = FindUser(context, username);
+                    user.UsedSuperVipRequests++;
+                    context.SaveChanges();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"{e} - {e.InnerException}");
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         public VipRequests GetVipRequests(string username)
         {
-            var requests = new VipRequests();
             using (var context = this.contextFactory.Create())
             {
                 var user = this.FindUser(context, username);
-                if (user == null) return requests;
-
-                requests = new VipRequests
-                {
-                    Donations = user.DonationOrBitsVipRequests,
-                    Follow = user.FollowVipRequest,
-                    ModGiven = user.ModGivenVipRequests,
-                    Sub = user.SubVipRequests,
-                    Used = user.UsedVipRequests,
-                    Byte = user.TokenVipRequests,
-                    ReceivedGift = user.ReceivedGiftVipRequests,
-                    SentGift = user.SentGiftVipRequests
-                };
+                return user == null ? null : VipRequests.Create(user);
             }
-
-            return requests;
         }
     }
 }
