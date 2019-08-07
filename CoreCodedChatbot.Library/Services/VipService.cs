@@ -54,37 +54,19 @@ namespace CoreCodedChatbot.Library.Services
             }
         }
 
-        public bool RefundSuperVip(string username, bool deferSave = false)
-        {
-            try
-            {
-                using (var context = chatbotContextFactory.Create())
-                {
-                    var user = context.Users.SingleOrDefault(u => u.Username == username);
-
-                    if (user == null) return false;
-
-                    user.ModGivenVipRequests += config.SuperVipCost;
-
-                    if (!deferSave) context.SaveChanges();
-                }
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"{e} - {e.InnerException}");
-                return false;
-            }
-        }
-
         public bool HasVip(string username)
         {
             try
             {
                 var user = GetUser(username);
 
-                return user != null && VipRequests.Create(user).TotalRemaining > 0;
+                if (user == null ||
+                    user.UsedVipRequests + user.SentGiftVipRequests >=
+                    (user.FollowVipRequest + user.SubVipRequests + user.ModGivenVipRequests +
+                     user.DonationOrBitsVipRequests + user.TokenVipRequests +
+                     user.ReceivedGiftVipRequests)) return false;
+
+                return true;
             }
             catch (Exception e)
             {
@@ -111,45 +93,6 @@ namespace CoreCodedChatbot.Library.Services
             catch (Exception e)
             {
                 Console.WriteLine($"UseVIP Exception\n{e} - {e.InnerException}");
-                return false;
-            }
-
-            return true;
-        }
-
-        public bool HasSuperVip(string username)
-        {
-            try
-            {
-                var user = GetUser(username);
-
-                return user != null && VipRequests.Create(user).TotalRemaining > config.SuperVipCost;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("HasSuperVip Exception:");
-                Console.WriteLine($"{e} - {e.InnerException}");
-                return false;
-            }
-        }
-
-        public bool UseSuperVip(string username)
-        {
-            try
-            {
-                if (!HasSuperVip(username)) return false;
-
-                using (var context = chatbotContextFactory.Create())
-                {
-                    var user = context.Users.Find(username);
-
-                    user.UsedSuperVipRequests++;
-                    context.SaveChanges();
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"UseSuperVIP Exception\n{e} - {e.InnerException}");
                 return false;
             }
 
