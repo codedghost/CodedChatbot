@@ -3,7 +3,7 @@ using System.Linq;
 using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Helpers.Interfaces;
-
+using CoreCodedChatbot.Interfaces;
 using TwitchLib.Api;
 using TwitchLib.Api.Services;
 using TwitchLib.Client;
@@ -39,6 +39,8 @@ namespace CoreCodedChatbot.Helpers
             container.RegisterInstance(pubsub);
             container.RegisterInstance(liveStreamMonitor);
             container.RegisterInstance(config);
+
+            container.RegisterType<IRedditHelper, RedditHelper>();
 
             container.RegisterType<IChatbotContextFactory, ChatbotContextFactory>();
 
