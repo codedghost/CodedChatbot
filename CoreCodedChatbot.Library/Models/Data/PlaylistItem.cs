@@ -11,6 +11,7 @@ namespace CoreCodedChatbot.Library.Models.Data
         public string songRequester { get; set; }
         public bool isInChat { get; set; }
         public bool isVip { get; set; }
+        public bool isSuperVip { get; set; }
         public bool isEvenIndex { get; set; }
         public bool isInDrive { get; set; }
 

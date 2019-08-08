@@ -8,6 +8,7 @@ namespace CoreCodedChatbot.Library.Models.Enums
     {
         Regular,
         Vip,
+        SuperVip,
         Empty
     }
 }
