@@ -31,17 +31,33 @@ namespace CoreCodedChatbot.Web.Services
 
         public async void UpdateChatters()
         {
-            var httpClient = new HttpClient();
-            var request = await httpClient.GetAsync($"https://tmi.twitch.tv/group/user/{config.StreamerChannel}/chatters");
+            var errorCounter = 0;
 
-            if (!request.IsSuccessStatusCode) return;
+            try
+            {
+                errorCounter = 0;
+                var httpClient = new HttpClient();
+                var request =
+                    await httpClient.GetAsync($"https://tmi.twitch.tv/group/user/{config.StreamerChannel}/chatters");
 
-            var currentChattersJson = await request.Content.ReadAsStringAsync();
-            // process json into username list.
-            Chatters = JsonConvert.DeserializeObject<ChatViewersModel>(currentChattersJson);
+                if (!request.IsSuccessStatusCode) return;
 
-            // Add broadcaster to modlist
-            Chatters.chatters.moderators = Chatters.chatters.moderators.Union(Chatters.chatters.broadcaster).ToArray();
+                var currentChattersJson = await request.Content.ReadAsStringAsync();
+                // process json into username list.
+                Chatters = JsonConvert.DeserializeObject<ChatViewersModel>(currentChattersJson);
+
+                // Add broadcaster to modlist
+                Chatters.chatters.moderators =
+                    Chatters.chatters.moderators.Union(Chatters.chatters.broadcaster).ToArray();
+            }
+            catch (Exception e)
+            {
+                Console.Out.WriteLine($"Could not access Twitch TMI resource. Exception:\n{e}\n{e.InnerException}");
+                errorCounter++;
+
+                if (errorCounter > 5)
+                    Chatters.chatters.moderators = null;
+            }
         }
 
         public ChatViewersModel GetCurrentChatters()
