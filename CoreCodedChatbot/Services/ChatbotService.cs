@@ -79,6 +79,8 @@ namespace CoreCodedChatbot.Services
             this.client.OnReSubscriber += OnReSub;
             this.client.OnGiftedSubscription += OnGiftSub;
             this.client.OnCommunitySubscription += OnSubBomb;
+            this.client.OnBeingHosted += OnBeingHosted;
+            this.client.OnRaidNotification += OnRaidNotification;
             this.client.Connect();
             
             this.liveStreamMonitor.SetChannelsByName(new List<string>{config.StreamerChannel});
@@ -297,6 +299,24 @@ namespace CoreCodedChatbot.Services
             Console.Out.WriteLine("Assuming stream category or title has updated, rescheduling tasks");
             UnScheduleStreamTasks();
             //ScheduleStreamTasks(e.Stream.Title);
+        }
+
+        private void OnRaidNotification(object sender, OnRaidNotificationArgs e)
+        {
+            int.TryParse(e.RaidNotificaiton.MsgParamViewerCount, out var viewersCount);
+            WelcomeRaidOrHost(e.Channel, e.RaidNotificaiton.MsgParamDisplayName, viewersCount, true);
+        }
+
+        private void OnBeingHosted(object sender, OnBeingHostedArgs e)
+        {
+            WelcomeRaidOrHost(e.BeingHostedNotification.Channel, e.BeingHostedNotification.HostedByChannel, e.BeingHostedNotification.Viewers, false);
+        }
+
+        private void WelcomeRaidOrHost(string hostedChannelName, string username, int numberofRaiders, bool isRaid)
+        {
+            var typeText = isRaid ? "raid" : "host";
+            client.SendMessage(hostedChannelName,
+                $"Hey everyone, we're getting a {typeText} from @{username} with {numberofRaiders} of their friends! Welcome one and all! codedgUitar");
         }
 
         private async void ScheduleStreamTasks(string streamGame = "Rocksmith 2014")
