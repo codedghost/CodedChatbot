@@ -45,7 +45,22 @@ namespace CoreCodedChatbot.Web.Controllers
 
         public IActionResult List()
         {
-            var twitchUser = GetTwitchUser();
+            var chattersModel = chatterService.GetCurrentChatters();
+            LoggedInTwitchUser twitchUser = null;
+
+            if (User.Identity.IsAuthenticated)
+            {
+                var username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
+                    ?.Value;
+                twitchUser = new LoggedInTwitchUser
+                {
+                    Username = username,
+                    IsMod = chattersModel?.IsUserMod(username) ?? false
+                };
+
+                ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
+                ViewBag.Username = twitchUser?.Username ?? string.Empty;
+            }
 
             var playlistModel = playlistService.GetAllSongs(twitchUser);
             playlistModel.RegularList =
@@ -58,9 +73,6 @@ namespace CoreCodedChatbot.Web.Controllers
             ViewBag.UserHasVip = User.Identity.IsAuthenticated && vipService.HasVip(User.Identity.Name.ToLower());
 
             ViewBag.IsPlaylistOpen = playlistService.GetPlaylistState() == PlaylistState.Open;
-
-            ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
-            ViewBag.Username = twitchUser?.Username ?? string.Empty;
 
             return View(playlistModel);
         }
@@ -79,13 +91,26 @@ namespace CoreCodedChatbot.Web.Controllers
         {
             try
             {
-                var twitchUser = GetTwitchUser();
+                var chattersModel = chatterService.GetCurrentChatters();
+
+                if (User.Identity.IsAuthenticated)
+                {
+                    var username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
+                        ?.Value;
+                    var twitchUser = new LoggedInTwitchUser
+                    {
+                        Username = username,
+                        IsMod = chattersModel?.IsUserMod(username) ?? false
+                    };
+
+                    ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
+                    ViewBag.Username = twitchUser?.Username ?? string.Empty;
+                }
 
                 ViewBag.UserHasVip = User.Identity.IsAuthenticated && vipService.HasVip(User.Identity.Name.ToLower());
 
                 ViewBag.IsPlaylistOpen = playlistService.GetPlaylistState() == PlaylistState.Open;
-                ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
-                ViewBag.Username = twitchUser?.Username ?? string.Empty;
+
                 return PartialView("Partials/List/RegularList", data);
             }
             catch (Exception)
@@ -99,13 +124,25 @@ namespace CoreCodedChatbot.Web.Controllers
         {
             try
             {
-                var twitchUser = GetTwitchUser();
+                var chattersModel = chatterService.GetCurrentChatters();
+
+                if (User.Identity.IsAuthenticated)
+                {
+                    var username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
+                        ?.Value;
+                    var twitchUser = new LoggedInTwitchUser
+                        {
+                            Username = username,
+                            IsMod = chattersModel?.IsUserMod(username) ?? false
+                        };
+
+                    ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
+                    ViewBag.Username = twitchUser?.Username ?? string.Empty;
+                }
 
                 ViewBag.UserHasVip = User.Identity.IsAuthenticated && vipService.HasVip(User.Identity.Name.ToLower());
 
                 ViewBag.IsPlaylistOpen = playlistService.GetPlaylistState() == PlaylistState.Open;
-                ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
-                ViewBag.Username = twitchUser?.Username ?? string.Empty;
                 return PartialView("Partials/List/VipList", data);
             }
             catch (Exception)
@@ -154,12 +191,22 @@ namespace CoreCodedChatbot.Web.Controllers
         {
             try
             {
-                var twitchUser = GetTwitchUser();
+                var chattersModel = chatterService.GetCurrentChatters();
+                if (User.Identity.IsAuthenticated)
+                {
+                    var username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
+                        ?.Value;
+                    var twitchUser = new LoggedInTwitchUser
+                        {
+                            Username = username,
+                            IsMod = chattersModel?.IsUserMod(username) ?? false
+                        };
+                    ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
+                }
 
                 ViewBag.UserHasVip = User.Identity.IsAuthenticated && vipService.HasVip(User.Identity.Name.ToLower());
 
                 ViewBag.IsPlaylistOpen = playlistService.GetPlaylistState() == PlaylistState.Open;
-                ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
                 return PartialView("Partials/List/CurrentSong", data);
             }
             catch (Exception)
@@ -229,8 +276,7 @@ namespace CoreCodedChatbot.Web.Controllers
                 var chattersModel = chatterService.GetCurrentChatters();
                 var request = playlistService.GetRequestById(songId);
 
-                if ((chattersModel?.chatters?.moderators?.Any(mod =>
-                         string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false) ||
+                if ((chattersModel?.IsUserMod(User.Identity.Name) ?? false) ||
                     string.Equals(User.Identity.Name, request.songRequester))
                 {
                     if (playlistService.ArchiveRequestById(songId))
@@ -248,8 +294,7 @@ namespace CoreCodedChatbot.Web.Controllers
             {
                 var chattersModel = chatterService.GetCurrentChatters();
 
-                if (chattersModel?.chatters?.moderators?.Any(mod =>
-                        string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ?? false)
+                if (chattersModel?.IsUserMod(User.Identity.Name) ?? false)
                 {
                     try
                     {
@@ -318,10 +363,10 @@ namespace CoreCodedChatbot.Web.Controllers
             if (User.Identity.IsAuthenticated)
             {
                 var chatters = chatterService.GetCurrentChatters();
-                var userIsMod = chatters?.chatters?.moderators?.Any(m => m == User.Identity.Name.ToLower()) ?? false;
 
                 var editRequestResult =
-                    playlistService.EditWebRequest(requestData, User.Identity.Name.ToLower(), userIsMod);
+                    playlistService.EditWebRequest(requestData, User.Identity.Name.ToLower(),
+                        chatters?.IsUserMod(User.Identity.Name.ToLower()) ?? false);
 
                 switch (editRequestResult)
                 {
@@ -568,18 +613,18 @@ namespace CoreCodedChatbot.Web.Controllers
 
             var chattersModel = chatterService.GetCurrentChatters();
 
-            var twitchUser = User.Identity.IsAuthenticated
-                ? new LoggedInTwitchUser
+            if (User.Identity.IsAuthenticated)
+            {
+                var username = User?.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
+                                   ?.Value ?? string.Empty;
+                var twitchUser = new LoggedInTwitchUser
                 {
-                    Username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
-                        ?.Value,
-                    IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
-                                string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ??
-                            false
-                }
-                : null;
+                    Username = username,
+                    IsMod = chattersModel.IsUserMod(username)
+                };
 
-            ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
+                ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
+            }
 
             return ViewBag.UserIsMod;
         }

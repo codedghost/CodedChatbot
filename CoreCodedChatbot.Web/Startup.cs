@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using Microsoft.Extensions.Configuration.Binder;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using AspNet.Security.OAuth.Twitch;
+using AspNetCoreRateLimit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
@@ -20,6 +23,7 @@ using CoreCodedChatbot.Library.Services;
 using CoreCodedChatbot.Web.Interfaces;
 using CoreCodedChatbot.Web.Services;
 using CoreCodedChatbot.Web.SignalRHubs;
+using Microsoft.Extensions.Configuration;
 using TwitchLib.Api;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
@@ -32,6 +36,18 @@ namespace CoreCodedChatbot.Web
         public void ConfigureServices(IServiceCollection services)
         {
             var config = new ConfigService().GetConfig();
+
+            services.AddOptions();
+            services.AddMemoryCache();
+
+            //var builder = new ConfigurationBuilder().SetBasePath(Environment.GetEnvironmentVariable("ASPNETCORE_CONTENTROOT"));
+            //var configuration = builder.Build();
+
+            //services.Configure<IpRateLimitOptions>(configuration.GetSection("IpRateLimiting"));
+            //services.Configure<IpRateLimitPolicies>(configuration.GetSection("IpRateLimitPolicies"));
+
+            //services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
+            //.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
 
             services.AddAuthentication(op =>
                 {
@@ -86,7 +102,9 @@ namespace CoreCodedChatbot.Web
                             client.JoinRoom(config.ChannelId, devRoomId);
                         }
                     });
-            
+
+            //services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            //services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 
             services.AddSingleton(client);
             services.AddSingleton(api);
@@ -112,6 +130,8 @@ namespace CoreCodedChatbot.Web
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+
+            //app.UseIpRateLimiting();
 
             app.UseStaticFiles();
 

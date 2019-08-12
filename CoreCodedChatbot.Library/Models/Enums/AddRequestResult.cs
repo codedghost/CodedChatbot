@@ -11,6 +11,7 @@ namespace CoreCodedChatbot.Library.Models.Enums
         NoMultipleRequests,
         Success,
         UnSuccessful,
-        NoRequestEntered
+        NoRequestEntered,
+        OnlyOneSuper
     }
 }

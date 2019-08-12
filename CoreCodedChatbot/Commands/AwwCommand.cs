@@ -2,23 +2,21 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Text;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Models.Data;
 using Newtonsoft.Json;
-using Serilog.Debugging;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
 namespace CoreCodedChatbot.Commands
 {
-    [CustomAttributes.ChatCommand(new[] { "kitty" }, false)]
-    public class KittyCommand : ICommand
+    [CustomAttributes.ChatCommand(new[] { "aww"}, false)]
+    public class AwwCommand : ICommand
     {
         private IRedditHelper _redditHelper;
 
-        public KittyCommand(IRedditHelper redditHelper)
+        public AwwCommand(IRedditHelper redditHelper)
         {
             _redditHelper = redditHelper;
         }
@@ -27,7 +25,7 @@ namespace CoreCodedChatbot.Commands
         {
             try
             {
-                var postInfo = await _redditHelper.GetRandomPost("cats");
+                var postInfo = await _redditHelper.GetRandomPost("aww");
                 if (postInfo == null)
                 {
                     client.SendMessage(joinedChannel,
@@ -50,7 +48,7 @@ namespace CoreCodedChatbot.Commands
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)
         {
             client.SendMessage(joinedChannel,
-                $"Hey @{username}, This command will give you a picture of a friendly feline!");
+                $"Hey @{username}, This command will get you a random cute post!");
         }
     }
 }
