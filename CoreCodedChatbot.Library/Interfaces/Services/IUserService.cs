@@ -8,6 +8,6 @@ namespace CoreCodedChatbot.Library.Interfaces.Services
 {
     public interface IUserService
     {
-        UserBalance GetUserVipByteBalance(string username);
+        VipRequests GetUserVipByteBalance(string username);
     }
 }

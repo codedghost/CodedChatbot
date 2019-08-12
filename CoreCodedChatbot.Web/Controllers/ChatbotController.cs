@@ -612,8 +612,8 @@ namespace CoreCodedChatbot.Web.Controllers
                 IsMod = chattersModel?.chatters?.moderators?.Any(mod =>
                             string.Equals(mod, User.Identity.Name, StringComparison.CurrentCultureIgnoreCase)) ??
                         false,
-                Vips = userBalance.Vips,
-                Bytes = userBalance.Bytes
+                Vips = userBalance.TotalRemaining,
+                Bytes = userBalance.TotalBytes
             };
 
             return twitchUser;

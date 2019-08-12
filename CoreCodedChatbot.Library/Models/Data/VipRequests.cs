@@ -24,7 +24,8 @@ namespace CoreCodedChatbot.Library.Models.Data
                 ReceivedGift = user.ReceivedGiftVipRequests,
                 Used = user.UsedVipRequests,
                 SentGift = user.SentGiftVipRequests,
-                UsedSuperVipRequests = user.UsedSuperVipRequests
+                UsedSuperVipRequests = user.UsedSuperVipRequests,
+                TokenBytes = user.TokenBytes
             };
         }
 
@@ -38,6 +39,9 @@ namespace CoreCodedChatbot.Library.Models.Data
         public int ReceivedGift { get; set; }
         public int UsedSuperVipRequests { get; set; }
 
+        private int TokenBytes { get; set; }
+
         public int TotalRemaining => (Donations + Follow + ModGiven + Sub + Byte + ReceivedGift) - (UsedSuperVipRequests * _config.SuperVipCost) - Used - SentGift;
+        public string TotalBytes => (TokenBytes / (float) _config.BytesToVip).ToString("n3");
     }
 }

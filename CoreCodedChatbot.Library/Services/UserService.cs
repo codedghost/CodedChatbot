@@ -20,14 +20,14 @@ namespace CoreCodedChatbot.Library.Services
             this.config = configService.GetConfig();
         }
 
-        public UserBalance GetUserVipByteBalance(string username)
+        public VipRequests GetUserVipByteBalance(string username)
         {
             try
             {
                 using (var context = chatbotContextFactory.Create())
                 {
                     var user = context.Users.Find(username.ToLower());
-                    return new UserBalance(user, config.BytesToVip);
+                    return VipRequests.Create(user);
                 }
             }
             catch (Exception e)
