@@ -45,19 +45,10 @@ namespace CoreCodedChatbot.Web.Controllers
 
         public IActionResult List()
         {
-            var chattersModel = chatterService.GetCurrentChatters();
-            LoggedInTwitchUser twitchUser = null;
+            var twitchUser = GetTwitchUser();
 
             if (User.Identity.IsAuthenticated)
             {
-                var username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
-                    ?.Value;
-                twitchUser = new LoggedInTwitchUser
-                {
-                    Username = username,
-                    IsMod = chattersModel?.IsUserMod(username) ?? false
-                };
-
                 ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
                 ViewBag.Username = twitchUser?.Username ?? string.Empty;
             }
@@ -91,18 +82,10 @@ namespace CoreCodedChatbot.Web.Controllers
         {
             try
             {
-                var chattersModel = chatterService.GetCurrentChatters();
+                var twitchUser = GetTwitchUser();
 
                 if (User.Identity.IsAuthenticated)
                 {
-                    var username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
-                        ?.Value;
-                    var twitchUser = new LoggedInTwitchUser
-                    {
-                        Username = username,
-                        IsMod = chattersModel?.IsUserMod(username) ?? false
-                    };
-
                     ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
                     ViewBag.Username = twitchUser?.Username ?? string.Empty;
                 }
@@ -124,18 +107,10 @@ namespace CoreCodedChatbot.Web.Controllers
         {
             try
             {
-                var chattersModel = chatterService.GetCurrentChatters();
+                var twitchUser = GetTwitchUser();
 
                 if (User.Identity.IsAuthenticated)
                 {
-                    var username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
-                        ?.Value;
-                    var twitchUser = new LoggedInTwitchUser
-                        {
-                            Username = username,
-                            IsMod = chattersModel?.IsUserMod(username) ?? false
-                        };
-
                     ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
                     ViewBag.Username = twitchUser?.Username ?? string.Empty;
                 }
@@ -191,16 +166,9 @@ namespace CoreCodedChatbot.Web.Controllers
         {
             try
             {
-                var chattersModel = chatterService.GetCurrentChatters();
+                var twitchUser = GetTwitchUser();
                 if (User.Identity.IsAuthenticated)
                 {
-                    var username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
-                        ?.Value;
-                    var twitchUser = new LoggedInTwitchUser
-                        {
-                            Username = username,
-                            IsMod = chattersModel?.IsUserMod(username) ?? false
-                        };
                     ViewBag.UserIsMod = twitchUser?.IsMod ?? false;
                 }
 
