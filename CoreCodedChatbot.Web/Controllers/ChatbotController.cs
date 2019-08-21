@@ -46,6 +46,8 @@ namespace CoreCodedChatbot.Web.Controllers
             var chattersModel = chatterService.GetCurrentChatters();
             LoggedInTwitchUser twitchUser = null;
 
+            ViewBag.UserIsMod = User.Identity.IsAuthenticated;
+
             if (User.Identity.IsAuthenticated)
             {
                 var username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
@@ -90,6 +92,7 @@ namespace CoreCodedChatbot.Web.Controllers
             try
             {
                 var chattersModel = chatterService.GetCurrentChatters();
+                ViewBag.UserIsMod = User.Identity.IsAuthenticated;
 
                 if (User.Identity.IsAuthenticated)
                 {
@@ -123,6 +126,7 @@ namespace CoreCodedChatbot.Web.Controllers
             try
             {
                 var chattersModel = chatterService.GetCurrentChatters();
+                ViewBag.UserIsMod = User.Identity.IsAuthenticated;
 
                 if (User.Identity.IsAuthenticated)
                 {
@@ -190,6 +194,8 @@ namespace CoreCodedChatbot.Web.Controllers
             try
             {
                 var chattersModel = chatterService.GetCurrentChatters();
+                ViewBag.UserIsMod = User.Identity.IsAuthenticated;
+
                 if (User.Identity.IsAuthenticated)
                 {
                     var username = User.FindFirst(c => c.Type == TwitchAuthenticationConstants.Claims.DisplayName)
