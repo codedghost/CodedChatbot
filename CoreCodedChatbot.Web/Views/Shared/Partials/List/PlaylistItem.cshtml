@@ -20,7 +20,7 @@
                           onclick="@(Model.isInDrive ? string.Empty : "showAddDriveModal(event)")"
                           data-toggle="tooltip" data-placement="top"></span>
                 }
-                if (ViewContext.ViewBag.UserIsMod || ViewContext.ViewBag.Username.ToLower() == Model.songRequester.ToLower())
+                if (ViewContext.ViewBag.UserIsMod || ViewContext.ViewBag.Username?.ToLower() ?? string.Empty == Model.songRequester.ToLower())
                 {
                     <span id="@Model.songRequestId" class="requestBadge editSongBadge" data-toggle="tooltip" data-placement="top" title="Edit Request" onclick="showEditRequestModal(event)"></span>
                     <span id="@Model.songRequestId" class="requestBadge removeSongBadge" data-toggle="tooltip" data-placement="top" title="Remove Request" onclick="showDeleteModal(event)"></span>
