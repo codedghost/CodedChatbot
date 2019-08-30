@@ -67,8 +67,6 @@ namespace CoreCodedChatbot.Commands
 
                     context.InfoCommands.Add(infoCommand);
 
-                    context.SaveChanges();
-
                     // Add aliases
                     var infoCommandKeywords = aliases.Select(a => new InfoCommandKeyword
                     {
