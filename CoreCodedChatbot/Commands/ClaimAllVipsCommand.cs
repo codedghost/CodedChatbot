@@ -13,11 +13,9 @@ namespace CoreCodedChatbot.Commands
     public class ClaimAllVipsCommand : ICommand
     {
         private BytesHelper bytesHelper;
-        private ConfigModel config;
 
-        public ClaimAllVipsCommand(BytesHelper bytesHelper, ConfigModel config)
+        public ClaimAllVipsCommand(BytesHelper bytesHelper)
         {
-            this.config = config;
             this.bytesHelper = bytesHelper;
         }
 
