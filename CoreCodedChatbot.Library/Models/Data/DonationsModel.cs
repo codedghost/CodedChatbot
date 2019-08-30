@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CoreCodedChatbot.Library.Models.Data
+﻿namespace CoreCodedChatbot.Library.Models.Data
 {
     public class DonationsModel
     {

@@ -11,9 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 using NSubstitute;
 using TwitchLib.Api;
-using TwitchLib.Api.Interfaces;
 using TwitchLib.Client;
-using TwitchLib.Client.Interfaces;
 using Xunit;
 
 namespace CoreCodedChatbot.Tests.HelperTests

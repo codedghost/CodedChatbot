@@ -1,21 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 using CoreCodedChatbot.Library.Interfaces.Services;
-using CoreCodedChatbot.Library.Models.ApiRequest;
 using CoreCodedChatbot.Library.Models.ApiRequest.Playlist;
 using CoreCodedChatbot.Library.Models.ApiResponse.Playlist;
-using CoreCodedChatbot.Library.Models.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using TwitchLib.Api;
-using TwitchLib.Client;
 
 namespace CoreCodedChatbot.Web.Controllers
 {

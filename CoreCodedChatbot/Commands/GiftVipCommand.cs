@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
-using CoreCodedChatbot.Helpers;
-using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Helpers;
-using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.ApiRequest.Vip;
 using CoreCodedChatbot.Library.Models.Data;
 using TwitchLib.Client;

@@ -1,18 +1,13 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Database.Context.Models;
 using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using TwitchLib.Api;
 using TwitchLib.Client;
-using TwitchLib.Client.Models;
 
 namespace CoreCodedChatbot.Library.Services
 {

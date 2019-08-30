@@ -1,6 +1,5 @@
 ﻿using System;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Library.Models.Data;
 
 using TwitchLib.Api;

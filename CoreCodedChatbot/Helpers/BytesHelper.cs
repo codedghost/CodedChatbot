@@ -2,7 +2,6 @@
 using System.Linq;
 
 using CoreCodedChatbot.Database.Context.Interfaces;
-using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Library.Models.Data;
 
 namespace CoreCodedChatbot.Helpers

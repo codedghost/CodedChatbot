@@ -1,5 +1,4 @@
-﻿using CoreCodedChatbot.Helpers.Interfaces;
-using CoreCodedChatbot.Interfaces;
+﻿using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Models.Data;
 
 using TwitchLib.Client;

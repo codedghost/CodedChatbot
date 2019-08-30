@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CoreCodedChatbot.Library.Models.Data;
+﻿using CoreCodedChatbot.Library.Models.Data;
 
 namespace CoreCodedChatbot.Library.Models.SignalR
 {

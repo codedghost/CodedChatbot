@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using Newtonsoft.Json;
-
-namespace CoreCodedChatbot.Library.Models.SongLibrary
+﻿namespace CoreCodedChatbot.Library.Models.SongLibrary
 {
     public class SongLibraryRecord
     {

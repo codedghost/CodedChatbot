@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CoreCodedChatbot.Library.Models.ApiRequest.Vip
+﻿namespace CoreCodedChatbot.Library.Models.ApiRequest.Vip
 {
     public class GiftVipModel
     {

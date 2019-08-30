@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using CoreCodedChatbot.Database.Context;
+﻿using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Interfaces;
