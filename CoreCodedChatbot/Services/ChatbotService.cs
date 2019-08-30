@@ -127,15 +127,24 @@ namespace CoreCodedChatbot.Services
         {
             try
             {
-                if ((config.DevelopmentBuild && !e.Command.ChatMessage.Channel.Contains(DevelopmentRoomId)) ||
-                     (!config.DevelopmentBuild && e.Command.ChatMessage.Channel.Contains(DevelopmentRoomId) && !string.IsNullOrWhiteSpace(DevelopmentRoomId)))
+                if (
+                    (config.DevelopmentBuild && !e.Command.ChatMessage.Channel.Contains(DevelopmentRoomId))
+                    || (!config.DevelopmentBuild && e.Command.ChatMessage.Channel.Contains(DevelopmentRoomId)
+                        && !string.IsNullOrWhiteSpace(DevelopmentRoomId)))
+                {
                     return;
+                }
 
-                if (config.DevelopmentBuild && !client.JoinedChannels.Select(jc => jc.Channel)
-                        .Any(jc => jc.Contains(DevelopmentRoomId)))
+                if (config.DevelopmentBuild
+                    && !client.JoinedChannels.Select(jc => jc.Channel).Any(jc => jc.Contains(DevelopmentRoomId)))
+                {
                     client.JoinRoom(config.ChannelId, DevelopmentRoomId);
+                }
 
-                commandHelper.ProcessCommand(e.Command.CommandText, client, e.Command.ChatMessage.Username,
+                commandHelper.ProcessCommand(
+                    e.Command.CommandText,
+                    client,
+                    e.Command.ChatMessage.Username,
                     e.Command.ArgumentsAsString,
                     e.Command.ChatMessage.IsModerator || e.Command.ChatMessage.IsBroadcaster,
                     client.JoinedChannels.FirstOrDefault(jc => jc.Channel == e.Command.ChatMessage.Channel));
