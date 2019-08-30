@@ -14,9 +14,9 @@ namespace CoreCodedChatbot.Commands
     {
         private readonly ConfigModel config;
 
-        public YoutubeCommand(IConfigHelper configHelper)
+        public YoutubeCommand(ConfigModel config)
         {
-            config = configHelper.GetConfig();
+            this.config = config;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)

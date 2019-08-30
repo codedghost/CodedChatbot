@@ -15,10 +15,10 @@ namespace CoreCodedChatbot.Commands
         private readonly ConfigModel config;
         private readonly TwitchAPI api;
 
-        public UptimeCommand(TwitchAPI api, IConfigHelper configHelper)
+        public UptimeCommand(TwitchAPI api, ConfigModel config)
         {
             this.api = api;
-            this.config = configHelper.GetConfig();
+            this.config = config;
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)

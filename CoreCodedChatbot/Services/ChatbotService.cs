@@ -59,7 +59,7 @@ namespace CoreCodedChatbot.Services
         private string DevelopmentRoomId = string.Empty; // Only for use in debug mode
 
         public ChatbotService(CommandHelper commandHelper, TwitchClient client, TwitchAPI api, TwitchPubSub pubsub, LiveStreamMonitorService liveStreamMonitor,
-            VipHelper vipHelper, BytesHelper bytesHelper, StreamLabsHelper streamLabsHelper, IConfigHelper configHelper)
+            VipHelper vipHelper, BytesHelper bytesHelper, StreamLabsHelper streamLabsHelper, ConfigModel config)
         {
             this.commandHelper = commandHelper;
             this.client = client;
@@ -68,7 +68,7 @@ namespace CoreCodedChatbot.Services
             this.liveStreamMonitor = liveStreamMonitor;
             this.vipHelper = vipHelper;
             this.bytesHelper = bytesHelper;
-            this.config = configHelper.GetConfig();
+            this.config = config;
             this.streamLabsHelper = streamLabsHelper;
 
             this.commandHelper.Init();

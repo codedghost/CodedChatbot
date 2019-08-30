@@ -12,9 +12,9 @@ namespace CoreCodedChatbot.Commands
     {
         private readonly ConfigModel config;
 
-        public TwitterCommand(IConfigHelper configHelper)
+        public TwitterCommand(ConfigModel config)
         {
-            this.config = configHelper.GetConfig();
+            this.config = config;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)

@@ -19,13 +19,10 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new []{ "giftvip", "iamasaintto"}, false)]
     public class GiftVipCommand : ICommand
     {
-        private ConfigModel config;
         private HttpClient vipClient;
 
-        public GiftVipCommand(IConfigHelper configHelper)
+        public GiftVipCommand(ConfigModel config)
         {
-            this.config = configHelper.GetConfig();
-
             this.vipClient = new HttpClient
             {
                 BaseAddress = new Uri(config.VipApiUrl),

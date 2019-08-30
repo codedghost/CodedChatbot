@@ -16,10 +16,10 @@ namespace CoreCodedChatbot.Helpers
         private readonly IChatbotContextFactory contextFactory;
         private readonly ConfigModel config;
 
-        public VipHelper(IChatbotContextFactory contextFactory, IConfigHelper configHelper)
+        public VipHelper(IChatbotContextFactory contextFactory, ConfigModel config)
         {
             this.contextFactory = contextFactory;
-            this.config = configHelper.GetConfig();
+            this.config = config;
         }
 
         public User FindUser(IChatbotContext context, string username, bool deferSave = false)
