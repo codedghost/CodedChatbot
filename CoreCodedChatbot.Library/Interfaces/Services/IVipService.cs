@@ -13,5 +13,6 @@ namespace CoreCodedChatbot.Library.Interfaces.Services
         bool UseVip(string username);
         bool HasSuperVip(string username);
         bool UseSuperVip(string username);
+        bool ModGiveVip(string username, int numberOfVips);
     }
 }

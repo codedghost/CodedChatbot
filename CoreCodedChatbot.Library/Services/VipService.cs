@@ -154,15 +154,15 @@ namespace CoreCodedChatbot.Library.Services
             return true;
         }
 
-        public bool ModGiveVip(string receivingUsername, int vipsToGive)
+        public bool ModGiveVip(string username, int numberOfVips)
         {
             try
             {
                 using (var context = chatbotContextFactory.Create())
                 {
-                    var user = GetUser(receivingUsername);
+                    var user = GetUser(username);
 
-                    user.ModGivenVipRequests += vipsToGive;
+                    user.ModGivenVipRequests += numberOfVips;
                     context.SaveChanges();
                 }
             }
