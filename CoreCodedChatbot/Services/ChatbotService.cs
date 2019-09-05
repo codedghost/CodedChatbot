@@ -17,6 +17,7 @@ using TwitchLib.Api.Services;
 using TwitchLib.Api.Services.Events;
 using TwitchLib.Api.Services.Events.LiveStreamMonitor;
 using TwitchLib.Client.Models;
+using TwitchLib.Communication.Events;
 using TwitchLib.PubSub;
 
 namespace CoreCodedChatbot.Services
@@ -79,6 +80,8 @@ namespace CoreCodedChatbot.Services
             this.client.OnCommunitySubscription += OnSubBomb;
             this.client.OnBeingHosted += OnBeingHosted;
             this.client.OnRaidNotification += OnRaidNotification;
+            this.client.OnDisconnected += OnDisconnected;
+            this.client.OnError += OnError;
             this.client.Connect();
             
             this.liveStreamMonitor.SetChannelsByName(new List<string>{config.StreamerChannel});
@@ -438,6 +441,16 @@ namespace CoreCodedChatbot.Services
                 null,
                 TimeSpan.Zero,
                 TimeSpan.FromMinutes(1));
+        }
+        
+        private void OnError(object sender, OnErrorEventArgs e)
+        {
+            Console.Error.WriteLine($"EXCEPTION - {DateTime.Now} \n Exception:\n{e.Exception} \n\n Inner: {e.Exception.InnerException}");
+        }
+
+        private void OnDisconnected(object sender, OnDisconnectedEventArgs e)
+        {
+            Console.Error.WriteLine($"DISCONNECTED FROM CHAT");
         }
 
         private void UnScheduleStreamTasks()

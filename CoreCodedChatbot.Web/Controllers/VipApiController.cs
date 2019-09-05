@@ -31,5 +31,13 @@ namespace CoreCodedChatbot.Web.Controllers
 
             return BadRequest();
         }
+
+        [HttpPost]
+        public IActionResult ModGiveVip([FromBody] ModGiveVipModel modGiveVipModel)
+        {
+
+
+            return BadRequest();
+        }
     }
 }

@@ -35,7 +35,7 @@ namespace CoreCodedChatbot.Commands
 
             var isOpen = JsonConvert.DeserializeObject<bool>(await request.Content.ReadAsStringAsync());
 
-            if (isOpen || username != "Chatbot")
+            if (isOpen)
             {
                 client.SendMessage(joinedChannel,
                     $"To request a song just use: !request <SongArtist> - <SongTitle> - (Guitar or Bass)");

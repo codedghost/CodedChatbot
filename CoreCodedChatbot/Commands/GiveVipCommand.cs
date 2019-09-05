@@ -1,6 +1,11 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
+using CoreCodedChatbot.Library.Helpers;
+using CoreCodedChatbot.Library.Models.ApiRequest.Vip;
 using CoreCodedChatbot.Library.Models.Data;
 
 using TwitchLib.Client;
@@ -8,45 +13,61 @@ using TwitchLib.Client.Models;
 
 namespace CoreCodedChatbot.Commands
 {
-    [CustomAttributes.ChatCommand(new []{ "gvip", "givevip" }, true)]
+    [CustomAttributes.ChatCommand(new[] {"gvip", "givevip"}, true)]
     public class GiveVipCommand : ICommand
     {
-        private readonly VipHelper vipHelper;
-
         private readonly ConfigModel config;
+        private HttpClient VipClient;
 
-        public GiveVipCommand(VipHelper vipHelper, ConfigModel config)
+        public GiveVipCommand(ConfigModel config)
         {
-            this.vipHelper = vipHelper;
             this.config = config;
+
+            this.VipClient = new HttpClient
+            {
+                BaseAddress = new Uri(config.VipApiUrl),
+                DefaultRequestHeaders =
+                {
+                    Authorization = new AuthenticationHeaderValue("Bearer", config.JwtTokenString)
+                }
+            };
         }
 
-        public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
+        public async void Process(TwitchClient client, string username, string commandText, bool isMod,
+            JoinedChannel joinedChannel)
         {
             var splitCommandText = commandText.Split(" ");
 
             if (commandText.Contains("@"))
             {
-                if (splitCommandText.Length == 1)
+                var giveVipModel = new ModGiveVipModel
                 {
-                    client.SendMessage(joinedChannel,
-                        vipHelper.GiveVipRequest(commandText.TrimStart('@'))
-                            ? $"Hey @{username}, I have successfully given {commandText} a VIP request!"
-                            : $"Hey @{username}, sorry something seems to be wrong here. Please check your command usage. Type !help gvip for more detailed help");
-                } else if (splitCommandText.Length == 2)
+                    ReceivingUsername = commandText.TrimStart('@'),
+                    VipsToGive = 1
+                };
+
+                if (splitCommandText.Length == 2)
                 {
                     var giveUser = splitCommandText.SingleOrDefault(x => x.Contains("@")).TrimStart('@');
-                    var giveAmount = 0;
-                    int.TryParse(splitCommandText.SingleOrDefault(x => !x.Contains("@")), out giveAmount);
-                    for (int i = 0; i < giveAmount; i++)
-                    {
-                        if (!vipHelper.GiveVipRequest(giveUser))
+
+                    if (int.TryParse(splitCommandText.SingleOrDefault(x => !x.Contains("@")), out var giveAmount))
+                        giveVipModel = new ModGiveVipModel
                         {
-                            client.SendMessage(joinedChannel, $"Hey @{username}, sorry something seems to be wrong here. I managed to give {i} VIPs. Please check your command usage. Type !help gvip for more detailed help");
-                        }
-                    }
-                    client.SendMessage(joinedChannel, $"Hey @{username}, I have successfully given @{giveUser} {giveAmount} VIPs");
+                            ReceivingUsername = giveUser,
+                            VipsToGive = giveAmount
+                        };
                 }
+
+                var result = await VipClient.PostAsync("ModGiveVip", HttpClientHelper.GetJsonData(giveVipModel));
+
+                client.SendMessage(joinedChannel,
+                    result.IsSuccessStatusCode
+                        ? $"Hey @{username}, I have successfully given {giveVipModel.ReceivingUsername} {giveVipModel.VipsToGive} VIPs!"
+                        : $"Hey @{username}, sorry something seems to be wrong here. Please check your command usage. Type !help gvip for more detailed help");
+
+                if (!result.IsSuccessStatusCode)
+                    Console.Error.WriteLine($"Error encountered when giving a single VIP: {result.StatusCode}");
+
             }
         }
 
