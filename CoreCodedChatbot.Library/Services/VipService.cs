@@ -154,6 +154,27 @@ namespace CoreCodedChatbot.Library.Services
             return true;
         }
 
+        public bool ModGiveVip(string receivingUsername, int vipsToGive)
+        {
+            try
+            {
+                using (var context = chatbotContextFactory.Create())
+                {
+                    var user = GetUser(receivingUsername);
+
+                    user.ModGivenVipRequests += vipsToGive;
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine($"ModGiveVIP Exception\n{e} - {e.InnerException}");
+                return false;
+            }
+
+            return true;
+        }
+
         private bool GiftVip(User donor, User receiver)
         {
             try

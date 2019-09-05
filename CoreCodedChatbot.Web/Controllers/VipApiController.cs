@@ -35,7 +35,14 @@ namespace CoreCodedChatbot.Web.Controllers
         [HttpPost]
         public IActionResult ModGiveVip([FromBody] ModGiveVipModel modGiveVipModel)
         {
-
+            try
+            {
+                if (vipService.ModGiveVip(modGiveVipModel.ReceivingUsername, modGiveVipModel.VipsToGive)) return Ok();
+            }
+            catch (Exception e)
+            {
+                Console.Error.Write($"ModGiveVIP\nException:\n{e}\nInner:\n{e.InnerException}");
+            }
 
             return BadRequest();
         }
