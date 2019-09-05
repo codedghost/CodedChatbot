@@ -4,6 +4,7 @@
     {
         Regular,
         Vip,
+        SuperVip,
         Empty
     }
 }

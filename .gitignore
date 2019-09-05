@@ -46,6 +46,7 @@
 /CoreCodedChatbot.Client/bin/
 /CoreCodedChatbot.Client/appsettings.Development.json
 /CoreCodedChatbot.Web/hosting.json
+/CoreCordedChatbot.Database/config.json
 /CoreCodedChatbot.Database/.vs/CoreCodedChatbot.Database/v15
 /CoreCodedChatbot.Database/bin/Debug
 /CoreCodedChatbot.Database/obj

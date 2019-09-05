@@ -7,6 +7,7 @@
         NoMultipleRequests,
         Success,
         UnSuccessful,
-        NoRequestEntered
+        NoRequestEntered,
+        OnlyOneSuper
     }
 }

@@ -2,7 +2,7 @@
 
 <div class="request even">
     <div class="requestHeader">
-        <b class="vipText">Current Song (@(Model != null ? Model.isVip ? "Vip" : "Regular" : ""))</b>
+        <b class="vipText">Current Song (@(Model != null ? Model.isSuperVip ? "SUPER" : Model.isVip ? "Vip" : "Regular" : ""))</b>
     </div>
 </div>
 <div id="@(@Model?.songRequestId ?? 0) "class="request even">

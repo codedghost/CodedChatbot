@@ -52,19 +52,37 @@ namespace CoreCodedChatbot.Library.Services
             }
         }
 
+        public bool RefundSuperVip(string username, bool deferSave = false)
+        {
+            try
+            {
+                using (var context = chatbotContextFactory.Create())
+                {
+                    var user = context.Users.SingleOrDefault(u => u.Username == username);
+
+                    if (user == null) return false;
+
+                    user.ModGivenVipRequests += config.SuperVipCost;
+
+                    if (!deferSave) context.SaveChanges();
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"{e} - {e.InnerException}");
+                return false;
+            }
+        }
+
         public bool HasVip(string username)
         {
             try
             {
                 var user = GetUser(username);
 
-                if (user == null ||
-                    user.UsedVipRequests + user.SentGiftVipRequests >=
-                    (user.FollowVipRequest + user.SubVipRequests + user.ModGivenVipRequests +
-                     user.DonationOrBitsVipRequests + user.TokenVipRequests +
-                     user.ReceivedGiftVipRequests)) return false;
-
-                return true;
+                return user != null && VipRequests.Create(user).TotalRemaining > 0;
             }
             catch (Exception e)
             {
