@@ -9,7 +9,6 @@ namespace CoreCodedChatbot.Database.Context.Models
         [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
         public string Username { get; set; }
         public int UsedVipRequests { get; set; }
-        public int UsedSuperVipRequests { get; set; }
         public int SentGiftVipRequests { get; set; }
         public int ModGivenVipRequests { get; set; }
         public int FollowVipRequest { get; set; }

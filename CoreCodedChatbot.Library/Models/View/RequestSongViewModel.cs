@@ -25,11 +25,6 @@ namespace CoreCodedChatbot.Library.Models.View
         [Display(Name="Use a VIP token?")]
         public bool IsVip { get; set; }
 
-        [Display(Name="Use a Super VIP token?")]
-        public bool IsSuperVip { get; set; }
-
         public bool ShouldShowVip { get; set; }
-
-        public bool ShouldShowSuperVip { get; set; }
     }
 }
