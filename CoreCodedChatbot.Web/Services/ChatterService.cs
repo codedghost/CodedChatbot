@@ -52,7 +52,7 @@ namespace CoreCodedChatbot.Web.Services
             }
             catch (Exception e)
             {
-                Console.Out.WriteLine($"Could not access Twitch TMI resource. Exception:\n{e}\n{e.InnerException}");
+                Console.Error.WriteLine($"Could not access Twitch TMI resource. Exception:\n{e}\n{e.InnerException}");
                 errorCounter++;
 
                 if (errorCounter > 5)
