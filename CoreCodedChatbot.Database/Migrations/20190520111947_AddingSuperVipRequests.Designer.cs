@@ -3,14 +3,16 @@ using System;
 using CoreCodedChatbot.Database.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CoreCodedChatbot.Database.Migrations
 {
     [DbContext(typeof(ChatbotContext))]
-    partial class ChatbotContextModelSnapshot : ModelSnapshot
+    [Migration("20190520111947_AddingSuperVipRequests")]
+    partial class AddingSuperVipRequests
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -155,6 +157,8 @@ namespace CoreCodedChatbot.Database.Migrations
                     b.Property<int>("SongId")
                         .HasColumnName("SongId");
 
+                    b.Property<DateTime?>("SuperVipRequestTime");
+
                     b.Property<DateTime?>("VipRequestTime");
 
                     b.HasKey("SongRequestId");
@@ -201,6 +205,11 @@ namespace CoreCodedChatbot.Database.Migrations
 
                     b.Property<int>("TotalDonated")
                         .HasColumnName("TotalDonated");
+
+                    b.Property<int>("UsedSuperVipRequests")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("UsedSuperVipRequests")
+                        .HasDefaultValue(0);
 
                     b.Property<int>("UsedVipRequests")
                         .HasColumnName("UsedVipRequests");

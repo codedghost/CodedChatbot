@@ -1,4 +1,7 @@
-﻿using CoreCodedChatbot.Library.Models.Enums;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using CoreCodedChatbot.Library.Models.Enums;
 
 namespace CoreCodedChatbot.Library.Models.ApiResponse.Playlist
 {
