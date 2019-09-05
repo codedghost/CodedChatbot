@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using CoreCodedChatbot.Helpers.Interfaces;
-using CoreCodedChatbot.Interfaces;
+﻿using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Models.Data;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
@@ -14,9 +10,9 @@ namespace CoreCodedChatbot.Commands
     {
         private readonly ConfigModel config;
 
-        public YoutubeCommand(IConfigHelper configHelper)
+        public YoutubeCommand(ConfigModel config)
         {
-            config = configHelper.GetConfig();
+            this.config = config;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)

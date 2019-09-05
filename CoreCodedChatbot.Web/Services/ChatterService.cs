@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading;
-using System.Threading.Tasks;
-using AspNet.Security.OAuth.Twitch;
-using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
-using CoreCodedChatbot.Library.Models.View;
 using CoreCodedChatbot.Web.Interfaces;
 using Newtonsoft.Json;
 
@@ -52,7 +47,7 @@ namespace CoreCodedChatbot.Web.Services
             }
             catch (Exception e)
             {
-                Console.Out.WriteLine($"Could not access Twitch TMI resource. Exception:\n{e}\n{e.InnerException}");
+                Console.Error.WriteLine($"Could not access Twitch TMI resource. Exception:\n{e}\n{e.InnerException}");
                 errorCounter++;
 
                 if (errorCounter > 5)

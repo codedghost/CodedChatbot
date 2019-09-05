@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Database.Context.Models;
 using CoreCodedChatbot.Library.Interfaces.Services;
@@ -93,6 +91,66 @@ namespace CoreCodedChatbot.Library.Services
             catch (Exception e)
             {
                 Console.WriteLine($"UseVIP Exception\n{e} - {e.InnerException}");
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool HasSuperVip(string username)
+        {
+            try
+            {
+                var user = GetUser(username);
+
+                return user != null && VipRequests.Create(user).TotalRemaining > config.SuperVipCost;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("HasSuperVip Exception:");
+                Console.WriteLine($"{e} - {e.InnerException}");
+                return false;
+            }
+        }
+
+        public bool UseSuperVip(string username)
+        {
+            try
+            {
+                if (!HasSuperVip(username)) return false;
+
+                using (var context = chatbotContextFactory.Create())
+                {
+                    var user = context.Users.Find(username);
+
+                    user.UsedSuperVipRequests++;
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"UseSuperVIP Exception\n{e} - {e.InnerException}");
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool ModGiveVip(string receivingUsername, int vipsToGive)
+        {
+            try
+            {
+                using (var context = chatbotContextFactory.Create())
+                {
+                    var user = GetUser(receivingUsername);
+
+                    user.ModGivenVipRequests += vipsToGive;
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.Error.WriteLine($"ModGiveVIP Exception\n{e} - {e.InnerException}");
                 return false;
             }
 

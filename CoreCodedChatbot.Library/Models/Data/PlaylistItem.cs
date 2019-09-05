@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Text.RegularExpressions;
-
-namespace CoreCodedChatbot.Library.Models.Data
+﻿namespace CoreCodedChatbot.Library.Models.Data
 {
     public class PlaylistItem
     {

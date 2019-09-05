@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Database.Context.Models;
 using CoreCodedChatbot.Interfaces;
@@ -10,7 +8,7 @@ using TwitchLib.Client.Models;
 
 namespace CoreCodedChatbot.Commands
 {
-    [CustomAttributes.ChatCommand(new []{ "addinfo" }, true)]
+    [CustomAttributes.ChatCommand(new[] { "addinfo" }, true)]
     public class AddInfoCommand : ICommand
     {
         private ChatbotContextFactory chatbotContextFactory;
@@ -25,7 +23,7 @@ namespace CoreCodedChatbot.Commands
             try
             {
                 // Parse Input
-                var splitInput = commandText.Split('"').Where(c => !string.IsNullOrWhiteSpace(c)).ToArray();
+                var splitInput = commandText.Split('"', StringSplitOptions.RemoveEmptyEntries).ToArray();
                 if (splitInput.Length != 3)
                 {
                     client.SendMessage(joinedChannel,
@@ -33,13 +31,15 @@ namespace CoreCodedChatbot.Commands
                     return;
                 }
 
-                var aliases = splitInput[0].Split(new[] {", ", ","}, StringSplitOptions.None)
-                    .Where(a => !string.IsNullOrWhiteSpace(a)).ToArray();
+                var aliases = splitInput[0]
+                    .Split(new[] { ", ", "," }, StringSplitOptions.RemoveEmptyEntries)
+                    .ToArray();
                 var info = splitInput[1];
                 var helpText = splitInput[2];
 
-                if (aliases.All(string.IsNullOrWhiteSpace) || string.IsNullOrWhiteSpace(info) ||
-                    string.IsNullOrWhiteSpace(helpText))
+                if (aliases.Length == 0
+                    || string.IsNullOrWhiteSpace(info)
+                    || string.IsNullOrWhiteSpace(helpText))
                 {
                     client.SendMessage(joinedChannel,
                         $"Hey @{username}, it doesn't look like you've provided everything I need. I need aliases, text, and helptext :)");
@@ -64,8 +64,6 @@ namespace CoreCodedChatbot.Commands
                     };
 
                     context.InfoCommands.Add(infoCommand);
-
-                    context.SaveChanges();
 
                     // Add aliases
                     var infoCommandKeywords = aliases.Select(a => new InfoCommandKeyword

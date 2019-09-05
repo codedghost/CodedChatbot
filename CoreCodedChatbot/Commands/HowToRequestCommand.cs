@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Library.Helpers;
 using CoreCodedChatbot.Library.Models.Data;
 using Newtonsoft.Json;
 using TwitchLib.Client;
@@ -37,7 +35,7 @@ namespace CoreCodedChatbot.Commands
 
             var isOpen = JsonConvert.DeserializeObject<bool>(await request.Content.ReadAsStringAsync());
 
-            if (isOpen || username != "Chatbot")
+            if (isOpen)
             {
                 client.SendMessage(joinedChannel,
                     $"To request a song just use: !request <SongArtist> - <SongTitle> - (Guitar or Bass)");

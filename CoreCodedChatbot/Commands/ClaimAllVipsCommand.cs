@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using CoreCodedChatbot.Helpers;
+﻿using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Library.Models.Data;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
@@ -13,11 +9,9 @@ namespace CoreCodedChatbot.Commands
     public class ClaimAllVipsCommand : ICommand
     {
         private BytesHelper bytesHelper;
-        private ConfigModel config;
 
-        public ClaimAllVipsCommand(BytesHelper bytesHelper, ConfigModel config)
+        public ClaimAllVipsCommand(BytesHelper bytesHelper)
         {
-            this.config = config;
             this.bytesHelper = bytesHelper;
         }
 

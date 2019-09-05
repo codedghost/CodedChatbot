@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace CoreCodedChatbot.Library.Interfaces.Services
+﻿namespace CoreCodedChatbot.Library.Interfaces.Services
 {
     public interface IVipService
     {
@@ -10,5 +6,8 @@ namespace CoreCodedChatbot.Library.Interfaces.Services
         bool RefundVip(string username, bool deferSave = false);
         bool HasVip(string username);
         bool UseVip(string username);
+        bool HasSuperVip(string username);
+        bool UseSuperVip(string username);
+        bool ModGiveVip(string receivingUsername, int vipsToGive);
     }
 }

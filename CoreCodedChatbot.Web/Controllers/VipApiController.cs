@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.ApiRequest.Vip;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -30,6 +27,21 @@ namespace CoreCodedChatbot.Web.Controllers
             catch (Exception e)
             {
                 Console.Out.Write($"{e} - {e.InnerException}");
+            }
+
+            return BadRequest();
+        }
+
+        [HttpPost]
+        public IActionResult ModGiveVip([FromBody] ModGiveVipModel modGiveVipModel)
+        {
+            try
+            {
+                if (vipService.ModGiveVip(modGiveVipModel.ReceivingUsername, modGiveVipModel.VipsToGive)) return Ok();
+            }
+            catch (Exception e)
+            {
+                Console.Error.Write($"ModGiveVIP\nException:\n{e}\nInner:\n{e.InnerException}");
             }
 
             return BadRequest();

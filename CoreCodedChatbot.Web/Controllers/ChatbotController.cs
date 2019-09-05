@@ -1,22 +1,15 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using AspNet.Security.OAuth.Twitch;
-using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Library.Models.Enums;
 using CoreCodedChatbot.Library.Models.SongLibrary;
 using CoreCodedChatbot.Library.Models.View;
 using CoreCodedChatbot.Web.Interfaces;
-using CoreCodedChatbot.Web.Services;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using TwitchLib.Api;
 
 namespace CoreCodedChatbot.Web.Controllers
 {

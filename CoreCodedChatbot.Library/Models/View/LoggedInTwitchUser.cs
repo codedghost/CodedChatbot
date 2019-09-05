@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CoreCodedChatbot.Library.Models.Data;
-
-namespace CoreCodedChatbot.Library.Models.View
+﻿namespace CoreCodedChatbot.Library.Models.View
 {
     public class LoggedInTwitchUser
     {

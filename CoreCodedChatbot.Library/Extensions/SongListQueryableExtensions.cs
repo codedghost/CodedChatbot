@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using CoreCodedChatbot.Database.Context.Models;
 
 namespace CoreCodedChatbot.Library.Extensions

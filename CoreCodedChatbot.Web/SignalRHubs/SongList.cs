@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Library.Models.SignalR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
 namespace CoreCodedChatbot.Web.SignalRHubs
