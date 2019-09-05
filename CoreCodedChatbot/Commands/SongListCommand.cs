@@ -1,5 +1,4 @@
-﻿using CoreCodedChatbot.Helpers.Interfaces;
-using CoreCodedChatbot.Interfaces;
+﻿using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Models.Data;
 
 using TwitchLib.Client;
@@ -12,9 +11,9 @@ namespace CoreCodedChatbot.Commands
     {
         private readonly ConfigModel config;
 
-        public SongListCommand(IConfigHelper configHelper)
+        public SongListCommand(ConfigModel config)
         {
-            this.config = configHelper.GetConfig();
+            this.config = config;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)

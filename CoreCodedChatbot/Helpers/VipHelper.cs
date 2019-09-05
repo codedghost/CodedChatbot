@@ -5,7 +5,6 @@ using System.Linq;
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Database.Context.Models;
-using CoreCodedChatbot.Helpers.Interfaces;
 using TwitchLib.Api.V5.Models.Subscriptions;
 
 
@@ -16,10 +15,10 @@ namespace CoreCodedChatbot.Helpers
         private readonly IChatbotContextFactory contextFactory;
         private readonly ConfigModel config;
 
-        public VipHelper(IChatbotContextFactory contextFactory, IConfigHelper configHelper)
+        public VipHelper(IChatbotContextFactory contextFactory, ConfigModel config)
         {
             this.contextFactory = contextFactory;
-            this.config = configHelper.GetConfig();
+            this.config = config;
         }
 
         public User FindUser(IChatbotContext context, string username, bool deferSave = false)

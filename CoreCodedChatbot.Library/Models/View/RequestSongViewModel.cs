@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
-using CoreCodedChatbot.Library.Helpers;
-using CoreCodedChatbot.Library.Models.Data;
+﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace CoreCodedChatbot.Library.Models.View

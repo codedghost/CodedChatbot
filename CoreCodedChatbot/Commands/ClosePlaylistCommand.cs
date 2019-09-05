@@ -2,10 +2,7 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Library.Models.Data;
-using Microsoft.AspNetCore.Localization;
-using Newtonsoft.Json;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
@@ -15,7 +12,6 @@ namespace CoreCodedChatbot.Commands
     public class ClosePlaylistCommand : ICommand
     {
         private readonly HttpClient playlistClient;
-        private readonly ConfigModel config;
 
         public ClosePlaylistCommand(ConfigModel config)
         {
@@ -27,8 +23,6 @@ namespace CoreCodedChatbot.Commands
                     Authorization = new AuthenticationHeaderValue("Bearer", config.JwtTokenString)
                 }
             };
-
-            this.config = config;
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)

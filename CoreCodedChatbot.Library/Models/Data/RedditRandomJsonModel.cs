@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-// Pretty big comprehensive model generated from random.json response.
+﻿// Pretty big comprehensive model generated from random.json response.
 // We'll likely only need a few fields here
 
 namespace CoreCodedChatbot.Library.Models.Data

@@ -2,7 +2,6 @@
 using System.Linq;
 
 using CoreCodedChatbot.Database.Context.Interfaces;
-using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Library.Models.Data;
 
 namespace CoreCodedChatbot.Helpers
@@ -14,11 +13,11 @@ namespace CoreCodedChatbot.Helpers
         private readonly VipHelper vipHelper;
         private readonly ConfigModel config;
 
-        public BytesHelper(IChatbotContextFactory contextFactory, VipHelper vipHelper, IConfigHelper configHelper)
+        public BytesHelper(IChatbotContextFactory contextFactory, VipHelper vipHelper, ConfigModel config)
         {
             this.contextFactory = contextFactory;
             this.vipHelper = vipHelper;
-            this.config = configHelper.GetConfig();
+            this.config = config;
         }
 
         public void GiveViewershipBytes(ChatViewersModel chatViewersModel)

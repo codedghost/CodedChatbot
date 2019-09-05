@@ -2,12 +2,10 @@
 using System.Net.Http;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Threading;
 using Newtonsoft.Json;
 
 using CoreCodedChatbot.Helpers;
-using CoreCodedChatbot.Helpers.Interfaces;
 using CoreCodedChatbot.Library.Models.Data;
 using Microsoft.EntityFrameworkCore.Internal;
 using TwitchLib.Client.Events;
@@ -60,7 +58,7 @@ namespace CoreCodedChatbot.Services
         private string DevelopmentRoomId = string.Empty; // Only for use in debug mode
 
         public ChatbotService(CommandHelper commandHelper, TwitchClient client, TwitchAPI api, TwitchPubSub pubsub, LiveStreamMonitorService liveStreamMonitor,
-            VipHelper vipHelper, BytesHelper bytesHelper, StreamLabsHelper streamLabsHelper, IConfigHelper configHelper)
+            VipHelper vipHelper, BytesHelper bytesHelper, StreamLabsHelper streamLabsHelper, ConfigModel config)
         {
             this.commandHelper = commandHelper;
             this.client = client;
@@ -69,7 +67,7 @@ namespace CoreCodedChatbot.Services
             this.liveStreamMonitor = liveStreamMonitor;
             this.vipHelper = vipHelper;
             this.bytesHelper = bytesHelper;
-            this.config = configHelper.GetConfig();
+            this.config = config;
             this.streamLabsHelper = streamLabsHelper;
 
             this.commandHelper.Init();
@@ -132,15 +130,24 @@ namespace CoreCodedChatbot.Services
         {
             try
             {
-                if ((config.DevelopmentBuild && !e.Command.ChatMessage.Channel.Contains(DevelopmentRoomId)) ||
-                     (!config.DevelopmentBuild && e.Command.ChatMessage.Channel.Contains(DevelopmentRoomId) && !string.IsNullOrWhiteSpace(DevelopmentRoomId)))
+                if (
+                    (config.DevelopmentBuild && !e.Command.ChatMessage.Channel.Contains(DevelopmentRoomId))
+                    || (!config.DevelopmentBuild && e.Command.ChatMessage.Channel.Contains(DevelopmentRoomId)
+                        && !string.IsNullOrWhiteSpace(DevelopmentRoomId)))
+                {
                     return;
+                }
 
-                if (config.DevelopmentBuild && !client.JoinedChannels.Select(jc => jc.Channel)
-                        .Any(jc => jc.Contains(DevelopmentRoomId)))
+                if (config.DevelopmentBuild
+                    && !client.JoinedChannels.Select(jc => jc.Channel).Any(jc => jc.Contains(DevelopmentRoomId)))
+                {
                     client.JoinRoom(config.ChannelId, DevelopmentRoomId);
+                }
 
-                commandHelper.ProcessCommand(e.Command.CommandText, client, e.Command.ChatMessage.Username,
+                commandHelper.ProcessCommand(
+                    e.Command.CommandText,
+                    client,
+                    e.Command.ChatMessage.Username,
                     e.Command.ArgumentsAsString,
                     e.Command.ChatMessage.IsModerator || e.Command.ChatMessage.IsBroadcaster,
                     client.JoinedChannels.FirstOrDefault(jc => jc.Channel == e.Command.ChatMessage.Channel));
