@@ -51,11 +51,13 @@ namespace CoreCodedChatbot.Commands
                     var giveUser = splitCommandText.SingleOrDefault(x => x.Contains("@")).TrimStart('@');
 
                     if (int.TryParse(splitCommandText.SingleOrDefault(x => !x.Contains("@")), out var giveAmount))
+                    {
                         giveVipModel = new ModGiveVipModel
                         {
                             ReceivingUsername = giveUser,
                             VipsToGive = giveAmount
                         };
+                    }
                 }
 
                 var result = await VipClient.PostAsync("ModGiveVip", HttpClientHelper.GetJsonData(giveVipModel));

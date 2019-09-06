@@ -23,7 +23,7 @@ namespace CoreCodedChatbot.Commands
             try
             {
                 // Parse Input
-                var splitInput = commandText.Split('"', StringSplitOptions.RemoveEmptyEntries).ToArray();
+                var splitInput = commandText.Split('"').Where(c => !string.IsNullOrWhiteSpace(c)).ToArray();
                 if (splitInput.Length != 3)
                 {
                     client.SendMessage(joinedChannel,
@@ -32,7 +32,8 @@ namespace CoreCodedChatbot.Commands
                 }
 
                 var aliases = splitInput[0]
-                    .Split(new[] { ", ", "," }, StringSplitOptions.RemoveEmptyEntries)
+                    .Split(",")
+                    .Where(c => !string.IsNullOrWhiteSpace(c))
                     .ToArray();
                 var info = splitInput[1];
                 var helpText = splitInput[2];

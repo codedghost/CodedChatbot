@@ -34,6 +34,7 @@
         public string JwtTokenString;
         public string PlaylistApiUrl;
         public string VipApiUrl;
+        public string ChatInfoApiUrl;
         public int ConcurrentRegularSongsToPlay;
         public int SecondsForGuessingGame;
         public string RocksnifferSongDetailsLocation;

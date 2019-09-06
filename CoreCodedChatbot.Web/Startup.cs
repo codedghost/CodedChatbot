@@ -109,6 +109,7 @@ namespace CoreCodedChatbot.Web
             services.AddSingleton(typeof(SignalRHeartbeatService), typeof(SignalRHeartbeatService));
             services.AddSingleton<IChatterService, ChatterService>();
             services.AddSingleton<IPlaylistService, PlaylistService>();
+            services.AddSingleton<IChatInfoService, ChatInfoService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
