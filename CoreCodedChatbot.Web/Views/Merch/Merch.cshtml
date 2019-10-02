@@ -1,7 +1,21 @@
-﻿
+﻿@model CoreCodedChatbot.Web.ViewModels.Merch.MerchLandingViewModel
+
 @{
     ViewBag.Title = "CodedGhost Merch";
     Layout = "_Layout";
 }
 
-MERCH SITE COMING SOON
+<div class="col-12">
+    <div class="align-content-center">
+        <form action="@Url.Action("Search", "Merch")" method="post">
+            @Html.EditorFor(m => m.SearchTerms)
+            <button type="submit">Search</button>
+        </form>
+
+        @foreach (var product in Model.SyncProducts)
+        {
+            <h2>@product.Name</h2>
+            <p>This product has @product.Variants variants! Click <a>here</a> to see what's available</p>
+        }
+    </div>
+</div>

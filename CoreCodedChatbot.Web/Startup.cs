@@ -15,6 +15,8 @@ using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Services;
+using CoreCodedChatbot.Printful.Factories;
+using CoreCodedChatbot.Printful.Interfaces.Factories;
 using CoreCodedChatbot.Web.Interfaces;
 using CoreCodedChatbot.Web.Services;
 using CoreCodedChatbot.Web.SignalRHubs;
@@ -109,6 +111,7 @@ namespace CoreCodedChatbot.Web
             services.AddSingleton(typeof(SignalRHeartbeatService), typeof(SignalRHeartbeatService));
             services.AddSingleton<IChatterService, ChatterService>();
             services.AddSingleton<IPlaylistService, PlaylistService>();
+            services.AddSingleton<IPrintfulClientFactory, PrintfulClientFactory>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
