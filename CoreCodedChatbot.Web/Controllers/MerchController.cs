@@ -7,7 +7,7 @@ namespace CoreCodedChatbot.Web.Controllers
         // GET
         public IActionResult Index()
         {
-
+            return View("Merch");
         }
     }
 }
