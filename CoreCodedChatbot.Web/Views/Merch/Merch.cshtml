@@ -12,10 +12,24 @@
             <button type="submit">Search</button>
         </form>
 
-        @foreach (var product in Model.SyncProducts)
+        @foreach (var product in Model.SyncVariants)
         {
-            <h2>@product.Name</h2>
-            <p>This product has @product.Variants variants! Click <a>here</a> to see what's available</p>
+            <h2>@product.Result.Sync_Product.Name</h2>
+
+            foreach (var variant in product.Result.Sync_Variants)
+            {
+                <h3>@variant.Name - @variant.Retail_Price @variant.Currency</h3>
+
+                {
+                    var previewFile = variant.Files.FirstOrDefault(f => f.Type == "preview");
+
+                    <img src="@previewFile.Thumbnail_Url" >
+                }
+
+
+            }
+
+            <br />
         }
     </div>
 </div>

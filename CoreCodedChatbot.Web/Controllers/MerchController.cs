@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using CoreCodedChatbot.Printful.Interfaces.ExternalClients;
 using CoreCodedChatbot.Printful.Interfaces.Factories;
 using CoreCodedChatbot.Printful.Models.ApiResponse;
@@ -34,12 +35,12 @@ namespace CoreCodedChatbot.Web.Controllers
             return View("Merch", BuildViewModel(products, submittedModel.SearchTerms));
         }
 
-        private MerchLandingViewModel BuildViewModel(GetSyncProductsResult getSyncProductsResult, string searchTerms)
+        private MerchLandingViewModel BuildViewModel(List<GetSyncVariantsResult> getSyncProductsResult, string searchTerms)
         {
             return new MerchLandingViewModel
             {
                 SearchTerms = searchTerms,
-                SyncProducts = getSyncProductsResult.Result
+                SyncVariants = getSyncProductsResult
             };
         }
     }

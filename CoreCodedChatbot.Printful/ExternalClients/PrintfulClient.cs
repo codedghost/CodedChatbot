@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -31,20 +33,20 @@ namespace CoreCodedChatbot.Printful.ExternalClients
             };
         }
 
-        public async Task<GetSyncProductsResult> GetAllProducts()
+        public async Task<List<GetSyncVariantsResult>> GetAllProducts()
         {
             var result = await _printfulApiClient.GetAsync("store/products");
 
             if (!result.IsSuccessStatusCode) return null;
 
             var jsonString = await result.Content.ReadAsStringAsync();
+
             var data = JsonConvert.DeserializeObject<GetSyncProductsResult>(jsonString);
 
-            return data;
-
+            return await GetAllVariants(data);
         }
 
-        public async Task<GetSyncProductsResult> GetRelevantProducts(string searchTerm)
+        public async Task<List<GetSyncVariantsResult>> GetRelevantProducts(string searchTerm)
         {
             var result = await _printfulApiClient.GetAsync($"store/products?search={WebUtility.UrlEncode(searchTerm)}");
 
@@ -52,7 +54,27 @@ namespace CoreCodedChatbot.Printful.ExternalClients
 
             var data = JsonConvert.DeserializeObject<GetSyncProductsResult>(await result.Content.ReadAsStringAsync());
 
-            return data;
+            return await GetAllVariants(data);
+        }
+
+        private async Task<List<GetSyncVariantsResult>> GetAllVariants(GetSyncProductsResult getSyncProductsResult)
+        {
+            List<GetSyncVariantsResult> results = new List<GetSyncVariantsResult>();
+
+            // Now go get the product images and other info
+            foreach (var item in getSyncProductsResult.Result)
+            {
+                var result = await _printfulApiClient.GetAsync($"store/products/{item.Id}");
+                if (!result.IsSuccessStatusCode) continue;
+
+                var jsonString = await result.Content.ReadAsStringAsync();
+
+                var syncVariantsResult = JsonConvert.DeserializeObject<GetSyncVariantsResult>(jsonString);
+
+                results.Add(syncVariantsResult);
+            }
+
+            return results;
         }
 
         public void Dispose()
