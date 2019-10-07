@@ -14,19 +14,12 @@
 
         @foreach (var product in Model.SyncVariants)
         {
-            <h2>@product.Result.Sync_Product.Name</h2>
+            <h2>@Html.ActionLink(product.Result.Sync_Product.Name, "ProductPage", new { id = product.Result.Sync_Product.Id })</h2>
 
-            foreach (var variant in product.Result.Sync_Variants)
             {
-                <h3>@variant.Name - @variant.Retail_Price @variant.Currency</h3>
+                var previewFile = product.Result.Sync_Variants.FirstOrDefault()?.Files?.FirstOrDefault(f => f.Type == "preview");
 
-                {
-                    var previewFile = variant.Files.FirstOrDefault(f => f.Type == "preview");
-
-                    <img src="@previewFile.Thumbnail_Url" >
-                }
-
-
+                <img src="@previewFile.Thumbnail_Url" alt="@product.Result.Sync_Product.Name Image">
             }
 
             <br />

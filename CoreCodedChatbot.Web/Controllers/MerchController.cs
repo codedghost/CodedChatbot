@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using CoreCodedChatbot.Printful.Interfaces.ExternalClients;
 using CoreCodedChatbot.Printful.Interfaces.Factories;
@@ -22,7 +23,7 @@ namespace CoreCodedChatbot.Web.Controllers
         {
             var products = await _printfulClient.GetAllProducts();
 
-            return View("Merch", BuildViewModel(products, string.Empty));
+            return View("Merch", BuildMerchLandingViewModel(products, string.Empty));
         }
 
         [HttpPost("/search")]
@@ -32,15 +33,31 @@ namespace CoreCodedChatbot.Web.Controllers
                 ? await _printfulClient.GetAllProducts()
                 : await _printfulClient.GetRelevantProducts(submittedModel.SearchTerms);
 
-            return View("Merch", BuildViewModel(products, submittedModel.SearchTerms));
+            return View("Merch", BuildMerchLandingViewModel(products, submittedModel.SearchTerms));
         }
 
-        private MerchLandingViewModel BuildViewModel(List<GetSyncVariantsResult> getSyncProductsResult, string searchTerms)
+        [HttpGet("/product/{id}")]
+        public async Task<IActionResult> ProductPage(int id)
+        {
+            var variants = await _printfulClient.GetVariantsById(id);
+
+            return View("ProductPage", BuildProductPageViewModel(variants));
+        }
+
+        private MerchLandingViewModel BuildMerchLandingViewModel(List<GetSyncVariantsResult> getSyncProductsResult, string searchTerms)
         {
             return new MerchLandingViewModel
             {
                 SearchTerms = searchTerms,
                 SyncVariants = getSyncProductsResult
+            };
+        }
+
+        private ProductPageViewModel BuildProductPageViewModel(GetSyncVariantsResult getSyncVariantsResult)
+        {
+            return new ProductPageViewModel
+            {
+                VariantQueryResult = getSyncVariantsResult.Result
             };
         }
     }

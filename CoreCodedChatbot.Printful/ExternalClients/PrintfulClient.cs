@@ -57,6 +57,23 @@ namespace CoreCodedChatbot.Printful.ExternalClients
             return await GetAllVariants(data);
         }
 
+        public async Task<GetSyncVariantsResult> GetVariantsById(int id)
+        {
+            return await GetVariants(id);
+        }
+
+        private async Task<GetSyncVariantsResult> GetVariants(int id)
+        {
+            var result = await _printfulApiClient.GetAsync($"store/products/{id}");
+            if (!result.IsSuccessStatusCode) return null;
+
+            var jsonString = await result.Content.ReadAsStringAsync();
+
+            var syncVariantsResult = JsonConvert.DeserializeObject<GetSyncVariantsResult>(jsonString);
+
+            return syncVariantsResult;
+        }
+
         private async Task<List<GetSyncVariantsResult>> GetAllVariants(GetSyncProductsResult getSyncProductsResult)
         {
             List<GetSyncVariantsResult> results = new List<GetSyncVariantsResult>();
@@ -64,14 +81,11 @@ namespace CoreCodedChatbot.Printful.ExternalClients
             // Now go get the product images and other info
             foreach (var item in getSyncProductsResult.Result)
             {
-                var result = await _printfulApiClient.GetAsync($"store/products/{item.Id}");
-                if (!result.IsSuccessStatusCode) continue;
+                var variant = await GetVariants(item.Id);
 
-                var jsonString = await result.Content.ReadAsStringAsync();
+                if (variant == null) continue;
 
-                var syncVariantsResult = JsonConvert.DeserializeObject<GetSyncVariantsResult>(jsonString);
-
-                results.Add(syncVariantsResult);
+                results.Add(variant);
             }
 
             return results;
