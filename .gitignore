@@ -56,3 +56,4 @@
 /CoreCodedChatbot.Api/obj
 /CoreCodedChatbot.Api/Properties/launchSettings.json
 /CoreCodedChatbot.Api/config.json
+/CoreCodedChatbot.Api/hosting.json

@@ -21,12 +21,18 @@ namespace CoreCodedChatbot.Api
                 context.Database.Migrate();
             }
 
+            var config = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("hosting.json", optional: true)
+                .Build();
 
-            CreateWebHostBuilder(args).Build().Run();
+            CreateWebHostBuilder(args, config).Run();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+        public static IWebHost CreateWebHostBuilder(string[] args, IConfigurationRoot config) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+                .UseConfiguration(config)
+                .UseStartup<Startup>()
+                .Build();
     }
 }
