@@ -5,16 +5,16 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CoreCodedChatbot.Web.Controllers
+namespace CoreCodedChatbot.Api.Controllers
 {
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class VipApiController : Controller
     {
-        private IVipService vipService;
+        private IVipService _vipService;
 
         public VipApiController(IVipService vipService)
         {
-            this.vipService = vipService;
+            _vipService = vipService;
         }
 
         [HttpPost]
@@ -22,7 +22,7 @@ namespace CoreCodedChatbot.Web.Controllers
         {
             try
             {
-                if (vipService.GiftVip(giftVipModel.DonorUsername, giftVipModel.ReceiverUsername)) return Ok();
+                if (_vipService.GiftVip(giftVipModel.DonorUsername, giftVipModel.ReceiverUsername)) return Ok();
             }
             catch (Exception e)
             {
@@ -37,7 +37,7 @@ namespace CoreCodedChatbot.Web.Controllers
         {
             try
             {
-                if (vipService.ModGiveVip(modGiveVipModel.ReceivingUsername, modGiveVipModel.VipsToGive)) return Ok();
+                if (_vipService.ModGiveVip(modGiveVipModel.ReceivingUsername, modGiveVipModel.VipsToGive)) return Ok();
             }
             catch (Exception e)
             {

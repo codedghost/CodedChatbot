@@ -6,16 +6,16 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CoreCodedChatbot.Web.Controllers
+namespace CoreCodedChatbot.Api.Controllers
 {
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PlaylistApiController : Controller
     {
-        private readonly IPlaylistService playlistService;
+        private readonly IPlaylistService _playlistService;
 
         public PlaylistApiController(IPlaylistService playlistService)
         {
-            this.playlistService = playlistService;
+            _playlistService = playlistService;
         }
 
         public IActionResult TestEndpoint()
@@ -26,7 +26,7 @@ namespace CoreCodedChatbot.Web.Controllers
         [HttpPost]
         public IActionResult EditRequest([FromBody] EditSongRequest editSongRequest)
         {
-            var success = playlistService.EditRequest(editSongRequest.username, editSongRequest.commandText, editSongRequest.isMod, 
+            var success = _playlistService.EditRequest(editSongRequest.username, editSongRequest.commandText, editSongRequest.isMod, 
                 out string songRequestText, out bool syntaxError);
 
             if (success)
@@ -45,7 +45,7 @@ namespace CoreCodedChatbot.Web.Controllers
         [HttpPost]
         public IActionResult GetUserRequests([FromBody] string username)
         {
-            var requests = playlistService.GetUserRequests(username);
+            var requests = _playlistService.GetUserRequests(username);
 
             var requestsResult = new GetUserRequestsResponse
             {
@@ -57,7 +57,7 @@ namespace CoreCodedChatbot.Web.Controllers
 
         public IActionResult OpenPlaylist()
         {
-            if (playlistService.OpenPlaylist())
+            if (_playlistService.OpenPlaylist())
                 return Ok();
 
             return BadRequest();
@@ -65,7 +65,7 @@ namespace CoreCodedChatbot.Web.Controllers
 
         public IActionResult VeryClosePlaylist()
         {
-            if (playlistService.VeryClosePlaylist())
+            if (_playlistService.VeryClosePlaylist())
                 return Ok();
 
             return BadRequest();
@@ -73,7 +73,7 @@ namespace CoreCodedChatbot.Web.Controllers
 
         public IActionResult ClosePlaylist()
         {
-            if (playlistService.ClosePlaylist())
+            if (_playlistService.ClosePlaylist())
                 return Ok();
 
             return BadRequest();
@@ -81,14 +81,14 @@ namespace CoreCodedChatbot.Web.Controllers
 
         public IActionResult IsPlaylistOpen()
         {
-            return Json(playlistService.GetPlaylistState());
+            return Json(_playlistService.GetPlaylistState());
         }
 
         public IActionResult ArchiveCurrentRequest()
         {
             try
             {
-                playlistService.ArchiveCurrentRequest();
+                _playlistService.ArchiveCurrentRequest();
                 return Ok();
             }
             catch (Exception)
@@ -100,7 +100,7 @@ namespace CoreCodedChatbot.Web.Controllers
         [HttpPost]
         public IActionResult RemoveRockRequests([FromBody] RemoveSongRequest removeSongRequest)
         {
-            if (playlistService.RemoveRockRequests(removeSongRequest.username, removeSongRequest.commandText, removeSongRequest.isMod))
+            if (_playlistService.RemoveRockRequests(removeSongRequest.username, removeSongRequest.commandText, removeSongRequest.isMod))
                 return Ok();
 
             return BadRequest();
@@ -109,7 +109,7 @@ namespace CoreCodedChatbot.Web.Controllers
         [HttpPost]
         public IActionResult RemoveSuperVipCommand([FromBody] RemoveSuperVipRequest requestModel)
         {
-            if (playlistService.RemoveSuperRequest(requestModel.username)) return Ok();
+            if (_playlistService.RemoveSuperRequest(requestModel.username)) return Ok();
 
             return BadRequest();
         }
@@ -117,7 +117,7 @@ namespace CoreCodedChatbot.Web.Controllers
         [HttpPost]
         public IActionResult AddRequest([FromBody] AddSongRequest requestModel)
         {
-            var addRequestResult = playlistService.AddRequest(requestModel.username, requestModel.commandText, requestModel.isVipRequest);
+            var addRequestResult = _playlistService.AddRequest(requestModel.username, requestModel.commandText, requestModel.isVipRequest);
             return new JsonResult(new AddRequestResponse
             {
                 Result = addRequestResult.Item1,
@@ -128,7 +128,7 @@ namespace CoreCodedChatbot.Web.Controllers
         [HttpPost]
         public IActionResult AddSuperRequest([FromBody] AddSuperVipRequest requestModel)
         {
-            var addSuperVipResult = playlistService.AddSuperVipRequest(requestModel.username, requestModel.commandText);
+            var addSuperVipResult = _playlistService.AddSuperVipRequest(requestModel.username, requestModel.commandText);
 
             return new JsonResult(new AddRequestResponse
             {
@@ -140,7 +140,7 @@ namespace CoreCodedChatbot.Web.Controllers
         public IActionResult EditSuperVipRequest([FromBody] EditSuperVipRequest requestModel)
         {
             var editSuperVipResult =
-                playlistService.EditSuperVipRequest(requestModel.username, requestModel.commandText);
+                _playlistService.EditSuperVipRequest(requestModel.username, requestModel.commandText);
 
             return new JsonResult(new EditRequestResponse
             {
@@ -152,7 +152,7 @@ namespace CoreCodedChatbot.Web.Controllers
         [HttpPost]
         public IActionResult PromoteRequest([FromBody] PromoteSongRequest promoteSongRequest)
         {
-            return new JsonResult(playlistService.PromoteRequest(promoteSongRequest.username));
+            return new JsonResult(_playlistService.PromoteRequest(promoteSongRequest.username));
         }
 
         [HttpGet]
@@ -160,7 +160,7 @@ namespace CoreCodedChatbot.Web.Controllers
         {
             try
             {
-                playlistService.ClearRockRequests();
+                _playlistService.ClearRockRequests();
                 return Ok();
             }
             catch (Exception)

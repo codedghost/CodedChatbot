@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Services;
@@ -47,11 +48,13 @@ namespace CoreCodedChatbot.Api
                     };
                 });
 
+            services.AddMvc();
+
             var api = new TwitchAPI();
             api.Settings.AccessToken = config.ChatbotAccessToken;
 
             services.AddSingleton(api);
-            services.AddSingleton<IChatbotContextFactory, IChatbotContextFactory>();
+            services.AddSingleton<IChatbotContextFactory, ChatbotContextFactory>();
             services.AddSingleton<IConfigService, ConfigService>();
             services.AddSingleton<IVipService, VipService>();
             services.AddSingleton<IGuessingGameService, GuessingGameService>();
