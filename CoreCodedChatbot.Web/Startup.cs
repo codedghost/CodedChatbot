@@ -85,17 +85,17 @@ namespace CoreCodedChatbot.Web
             api.Settings.AccessToken = config.ChatbotAccessToken;
 
 
-            api.V5.Chat.GetChatRoomsByChannelAsync(config.ChannelId, config.ChatbotAccessToken)
-                .ContinueWith(
-                    rooms =>
-                    {
-                        if (!rooms.IsCompletedSuccessfully) return;
-                        var devRoomId = rooms.Result.Rooms.SingleOrDefault(r => r.Name == "dev")?.Id;
-                        if (!string.IsNullOrWhiteSpace(devRoomId))
-                        {
-                            client.JoinRoom(config.ChannelId, devRoomId);
-                        }
-                    });
+            //api.V5.Chat.GetChatRoomsByChannelAsync(config.ChannelId, config.ChatbotAccessToken)
+            //    .ContinueWith(
+            //        rooms =>
+            //        {
+            //            if (!rooms.IsCompletedSuccessfully) return;
+            //            var devRoomId = rooms.Result.Rooms.SingleOrDefault(r => r.Name == "dev")?.Id;
+            //            if (!string.IsNullOrWhiteSpace(devRoomId))
+            //            {
+            //                client.JoinRoom(config.ChannelId, devRoomId);
+            //            }
+            //        });
 
             //services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             //services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();

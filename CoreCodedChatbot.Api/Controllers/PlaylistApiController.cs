@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CoreCodedChatbot.Api.Controllers
 {
+    [Route("PlaylistApi/[action]")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class PlaylistApiController : Controller
     {
