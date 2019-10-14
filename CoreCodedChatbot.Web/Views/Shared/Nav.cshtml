@@ -1,21 +1,35 @@
 ﻿<div class="navbar navbar-expand-lg bg-dark">
     <div class="container">
-        @Html.ActionLink("CodedGhost", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+        <a class="navbar-brand" href="#">
+            <img src="images/ghost-72.png" />
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="False" aria-label="Show nav menu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
         <div class="navbar-collapse collapse">
             <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    @Html.ActionLink("CodedGhost", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="chatbotDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="False">
-                        CodedChatbot
-                    </a>
                     <div class="dropdown-menu" aria-labelledby="chatbotDropdown">
-                        @Html.ActionLink("Info", "Index", "Chatbot", new{}, new { @class="dropdown-item" })
-                        @Html.ActionLink("Playlist", "List", "Chatbot", new {}, new { @class="dropdown-item" })
-                        @Html.ActionLink("Library", "Library", "Chatbot", new {}, new { @class="dropdown-item" })
+                        @Html.ActionLink("Info", "Index", "Chatbot", new {}, new {@class = "dropdown-item"})
+                        @Html.ActionLink("Playlist", "List", "Chatbot", new {}, new {@class = "dropdown-item"})
+                        @Html.ActionLink("Library", "Library", "Chatbot", new {}, new {@class = "dropdown-item"})
                     </div>
                 </li>
                 <li class="nav-item">
-                    @Html.ActionLink("About", "Index", "About", new {}, new { @class="nav-link" })
-</li>
+                    @Html.ActionLink("Socials", "Index", "Socials")
+                </li>
+                <li class="nav-item">
+                    @Html.ActionLink("Media", "Index", "Media")
+                </li>
+                <li class="nav-item">
+                    @Html.ActionLink("Merch", "Index", "Merch")
+                </li>
+                <li class="nav-item">
+                    @Html.ActionLink("About", "Index", "About", new {}, new {@class = "nav-link"})
+                </li>
             </ul>
             <span class="navbar-text">
                 @if (User.Identity.IsAuthenticated)
@@ -24,7 +38,7 @@
                 }
                 else
                 {
-                <button class="btn btn-primary" onclick="window.location.href = '@Url.Action("Index", "Login")'">Login with Twitch</button>
+                    <button class="btn btn-primary" onclick="window.location.href = '@Url.Action("Index", "Login")'">Login with Twitch</button>
                 }
             </span>
         </div>
