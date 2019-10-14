@@ -52,8 +52,9 @@ namespace CoreCodedChatbot.Commands
 
                 if (addRequest.IsSuccessStatusCode)
                 {
+                    var textResult = await addRequest.Content.ReadAsStringAsync();
                     var addResult =
-                        JsonConvert.DeserializeObject<AddRequestResponse>(await addRequest.Content.ReadAsStringAsync());
+                        JsonConvert.DeserializeObject<AddRequestResponse>(textResult);
                     if (addResult.Result == AddRequestResult.PlaylistVeryClosed)
                     {
                         client.SendMessage(joinedChannel,

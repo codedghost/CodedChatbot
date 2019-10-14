@@ -44,6 +44,7 @@ namespace CoreCodedChatbot.Services
         private Timer YoutubeTimer { get; set; }
         private Timer MerchTimer { get; set; }
         private Timer RocksmithChallengeTimer { get; set; }
+        private Timer ChatConnectionTimer { get; set; }
 
         private int MaxTimerMinutesRocksmith = 56;
         private int MaxTimerMinutesGaming = 35;
@@ -99,24 +100,23 @@ namespace CoreCodedChatbot.Services
             this.pubsub.Connect();
         }
 
-        private void OnJoinedChannel(object sender, OnJoinedChannelArgs e)
+        private void JoinChannel()
         {
-
             if (config.DevelopmentBuild)
             {
-                api.V5.Chat.GetChatRoomsByChannelAsync(config.ChannelId, config.ChatbotAccessToken)
-                    .ContinueWith(
-                        rooms =>
-                        {
-                            if (!rooms.IsCompletedSuccessfully) return;
-                            DevelopmentRoomId = rooms.Result.Rooms.SingleOrDefault(r => r.Name == "dev")?.Id;
-                            if (!string.IsNullOrWhiteSpace(DevelopmentRoomId))
-                            {
-                                client.JoinRoom(config.ChannelId, DevelopmentRoomId);
-                                client.SendMessage(client.JoinedChannels.FirstOrDefault(jc => jc.Channel.Contains(DevelopmentRoomId)),
-                                    $"BEEP BOOP: {config.ChatbotNick} has joined dev!");
-                            }
-                        });
+                //api.V5.Chat.GetChatRoomsByChannelAsync(config.ChannelId, config.ChatbotAccessToken)
+                //    .ContinueWith(
+                //        rooms =>
+                //        {
+                //            if (!rooms.IsCompletedSuccessfully) return;
+                //            DevelopmentRoomId = rooms.Result.Rooms.SingleOrDefault(r => r.Name == "dev")?.Id;
+                //            if (!string.IsNullOrWhiteSpace(DevelopmentRoomId))
+                //            {
+                //                client.JoinRoom(config.ChannelId, DevelopmentRoomId);
+                //                client.SendMessage(client.JoinedChannels.FirstOrDefault(jc => jc.Channel.Contains(DevelopmentRoomId)),
+                //                    $"BEEP BOOP: {config.ChatbotNick} has joined dev!");
+                //            }
+                //        });
 
                 ScheduleStreamTasks(); // If we are in development we should leave chatty tasks running
             }
@@ -124,6 +124,11 @@ namespace CoreCodedChatbot.Services
             {
                 client.SendMessage(config.StreamerChannel, $"BEEP BOOP: {config.ChatbotNick} online!");
             }
+        }
+
+        private void OnJoinedChannel(object sender, OnJoinedChannelArgs e)
+        {
+            JoinChannel();
         }
 
         private void OnCommandReceived(object sender, OnChatCommandReceivedArgs e)
@@ -136,12 +141,6 @@ namespace CoreCodedChatbot.Services
                         && !string.IsNullOrWhiteSpace(DevelopmentRoomId)))
                 {
                     return;
-                }
-
-                if (config.DevelopmentBuild
-                    && !client.JoinedChannels.Select(jc => jc.Channel).Any(jc => jc.Contains(DevelopmentRoomId)))
-                {
-                    client.JoinRoom(config.ChannelId, DevelopmentRoomId);
                 }
 
                 commandHelper.ProcessCommand(
@@ -263,7 +262,7 @@ namespace CoreCodedChatbot.Services
             JoinedChannel channel = null;
 
             channel = client.GetJoinedChannel(config.StreamerChannel);
-            client.SendMessage(e.Channel, $"Looks like @{e.Channel} has come online, better get to work!");
+            client.SendMessage(channel.Channel, $"Looks like @{channel.Channel} has come online, better get to work!");
 
             ScheduleStreamTasks(e.Stream.Title);
         }
@@ -274,26 +273,7 @@ namespace CoreCodedChatbot.Services
 
             if (client.IsConnected)
             {
-                if (config.DevelopmentBuild)
-                {
-                    api.V5.Chat.GetChatRoomsByChannelAsync(config.ChannelId, config.ChatbotAccessToken)
-                        .ContinueWith(
-                            rooms =>
-                            {
-                                if (!rooms.IsCompletedSuccessfully) return;
-                                var devRoomId = rooms.Result.Rooms.SingleOrDefault(r => r.Name == "dev")?.Id;
-                                if (!string.IsNullOrWhiteSpace(devRoomId))
-                                {
-                                    client.JoinRoom(config.ChannelId, devRoomId);
-                                    client.SendMessage(client.JoinedChannels.FirstOrDefault(jc => jc.Channel.Contains(devRoomId)),
-                                        $"Looks like @{e.Channel} has gone offline, *yawn* powering down");
-                                }
-                            });
-                }
-                else
-                {
-                    client.SendMessage(e.Channel, $"Looks like @{e.Channel} has gone offline, *yawn* powering down");
-                }
+                client.SendMessage(e.Channel, $"Looks like @{e.Channel} has gone offline, *yawn* powering down");
             }
             UnScheduleStreamTasks();
         }
@@ -347,9 +327,7 @@ namespace CoreCodedChatbot.Services
             {
                 Console.Out.WriteLine("Not a partner. Skipping sub setup.");
             }
-
-            if (config.DevelopmentBuild && !client.JoinedChannels.Any(jc => jc.Channel.Contains(DevelopmentRoomId)))
-                client.JoinRoom(config.ChannelId, DevelopmentRoomId);
+            
 
             var joinedRoom = client.JoinedChannels.FirstOrDefault(jc =>
                 config.DevelopmentBuild ? jc.Channel.Contains(DevelopmentRoomId) : jc.Channel == config.StreamerChannel);
@@ -441,6 +419,19 @@ namespace CoreCodedChatbot.Services
                 null,
                 TimeSpan.Zero,
                 TimeSpan.FromMinutes(1));
+
+            ChatConnectionTimer = new Timer(
+                e =>
+                {
+                    if (!client.IsConnected)
+                    {
+                        Console.Error.WriteLine($"DISCONNECTED FROM CHAT, RECONNECTING");
+                        JoinChannel();
+                    }
+                },
+                null,
+                TimeSpan.Zero,
+                TimeSpan.FromSeconds(10));
         }
         
         private void OnError(object sender, OnErrorEventArgs e)
