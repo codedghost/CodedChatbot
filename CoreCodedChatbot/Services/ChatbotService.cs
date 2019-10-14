@@ -421,12 +421,29 @@ namespace CoreCodedChatbot.Services
                 TimeSpan.FromMinutes(1));
 
             ChatConnectionTimer = new Timer(
-                e =>
+                async e =>
                 {
-                    if (!client.IsConnected)
+                    try
                     {
-                        Console.Error.WriteLine($"DISCONNECTED FROM CHAT, RECONNECTING");
-                        JoinChannel();
+                        var currentChattersJson = await httpClient.GetAsync($"https://tmi.twitch.tv/group/user/{config.StreamerChannel}/chatters");
+
+                        if (currentChattersJson.IsSuccessStatusCode)
+                        {
+                            // process json into username list.
+                            var chattersModel =
+                                JsonConvert.DeserializeObject<ChatViewersModel>(currentChattersJson.Content
+                                    .ReadAsStringAsync().Result);
+
+                            if (chattersModel.chatters.moderators.Contains(config.ChatbotNick)) return;
+
+                            Console.Error.WriteLine($"DISCONNECTED FROM CHAT, RECONNECTING");
+                            JoinChannel();
+                        }
+                        else Console.Out.WriteLine("Could not retrieve Chatters JSON");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Out.WriteLine(ex.ToString());
                     }
                 },
                 null,
