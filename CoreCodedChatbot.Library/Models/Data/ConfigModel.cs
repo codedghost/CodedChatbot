@@ -42,5 +42,7 @@
         public string InstagramLink;
         public string RocksmithLink;
         public int SuperVipCost;
+        public string PrintfulAPIKey;
+        public string PrintfulAPIBaseUrl;
     }
 }

@@ -51,3 +51,11 @@
 /CoreCodedChatbot.Database/bin/Debug
 /CoreCodedChatbot.Database/obj
 /CoreCodedChatbot.Database/config.json
+/CoreCodedChatbot.Api/bin/Debug/netcoreapp2.1
+/CoreCodedChatbot.Api/obj/Debug/netcoreapp2.1
+/CoreCodedChatbot.Api/obj
+/CoreCodedChatbot.Api/Properties/launchSettings.json
+/CoreCodedChatbot.Api/config.json
+/CoreCodedChatbot.Api/hosting.json
+/CoreCodedChatbot.Printful/obj
+/CoreCodedChatbot.Printful/bin/Debug/netcoreapp2.1

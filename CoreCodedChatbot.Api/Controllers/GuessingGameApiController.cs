@@ -5,18 +5,19 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CoreCodedChatbot.Web.Controllers
+namespace CoreCodedChatbot.Api.Controllers
 {
+    [Route("GuessingGameApi/[action]")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class GuessingGameApiController : Controller
     {
-        private IGuessingGameService guessingGameService;
+        private IGuessingGameService _guessingGameService;
 
         private object timerLock = new object();
 
         public GuessingGameApiController(IGuessingGameService guessingGameService)
         {
-            this.guessingGameService = guessingGameService;
+            _guessingGameService = guessingGameService;
         }
 
         [HttpPost]
@@ -28,11 +29,11 @@ namespace CoreCodedChatbot.Web.Controllers
                 lock (timerLock)
                 {
                     // Check guessing game state
-                    isGameInProgress = guessingGameService.IsGuessingGameInProgress();
+                    isGameInProgress = _guessingGameService.IsGuessingGameInProgress();
                 }
 
                 if (!isGameInProgress)
-                    guessingGameService.GuessingGameStart(songInfo.SongName, songInfo.SongLengthSeconds);
+                    _guessingGameService.GuessingGameStart(songInfo.SongName, songInfo.SongLengthSeconds);
 
                 return Ok();
             }
@@ -46,7 +47,7 @@ namespace CoreCodedChatbot.Web.Controllers
         [HttpPost]
         public IActionResult FinishGuessingGame([FromBody] decimal finalPercentage)
         {
-            if (guessingGameService.SetPercentageAndFinishGame(finalPercentage))
+            if (_guessingGameService.SetPercentageAndFinishGame(finalPercentage))
             {
                 return Ok();
             }
@@ -57,7 +58,7 @@ namespace CoreCodedChatbot.Web.Controllers
         [HttpPost]
         public IActionResult SubmitGuess([FromBody] SubmitGuessModel submitGuessModel)
         {
-            if (guessingGameService.UserGuess(submitGuessModel.Username, submitGuessModel.Guess))
+            if (_guessingGameService.UserGuess(submitGuessModel.Username, submitGuessModel.Guess))
                 return Ok();
 
             return BadRequest();

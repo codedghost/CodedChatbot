@@ -15,6 +15,8 @@ using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Services;
+using CoreCodedChatbot.Printful.Factories;
+using CoreCodedChatbot.Printful.Interfaces.Factories;
 using CoreCodedChatbot.Web.Interfaces;
 using CoreCodedChatbot.Web.Services;
 using CoreCodedChatbot.Web.SignalRHubs;
@@ -85,17 +87,17 @@ namespace CoreCodedChatbot.Web
             api.Settings.AccessToken = config.ChatbotAccessToken;
 
 
-            api.V5.Chat.GetChatRoomsByChannelAsync(config.ChannelId, config.ChatbotAccessToken)
-                .ContinueWith(
-                    rooms =>
-                    {
-                        if (!rooms.IsCompletedSuccessfully) return;
-                        var devRoomId = rooms.Result.Rooms.SingleOrDefault(r => r.Name == "dev")?.Id;
-                        if (!string.IsNullOrWhiteSpace(devRoomId))
-                        {
-                            client.JoinRoom(config.ChannelId, devRoomId);
-                        }
-                    });
+            //api.V5.Chat.GetChatRoomsByChannelAsync(config.ChannelId, config.ChatbotAccessToken)
+            //    .ContinueWith(
+            //        rooms =>
+            //        {
+            //            if (!rooms.IsCompletedSuccessfully) return;
+            //            var devRoomId = rooms.Result.Rooms.SingleOrDefault(r => r.Name == "dev")?.Id;
+            //            if (!string.IsNullOrWhiteSpace(devRoomId))
+            //            {
+            //                client.JoinRoom(config.ChannelId, devRoomId);
+            //            }
+            //        });
 
             //services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             //services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
@@ -109,6 +111,7 @@ namespace CoreCodedChatbot.Web
             services.AddSingleton(typeof(SignalRHeartbeatService), typeof(SignalRHeartbeatService));
             services.AddSingleton<IChatterService, ChatterService>();
             services.AddSingleton<IPlaylistService, PlaylistService>();
+            services.AddSingleton<IPrintfulClientFactory, PrintfulClientFactory>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
