@@ -104,19 +104,19 @@ namespace CoreCodedChatbot.Services
         {
             if (config.DevelopmentBuild)
             {
-                api.V5.Chat.GetChatRoomsByChannelAsync(config.ChannelId, config.ChatbotAccessToken)
-                    .ContinueWith(
-                        rooms =>
-                        {
-                            if (!rooms.IsCompletedSuccessfully) return;
-                            DevelopmentRoomId = rooms.Result.Rooms.SingleOrDefault(r => r.Name == "dev")?.Id;
-                            if (!string.IsNullOrWhiteSpace(DevelopmentRoomId))
-                            {
-                                client.JoinRoom(config.ChannelId, DevelopmentRoomId);
-                                client.SendMessage(client.JoinedChannels.FirstOrDefault(jc => jc.Channel.Contains(DevelopmentRoomId)),
-                                    $"BEEP BOOP: {config.ChatbotNick} has joined dev!");
-                            }
-                        });
+                //api.V5.Chat.GetChatRoomsByChannelAsync(config.ChannelId, config.ChatbotAccessToken)
+                //    .ContinueWith(
+                //        rooms =>
+                //        {
+                //            if (!rooms.IsCompletedSuccessfully) return;
+                //            DevelopmentRoomId = rooms.Result.Rooms.SingleOrDefault(r => r.Name == "dev")?.Id;
+                //            if (!string.IsNullOrWhiteSpace(DevelopmentRoomId))
+                //            {
+                //                client.JoinRoom(config.ChannelId, DevelopmentRoomId);
+                //                client.SendMessage(client.JoinedChannels.FirstOrDefault(jc => jc.Channel.Contains(DevelopmentRoomId)),
+                //                    $"BEEP BOOP: {config.ChatbotNick} has joined dev!");
+                //            }
+                //        });
 
                 ScheduleStreamTasks(); // If we are in development we should leave chatty tasks running
             }
@@ -141,12 +141,6 @@ namespace CoreCodedChatbot.Services
                         && !string.IsNullOrWhiteSpace(DevelopmentRoomId)))
                 {
                     return;
-                }
-
-                if (config.DevelopmentBuild
-                    && !client.JoinedChannels.Select(jc => jc.Channel).Any(jc => jc.Contains(DevelopmentRoomId)))
-                {
-                    client.JoinRoom(config.ChannelId, DevelopmentRoomId);
                 }
 
                 commandHelper.ProcessCommand(
@@ -279,26 +273,7 @@ namespace CoreCodedChatbot.Services
 
             if (client.IsConnected)
             {
-                if (config.DevelopmentBuild)
-                {
-                    api.V5.Chat.GetChatRoomsByChannelAsync(config.ChannelId, config.ChatbotAccessToken)
-                        .ContinueWith(
-                            rooms =>
-                            {
-                                if (!rooms.IsCompletedSuccessfully) return;
-                                var devRoomId = rooms.Result.Rooms.SingleOrDefault(r => r.Name == "dev")?.Id;
-                                if (!string.IsNullOrWhiteSpace(devRoomId))
-                                {
-                                    client.JoinRoom(config.ChannelId, devRoomId);
-                                    client.SendMessage(client.JoinedChannels.FirstOrDefault(jc => jc.Channel.Contains(devRoomId)),
-                                        $"Looks like @{e.Channel} has gone offline, *yawn* powering down");
-                                }
-                            });
-                }
-                else
-                {
-                    client.SendMessage(e.Channel, $"Looks like @{e.Channel} has gone offline, *yawn* powering down");
-                }
+                client.SendMessage(e.Channel, $"Looks like @{e.Channel} has gone offline, *yawn* powering down");
             }
             UnScheduleStreamTasks();
         }
@@ -352,9 +327,7 @@ namespace CoreCodedChatbot.Services
             {
                 Console.Out.WriteLine("Not a partner. Skipping sub setup.");
             }
-
-            if (config.DevelopmentBuild && !client.JoinedChannels.Any(jc => jc.Channel.Contains(DevelopmentRoomId)))
-                client.JoinRoom(config.ChannelId, DevelopmentRoomId);
+            
 
             var joinedRoom = client.JoinedChannels.FirstOrDefault(jc =>
                 config.DevelopmentBuild ? jc.Channel.Contains(DevelopmentRoomId) : jc.Channel == config.StreamerChannel);

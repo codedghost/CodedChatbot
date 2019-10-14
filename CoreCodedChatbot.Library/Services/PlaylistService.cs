@@ -23,7 +23,6 @@ namespace CoreCodedChatbot.Library.Services
         private readonly ConfigModel config;
         private readonly IChatbotContextFactory contextFactory;
         private readonly IVipService vipService;
-        private readonly TwitchAPI twitchApi;
         private readonly TwitchClient client;
 
         private string DevelopmentRoomId;
@@ -34,26 +33,18 @@ namespace CoreCodedChatbot.Library.Services
         private Random rand = new Random();
 
         public PlaylistService(IChatbotContextFactory contextFactory, IConfigService configService, IVipService vipService,
-            TwitchAPI twitchApi, TwitchClient client)
+            TwitchClient client)
         {
             this.contextFactory = contextFactory;
             this.config = configService.GetConfig();
             this.vipService = vipService;
             
-            this.twitchApi = twitchApi;
             this.client = client;
 
             this.ConcurrentVipSongsToPlay = config.ConcurrentRegularSongsToPlay;
             
             if (config.DevelopmentBuild)
             {
-                twitchApi.V5.Chat.GetChatRoomsByChannelAsync(config.ChannelId, config.ChatbotAccessToken)
-                    .ContinueWith(
-                        rooms =>
-                        {
-                            if (!rooms.IsCompletedSuccessfully) return;
-                            DevelopmentRoomId = rooms.Result.Rooms.SingleOrDefault(r => r.Name == "dev")?.Id;
-                        });
             }
         }
 
@@ -732,10 +723,6 @@ namespace CoreCodedChatbot.Library.Services
 
         public bool OpenPlaylistWeb()
         {
-            if (config.DevelopmentBuild && !client.JoinedChannels.Select(jc => jc.Channel)
-                    .Any(jc => jc.Contains(DevelopmentRoomId)))
-                client.JoinRoom(config.ChannelId, DevelopmentRoomId);
-
             var isPlaylistOpened = OpenPlaylist();
 
             client.SendMessage(string.IsNullOrEmpty(DevelopmentRoomId) ? config.StreamerChannel : DevelopmentRoomId,
@@ -746,10 +733,6 @@ namespace CoreCodedChatbot.Library.Services
 
         public bool VeryClosePlaylistWeb()
         {
-            if (config.DevelopmentBuild && !client.JoinedChannels.Select(jc => jc.Channel)
-                    .Any(jc => jc.Contains(DevelopmentRoomId)))
-                client.JoinRoom(config.ChannelId, DevelopmentRoomId);
-
             var isPlaylistClosed = VeryClosePlaylist();
 
             client.SendMessage(string.IsNullOrEmpty(DevelopmentRoomId) ? config.StreamerChannel : DevelopmentRoomId,
