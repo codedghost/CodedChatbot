@@ -1,22 +1,9 @@
-﻿using CoreCodedChatbot.Library.Interfaces.ApiClients;
+﻿using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.Library.Models.ApiRequest.GuessingGame;
 
 namespace CoreCodedChatbot.ApiClient.ApiClients
 {
     public class GuessingGameApiClient : IGuessingGameApiClient
     {
-        public bool StartGuessingGame(StartGuessingGameModel songInfo)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public bool FinishGuessingGame(decimal finalPercentage)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public bool SubmitGuess(SubmitGuessModel submitGuessModel)
-        {
-            throw new System.NotImplementedException();
-        }
     }
 }

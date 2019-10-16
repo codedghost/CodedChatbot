@@ -2,7 +2,7 @@
 using CoreCodedChatbot.Library.Models.ApiResponse.Playlist;
 using CoreCodedChatbot.Library.Models.Enums;
 
-namespace CoreCodedChatbot.Library.Interfaces.ApiClients
+namespace CoreCodedChatbot.ApiClient.Interfaces.ApiClients
 {
     public interface IPlaylistApiClient
     {

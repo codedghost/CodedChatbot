@@ -1,6 +1,6 @@
 ﻿using CoreCodedChatbot.Library.Models.ApiRequest.GuessingGame;
 
-namespace CoreCodedChatbot.Library.Interfaces.ApiClients
+namespace CoreCodedChatbot.ApiClient.Interfaces.ApiClients
 {
     public interface IGuessingGameApiClient
     {

@@ -2,12 +2,12 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.Library.Helpers;
-using CoreCodedChatbot.Library.Interfaces.ApiClients;
 using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.ApiRequest.Vip;
 
-namespace CoreCodedChatbot.Library.ApiClients
+namespace CoreCodedChatbot.ApiClient.ApiClients
 {
     public class VipApiClient : IVipApiClient
     {
@@ -26,7 +26,6 @@ namespace CoreCodedChatbot.Library.ApiClients
                 }
             };
         }
-
 
         public async Task<bool> GiftVip(GiftVipModel giftVipModel)
         {

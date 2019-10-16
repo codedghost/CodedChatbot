@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using CoreCodedChatbot.Library.Models.ApiRequest.Vip;
 
-namespace CoreCodedChatbot.Library.Interfaces.ApiClients
+namespace CoreCodedChatbot.ApiClient.Interfaces.ApiClients
 {
     public interface IVipApiClient
     {
