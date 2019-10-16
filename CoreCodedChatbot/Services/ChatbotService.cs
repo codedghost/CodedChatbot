@@ -46,8 +46,8 @@ namespace CoreCodedChatbot.Services
         private Timer RocksmithChallengeTimer { get; set; }
         private Timer ChatConnectionTimer { get; set; }
 
-        private int MaxTimerMinutesRocksmith = 56;
-        private int MaxTimerMinutesGaming = 35;
+        private int MaxTimerMinutesRocksmith = 135;
+        private int MaxTimerMinutesGaming = 90;
 
         private int ChattyTimerCounter = 0;
         private int MinutesBetweenChattyCommands = 15;
