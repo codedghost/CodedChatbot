@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using CoreCodedChatbot.Services;
 using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Helpers;
-
+using Microsoft.Extensions.DependencyInjection;
 using Unity;
 
 namespace CoreCodedChatbot
@@ -19,8 +19,16 @@ namespace CoreCodedChatbot
                 context.Database.Migrate();
             }
 
-            var container = UnityHelper.Create();
-            var chatbotService = container.Resolve<ChatbotService>();
+            var serviceProvider = new ServiceCollection()
+                .AddTwitchServices()
+                .AddLibraryServices()
+                .AddHelpers()
+                .AddChatCommands()
+                .BuildServiceProvider();
+
+            serviceProvider.GetService<CommandHelper>().Init(serviceProvider);
+
+            var chatbotService = serviceProvider.GetService<ChatbotService>();
 
             chatbotService.Main();
 
