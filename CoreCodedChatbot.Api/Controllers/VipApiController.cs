@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CoreCodedChatbot.Api.Controllers
 {
-    [Route("VipApi/[action]")]
+    [Route("Vip/[action]")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class VipApiController : Controller
     {

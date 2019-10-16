@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CoreCodedChatbot.Api.Controllers
 {
-    [Route("GuessingGameApi/[action]")]
+    [Route("GuessingGame/[action]")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class GuessingGameApiController : Controller
     {
