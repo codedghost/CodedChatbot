@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using CoreCodedChatbot.Database.Context;
+using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Database.Context.Models;
 using CoreCodedChatbot.Interfaces;
 using TwitchLib.Client;
@@ -11,11 +11,11 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new[] { "addinfo" }, true)]
     public class AddInfoCommand : ICommand
     {
-        private ChatbotContextFactory chatbotContextFactory;
+        private IChatbotContextFactory _chatbotContextFactory;
 
-        public AddInfoCommand(ChatbotContextFactory chatbotContextFactory)
+        public AddInfoCommand(IChatbotContextFactory chatbotContextFactory)
         {
-            this.chatbotContextFactory = chatbotContextFactory;
+            _chatbotContextFactory = chatbotContextFactory;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
@@ -47,7 +47,7 @@ namespace CoreCodedChatbot.Commands
                 }
 
                 // Check that info aliases aren't already in use
-                using (var context = chatbotContextFactory.Create())
+                using (var context = _chatbotContextFactory.Create())
                 {
                     if (context.InfoCommandKeywords.Any(ik => aliases.Contains(ik.InfoCommandKeywordText)))
                     {

@@ -1,5 +1,6 @@
 ﻿using System;
 using CoreCodedChatbot.Interfaces;
+using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
 
 using TwitchLib.Api;
@@ -14,10 +15,10 @@ namespace CoreCodedChatbot.Commands
         private readonly ConfigModel config;
         private readonly TwitchAPI api;
 
-        public UptimeCommand(TwitchAPI api, ConfigModel config)
+        public UptimeCommand(TwitchAPI api, IConfigService configService)
         {
             this.api = api;
-            this.config = config;
+            this.config = configService.GetConfig();
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)

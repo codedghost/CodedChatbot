@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Models.Data;
+using CoreCodedChatbot.Library.Models.Enums;
 using Newtonsoft.Json;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
@@ -12,30 +14,18 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new[] { "howtorequest", "helprequest" }, false)]
     public class HowToRequestCommand : ICommand
     {
-        private readonly ConfigModel config;
-        private readonly HttpClient playlistClient;
+        private readonly IPlaylistApiClient _playlistApiClient;
 
-        public HowToRequestCommand(ConfigModel config)
+        public HowToRequestCommand(IPlaylistApiClient playlistApiClient)
         {
-            this.config = config;
-            this.playlistClient = new HttpClient
-            {
-                BaseAddress = new Uri(config.PlaylistApiUrl),
-                DefaultRequestHeaders =
-                {
-                    Authorization = new AuthenticationHeaderValue("Bearer", config.JwtTokenString)
-                }
-            };
+            _playlistApiClient = playlistApiClient;
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            var request = await playlistClient.GetAsync("IsPlaylistOpen");
-            if (!request.IsSuccessStatusCode) return;
+            var request = _playlistApiClient.IsPlaylistOpen();
 
-            var isOpen = JsonConvert.DeserializeObject<bool>(await request.Content.ReadAsStringAsync());
-
-            if (isOpen)
+            if (request == PlaylistState.Open)
             {
                 client.SendMessage(joinedChannel,
                     $"To request a song just use: !request <SongArtist> - <SongTitle> - (Guitar or Bass)");

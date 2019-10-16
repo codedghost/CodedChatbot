@@ -1,5 +1,6 @@
 ﻿using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
+using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
@@ -10,11 +11,11 @@ namespace CoreCodedChatbot.Commands
     public class SocialCommand : ICommand
     {
         private ConfigModel config;
-        private CommandHelper commandHelper;
+        private ICommandHelper commandHelper;
 
-        public SocialCommand(ConfigModel config, CommandHelper commandHelper)
+        public SocialCommand(IConfigService configService, ICommandHelper commandHelper)
         {
-            this.config = config;
+            this.config = configService.GetConfig();
             this.commandHelper = commandHelper;
         }
 

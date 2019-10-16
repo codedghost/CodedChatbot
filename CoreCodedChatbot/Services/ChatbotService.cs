@@ -6,6 +6,8 @@ using System.Threading;
 using Newtonsoft.Json;
 
 using CoreCodedChatbot.Helpers;
+using CoreCodedChatbot.Interfaces;
+using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
 using Microsoft.EntityFrameworkCore.Internal;
 using TwitchLib.Client.Events;
@@ -13,24 +15,27 @@ using TwitchLib.PubSub.Events;
 using TwitchLib.Client;
 using TwitchLib.Api;
 using TwitchLib.Api.Core.Exceptions;
+using TwitchLib.Api.Interfaces;
 using TwitchLib.Api.Services;
 using TwitchLib.Api.Services.Events;
 using TwitchLib.Api.Services.Events.LiveStreamMonitor;
+using TwitchLib.Client.Interfaces;
 using TwitchLib.Client.Models;
 using TwitchLib.Communication.Events;
 using TwitchLib.PubSub;
+using TwitchLib.PubSub.Interfaces;
 
 namespace CoreCodedChatbot.Services
 {
-    public class ChatbotService
+    public class ChatbotService : IChatbotService
     {
-        private readonly CommandHelper commandHelper;
+        private readonly ICommandHelper commandHelper;
         private readonly TwitchClient client;
         private readonly TwitchAPI api;
         private readonly TwitchPubSub pubsub;
-        private readonly VipHelper vipHelper;
-        private readonly BytesHelper bytesHelper;
-        private readonly StreamLabsHelper streamLabsHelper;
+        private readonly IVipHelper vipHelper;
+        private readonly IBytesHelper bytesHelper;
+        private readonly IStreamLabsHelper streamLabsHelper;
         private readonly LiveStreamMonitorService liveStreamMonitor;
 
         private Timer HowToRequestTimer { get; set; }
@@ -58,8 +63,8 @@ namespace CoreCodedChatbot.Services
 
         private string DevelopmentRoomId = string.Empty; // Only for use in debug mode
 
-        public ChatbotService(CommandHelper commandHelper, TwitchClient client, TwitchAPI api, TwitchPubSub pubsub, LiveStreamMonitorService liveStreamMonitor,
-            VipHelper vipHelper, BytesHelper bytesHelper, StreamLabsHelper streamLabsHelper, ConfigModel config)
+        public ChatbotService(ICommandHelper commandHelper, TwitchClient client, TwitchAPI api, TwitchPubSub pubsub, LiveStreamMonitorService liveStreamMonitor,
+            IVipHelper vipHelper, IBytesHelper bytesHelper, IStreamLabsHelper streamLabsHelper, IConfigService configService)
         {
             this.commandHelper = commandHelper;
             this.client = client;
@@ -68,10 +73,8 @@ namespace CoreCodedChatbot.Services
             this.liveStreamMonitor = liveStreamMonitor;
             this.vipHelper = vipHelper;
             this.bytesHelper = bytesHelper;
-            this.config = config;
+            this.config = configService.GetConfig();
             this.streamLabsHelper = streamLabsHelper;
-
-            this.commandHelper.Init();
 
             this.client.OnJoinedChannel += OnJoinedChannel;
             this.client.OnChatCommandReceived += OnCommandReceived;

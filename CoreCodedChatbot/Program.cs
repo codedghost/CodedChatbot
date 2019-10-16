@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using CoreCodedChatbot.Services;
 using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Helpers;
+using CoreCodedChatbot.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Unity;
 
@@ -24,11 +25,12 @@ namespace CoreCodedChatbot
                 .AddLibraryServices()
                 .AddHelpers()
                 .AddChatCommands()
+                .AddChatbotServices()
                 .BuildServiceProvider();
 
             serviceProvider.GetService<CommandHelper>().Init(serviceProvider);
 
-            var chatbotService = serviceProvider.GetService<ChatbotService>();
+            var chatbotService = serviceProvider.GetService<IChatbotService>();
 
             chatbotService.Main();
 

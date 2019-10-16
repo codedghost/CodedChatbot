@@ -5,20 +5,19 @@ using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Models.Data;
 
 using TwitchLib.Client;
+using TwitchLib.Client.Interfaces;
 using TwitchLib.Client.Models;
 using ChatCommand = CoreCodedChatbot.CustomAttributes.ChatCommand;
 
 namespace CoreCodedChatbot.Helpers
 {
-    public class HelpHelper
+    public class HelpHelper : IHelpHelper
     {
-        private readonly TwitchClient client;
-        private readonly ConfigModel config;
+        private readonly ITwitchClient client;
 
-        public HelpHelper(TwitchClient client, ConfigModel config)
+        public HelpHelper(ITwitchClient client)
         {
             this.client = client;
-            this.config = config;
         }
 
         public void ProcessHelp(string commandName, string username, JoinedChannel joinedChannel)
@@ -37,7 +36,7 @@ namespace CoreCodedChatbot.Helpers
                 return;
             }
 
-            command.ShowHelp(client, username, joinedChannel);
+            command.ShowHelp((TwitchClient)client, username, joinedChannel);
         }
     }
 }

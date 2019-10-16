@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Models.Data;
 
@@ -12,27 +13,18 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new[] { "rcr", "removecurrentrequest" }, true)]
     public class RemoveCurrentRequestCommand : ICommand
     {
-        private HttpClient playlistClient;
-        private readonly ConfigModel config;
+        private readonly IPlaylistApiClient _playlistApiClient;
 
-        public RemoveCurrentRequestCommand(ConfigModel config)
+        public RemoveCurrentRequestCommand(IPlaylistApiClient playlistApiClient)
         {
-            this.playlistClient = new HttpClient
-            {
-                BaseAddress = new Uri(config.PlaylistApiUrl),
-                DefaultRequestHeaders =
-                {
-                    Authorization = new AuthenticationHeaderValue("Bearer", config.JwtTokenString)
-                }
-            };
-            this.config = config;
+            _playlistApiClient = playlistApiClient;
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            var request = await playlistClient.GetAsync("ArchiveCurrentRequest");
+            var success = _playlistApiClient.ArchiveCurrentRequest();
 
-            if (request.IsSuccessStatusCode)
+            if (success)
             {
                 client.SendMessage(joinedChannel, $"Hey @{username}, the current request has been removed");
                 return;

@@ -10,14 +10,11 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new []{ "myvips", "mvip", "myvip", "vips"}, false)]
     public class MyVipsCommand : ICommand
     {
-        private readonly VipHelper vipHelper;
+        private readonly IVipHelper vipHelper;
 
-        private readonly ConfigModel config;
-
-        public MyVipsCommand(VipHelper vipHelper, ConfigModel config)
+        public MyVipsCommand(IVipHelper vipHelper)
         {
             this.vipHelper = vipHelper;
-            this.config = config;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)

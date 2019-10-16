@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.Interfaces;
+using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
@@ -11,33 +13,26 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new[] { "cp", "closeplaylist", "sp", "shutplaylist" }, true)]
     public class ClosePlaylistCommand : ICommand
     {
-        private readonly HttpClient playlistClient;
+        private readonly IPlaylistApiClient _playlistApiClient;
 
-        public ClosePlaylistCommand(ConfigModel config)
+        public ClosePlaylistCommand(IPlaylistApiClient playlistApiClient)
         {
-            this.playlistClient = new HttpClient
-            {
-                BaseAddress = new Uri(config.PlaylistApiUrl),
-                DefaultRequestHeaders =
-                {
-                    Authorization = new AuthenticationHeaderValue("Bearer", config.JwtTokenString)
-                }
-            };
+            _playlistApiClient = playlistApiClient;
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            HttpResponseMessage response;
+            bool response;
             if (commandText.Equals("very", StringComparison.OrdinalIgnoreCase))
             {
-                response = await playlistClient.GetAsync("VeryClosePlaylist");
+                response = _playlistApiClient.VeryClosePlaylist();
             } 
             else
             {
-                response = await playlistClient.GetAsync("ClosePlaylist");
+                response = _playlistApiClient.ClosePlaylist();
             }
 
-            client.SendMessage(joinedChannel, response.IsSuccessStatusCode
+            client.SendMessage(joinedChannel, response
                 ? $"Hey @{username}, I have closed the playlist{(commandText.Equals("very", StringComparison.OrdinalIgnoreCase) ? " completely" : string.Empty)}!"
                 : $"Hey {username}, I can't seem to close the playlist for some reason :(");
         }

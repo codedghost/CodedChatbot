@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Helpers;
@@ -16,21 +17,11 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new[] {"gvip", "givevip"}, true)]
     public class GiveVipCommand : ICommand
     {
-        private readonly ConfigModel config;
-        private HttpClient VipClient;
+        private readonly IVipApiClient _vipApiClient;
 
-        public GiveVipCommand(ConfigModel config)
+        public GiveVipCommand(IVipApiClient vipApiClient)
         {
-            this.config = config;
-
-            this.VipClient = new HttpClient
-            {
-                BaseAddress = new Uri(config.VipApiUrl),
-                DefaultRequestHeaders =
-                {
-                    Authorization = new AuthenticationHeaderValue("Bearer", config.JwtTokenString)
-                }
-            };
+            _vipApiClient = vipApiClient;
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod,
@@ -58,15 +49,15 @@ namespace CoreCodedChatbot.Commands
                         };
                 }
 
-                var result = await VipClient.PostAsync("ModGiveVip", HttpClientHelper.GetJsonData(giveVipModel));
+                var result = await _vipApiClient.ModGiveVip(giveVipModel);
 
                 client.SendMessage(joinedChannel,
-                    result.IsSuccessStatusCode
+                    result
                         ? $"Hey @{username}, I have successfully given {giveVipModel.ReceivingUsername} {giveVipModel.VipsToGive} VIPs!"
                         : $"Hey @{username}, sorry something seems to be wrong here. Please check your command usage. Type !help gvip for more detailed help");
 
-                if (!result.IsSuccessStatusCode)
-                    Console.Error.WriteLine($"Error encountered when giving a single VIP: {result.StatusCode}");
+                if (!result)
+                    Console.Error.WriteLine($"Error encountered when giving a single VIP");
 
             }
         }

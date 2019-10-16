@@ -53,6 +53,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CoreCodedChatbot.ApiClient\CoreCodedChatbot.ApiClient.csproj" />
     <ProjectReference Include="..\CoreCodedChatbot.Database\CoreCodedChatbot.Database.csproj" />
     <ProjectReference Include="..\CoreCodedChatbot.Library\CoreCodedChatbot.Library.csproj" />
   </ItemGroup>

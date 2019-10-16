@@ -3,32 +3,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using CoreCodedChatbot.Database.Context;
+using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Database.Context.Models;
+using CoreCodedChatbot.Interfaces;
+using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
 using Newtonsoft.Json;
 
 namespace CoreCodedChatbot.Helpers
 {
-    public class StreamLabsHelper
+    public class StreamLabsHelper : IStreamLabsHelper
     {
-        private readonly ChatbotContextFactory chatbotContextFactory;
-        private readonly VipHelper vipHelper;
-        private readonly ConfigModel config;
+        private readonly IChatbotContextFactory _chatbotContextFactory;
+        private readonly IVipHelper _vipHelper;
+        private readonly ConfigModel _config;
 
         private HttpClient httpClient = new HttpClient();
 
-        public StreamLabsHelper(ChatbotContextFactory chatbotContextFactory, VipHelper vipHelper, ConfigModel config)
+        public StreamLabsHelper(IChatbotContextFactory chatbotContextFactory, IVipHelper vipHelper, IConfigService configService)
         {
-            this.chatbotContextFactory = chatbotContextFactory;
-            this.vipHelper = vipHelper;
-            this.config = config;
+            _chatbotContextFactory = chatbotContextFactory;
+            _vipHelper = vipHelper;
+            _config = configService.GetConfig();
         }
 
         public bool RefreshAuthToken()
         {
             try
             {
-                using (var context = chatbotContextFactory.Create())
+                using (var context = _chatbotContextFactory.Create())
                 {
                     var refreshTokenRecord = context.Settings.SingleOrDefault(s => s.SettingName == "StreamLabsRefreshToken");
                     if (refreshTokenRecord == null) return false;
@@ -36,8 +39,8 @@ namespace CoreCodedChatbot.Helpers
                     var vals = new Dictionary<string, string>
                     {
                         {"grant_type", "refresh_token"},
-                        {"client_id", config.StreamLabsClientId},
-                        {"client_secret", config.StreamLabsClientSecret},
+                        {"client_id", _config.StreamLabsClientId},
+                        {"client_secret", _config.StreamLabsClientSecret},
                         {"redirect_uri", "localhost"},
                         {"refresh_token", refreshTokenRecord.SettingValue}
                     };
@@ -79,7 +82,7 @@ namespace CoreCodedChatbot.Helpers
                                              ?.SettingValue ?? "";
 
                     var getDonationsResponse = httpClient
-                        .GetAsync($"https://streamlabs.com/api/v1.0/donations?access_token={accessToken}&after={lastDonationId}&currency={config.DonationCurrency}&limit=100")
+                        .GetAsync($"https://streamlabs.com/api/v1.0/donations?access_token={accessToken}&after={lastDonationId}&currency={_config.DonationCurrency}&limit=100")
                         .Result;
                     if (!getDonationsResponse.IsSuccessStatusCode) return null;
 
@@ -144,10 +147,10 @@ namespace CoreCodedChatbot.Helpers
 
                     foreach (var donation in groupedDonations)
                     {
-                        var user = vipHelper.FindUser(context, donation.name);
+                        var user = _vipHelper.FindUser(context, donation.name);
                         user.TotalDonated += donation.amount;
 
-                        vipHelper.GiveDonationVipsDb(user);
+                        _vipHelper.GiveDonationVipsDb(user);
                         context.SaveChanges();
                     }
 

@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Helpers;
+using CoreCodedChatbot.Library.Interfaces.Services;
+using CoreCodedChatbot.Library.Models.ApiRequest.Playlist;
 using CoreCodedChatbot.Library.Models.ApiResponse.Playlist;
 using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Library.Models.Enums;
@@ -18,24 +21,16 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new []{"supervip", "svip", "super"}, false)]
     public class SuperVipCommand : ICommand
     {
-        private HttpClient _playlistClient;
-        private VipHelper _vipHelper;
+        private IVipHelper _vipHelper;
+        private readonly IPlaylistApiClient _playlistApiClient;
 
         private readonly ConfigModel _config;
 
-        public SuperVipCommand(VipHelper vipHelper, ConfigModel config)
+        public SuperVipCommand(IVipHelper vipHelper, IConfigService configService, IPlaylistApiClient playlistApiClient)
         {
             _vipHelper = vipHelper;
-            _config = config;
-
-            _playlistClient = new HttpClient
-            {
-                BaseAddress = new Uri(config.PlaylistApiUrl),
-                DefaultRequestHeaders =
-                {
-                    Authorization = new AuthenticationHeaderValue("Bearer", config.JwtTokenString)
-                }
-            };
+            _playlistApiClient = playlistApiClient;
+            _config = configService.GetConfig();
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
@@ -50,14 +45,15 @@ namespace CoreCodedChatbot.Commands
             // Check the user has enough VIPs
             if (_vipHelper.CanUseSuperVipRequest(username))
             {
-                var addSuperRequest = await _playlistClient.PostAsync("AddSuperRequest",
-                    HttpClientHelper.GetJsonData(new { username, commandText }));
-
-                if (addSuperRequest.IsSuccessStatusCode)
+                var addSuperResponse = _playlistApiClient.AddSuperVip(new AddSuperVipRequest
                 {
-                    var addResult =
-                        JsonConvert.DeserializeObject<AddSuperVipResponse>(await addSuperRequest.Content.ReadAsStringAsync());
-                    switch (addResult.Result)
+                    username = username,
+                    commandText = commandText
+                });
+
+                if (addSuperResponse != null)
+                {
+                    switch (addSuperResponse.Result)
                     {
                         case AddRequestResult.PlaylistVeryClosed:
                             client.SendMessage(joinedChannel,

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using CoreCodedChatbot.Interfaces;
+using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
 using TwitchLib.Api;
 using TwitchLib.Client;
@@ -15,9 +16,9 @@ namespace CoreCodedChatbot.Commands
         private ConfigModel config;
         private TwitchAPI twitchApi;
 
-        public FollowageCommand(ConfigModel config, TwitchAPI twitchApi)
+        public FollowageCommand(IConfigService configService, TwitchAPI twitchApi)
         {
-            this.config = config;
+            this.config = configService.GetConfig();
             this.twitchApi = twitchApi;
         }
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)

@@ -8,6 +8,7 @@ using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Services;
+using CoreCodedChatbot.Services;
 using Microsoft.Extensions.DependencyInjection;
 using TwitchLib.Api;
 using TwitchLib.Api.Services;
@@ -101,6 +102,13 @@ namespace CoreCodedChatbot
 
             // Register CommandHelper
             services.AddScoped<ICommandHelper, CommandHelper>();
+
+            return services;
+        }
+
+        public static ServiceCollection AddChatbotServices(this ServiceCollection services)
+        {
+            services.AddSingleton<IChatbotService, ChatbotService>();
 
             return services;
         }

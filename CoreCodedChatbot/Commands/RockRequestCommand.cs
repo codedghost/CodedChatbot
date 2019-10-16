@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Helpers;
+using CoreCodedChatbot.Library.Models.ApiRequest.Playlist;
 using CoreCodedChatbot.Library.Models.ApiResponse.Playlist;
 using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Library.Models.Enums;
@@ -16,20 +18,11 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new[] { "request", "rr", "sr", "songrequest", "rockrequest", "song" }, false)]
     public class RockRequestCommand : ICommand
     {
-        private HttpClient playlistClient;
-        private readonly ConfigModel config;
+        private readonly IPlaylistApiClient _playlistApiClient;
 
-        public RockRequestCommand(ConfigModel config)
+        public RockRequestCommand(IPlaylistApiClient playlistApiClient)
         {
-            this.playlistClient = new HttpClient
-            {
-                BaseAddress = new Uri(config.PlaylistApiUrl),
-                DefaultRequestHeaders =
-                {
-                    Authorization = new AuthenticationHeaderValue("Bearer", config.JwtTokenString)
-                }
-            };
-            this.config = config;
+            _playlistApiClient = playlistApiClient;
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
@@ -40,14 +33,16 @@ namespace CoreCodedChatbot.Commands
                 return;
             }
 
-            var request = await playlistClient.PostAsync("AddRequest", HttpClientHelper.GetJsonData(new {username, commandText}));
+            var result = _playlistApiClient.AddSong(new AddSongRequest
+            {
+                username = username,
+                commandText = commandText,
+                isVipRequest = false
+            });
 
             string message;
-            if (request.IsSuccessStatusCode)
+            if (result != null)
             {
-                var result =
-                    JsonConvert.DeserializeObject<AddRequestResponse>(await request.Content.ReadAsStringAsync());
-
                 switch (result.Result)
                 {
                     case AddRequestResult.PlaylistVeryClosed:

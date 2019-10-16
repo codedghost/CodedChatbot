@@ -1,4 +1,5 @@
 ﻿using CoreCodedChatbot.Interfaces;
+using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
 
 using TwitchLib.Client;
@@ -11,9 +12,9 @@ namespace CoreCodedChatbot.Commands
     {
         private readonly ConfigModel config;
 
-        public DiscordCommand(ConfigModel config)
+        public DiscordCommand(IConfigService configService)
         {
-            this.config = config;
+            this.config = configService.GetConfig();
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)

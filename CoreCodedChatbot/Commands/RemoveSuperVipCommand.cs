@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Helpers;
+using CoreCodedChatbot.Library.Models.ApiRequest.Playlist;
 using CoreCodedChatbot.Library.Models.ApiResponse.Playlist;
 using CoreCodedChatbot.Library.Models.Data;
 using Newtonsoft.Json;
@@ -16,27 +18,21 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new[] { "removesupervip", "removesuper", "rmsvip", "deletesuper", "deletesupervip", "delsvip" }, false)]
     public class RemoveSuperVipCommand : ICommand
     {
-        private readonly ConfigModel config;
-        private HttpClient playlistClient;
+        private readonly IPlaylistApiClient _playlistApiClient;
 
-        public RemoveSuperVipCommand(ConfigModel config)
+        public RemoveSuperVipCommand(IPlaylistApiClient playlistApiClient)
         {
-            this.playlistClient = new HttpClient
-            {
-                BaseAddress = new Uri(config.PlaylistApiUrl),
-                DefaultRequestHeaders =
-                {
-                    Authorization = new AuthenticationHeaderValue("Bearer", config.JwtTokenString)
-                }
-            };
-            this.config = config;
+            _playlistApiClient = playlistApiClient;
         }
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            var result = await playlistClient.PostAsync("RemoveSuperVipCommand", HttpClientHelper.GetJsonData(new { username }));
+            var success = _playlistApiClient.RemoveSuperVip(new RemoveSuperVipRequest
+            {
+                username = username
+            });
 
             client.SendMessage(joinedChannel,
-                result.IsSuccessStatusCode
+                success
                     ? $"Hey @{username}, your SuperVIP request has been removed and refunded"
                     : $"Hey @{username}, I couldn't remove your request, please try again in a sec.");
         }
