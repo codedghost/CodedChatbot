@@ -46,8 +46,8 @@ namespace CoreCodedChatbot.Services
         private Timer RocksmithChallengeTimer { get; set; }
         private Timer ChatConnectionTimer { get; set; }
 
-        private int MaxTimerMinutesRocksmith = 56;
-        private int MaxTimerMinutesGaming = 35;
+        private int MaxTimerMinutesRocksmith = 135;
+        private int MaxTimerMinutesGaming = 90;
 
         private int ChattyTimerCounter = 0;
         private int MinutesBetweenChattyCommands = 15;
@@ -330,7 +330,8 @@ namespace CoreCodedChatbot.Services
             
 
             var joinedRoom = client.JoinedChannels.FirstOrDefault(jc =>
-                config.DevelopmentBuild ? jc.Channel.Contains(DevelopmentRoomId) : jc.Channel == config.StreamerChannel);
+                // config.DevelopmentBuild ? jc.Channel.Contains(DevelopmentRoomId) :
+                jc.Channel == config.StreamerChannel);
             // Set threads for sending out stream info to the chat.
             if (isStreamingRocksmith)
             {
@@ -437,7 +438,8 @@ namespace CoreCodedChatbot.Services
                             if (chattersModel.chatters.moderators.Contains(config.ChatbotNick)) return;
 
                             Console.Error.WriteLine($"DISCONNECTED FROM CHAT, RECONNECTING");
-                            JoinChannel();
+
+                            client.Connect();
                         }
                         else Console.Out.WriteLine("Could not retrieve Chatters JSON");
                     }
