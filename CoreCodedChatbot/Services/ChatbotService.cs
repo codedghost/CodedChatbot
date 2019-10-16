@@ -330,7 +330,8 @@ namespace CoreCodedChatbot.Services
             
 
             var joinedRoom = client.JoinedChannels.FirstOrDefault(jc =>
-                config.DevelopmentBuild ? jc.Channel.Contains(DevelopmentRoomId) : jc.Channel == config.StreamerChannel);
+                // config.DevelopmentBuild ? jc.Channel.Contains(DevelopmentRoomId) :
+                jc.Channel == config.StreamerChannel);
             // Set threads for sending out stream info to the chat.
             if (isStreamingRocksmith)
             {
