@@ -434,14 +434,11 @@ namespace CoreCodedChatbot.Services
                                 JsonConvert.DeserializeObject<ChatViewersModel>(currentChattersJson.Content
                                     .ReadAsStringAsync().Result);
 
-                            if (chattersModel.chatters.moderators.Contains(config.ChatbotNick))
-                            {
-                                Console.Out.WriteLine($"{DateTime.UtcNow}: Chatbot in chat at");
-                                return;
-                            }
+                            if (chattersModel.chatters.moderators.Contains(config.ChatbotNick)) return;
 
                             Console.Error.WriteLine($"DISCONNECTED FROM CHAT, RECONNECTING");
-                            JoinChannel();
+
+                            client.Connect();
                         }
                         else Console.Out.WriteLine("Could not retrieve Chatters JSON");
                     }
