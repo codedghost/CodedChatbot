@@ -434,7 +434,11 @@ namespace CoreCodedChatbot.Services
                                 JsonConvert.DeserializeObject<ChatViewersModel>(currentChattersJson.Content
                                     .ReadAsStringAsync().Result);
 
-                            if (chattersModel.chatters.moderators.Contains(config.ChatbotNick)) return;
+                            if (chattersModel.chatters.moderators.Contains(config.ChatbotNick))
+                            {
+                                Console.Out.WriteLine($"{DateTime.UtcNow}: Chatbot in chat at");
+                                return;
+                            }
 
                             Console.Error.WriteLine($"DISCONNECTED FROM CHAT, RECONNECTING");
                             JoinChannel();
