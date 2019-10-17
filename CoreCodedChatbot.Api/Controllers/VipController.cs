@@ -9,11 +9,11 @@ namespace CoreCodedChatbot.Api.Controllers
 {
     [Route("Vip/[action]")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class VipApiController : Controller
+    public class VipController : Controller
     {
         private IVipService _vipService;
 
-        public VipApiController(IVipService vipService)
+        public VipController(IVipService vipService)
         {
             _vipService = vipService;
         }

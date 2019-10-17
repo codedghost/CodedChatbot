@@ -33,7 +33,7 @@ namespace CoreCodedChatbot.Commands
                 return;
             }
 
-            var success = _guessingGameApiClient.SubmitGuess(new SubmitGuessModel
+            var success = await _guessingGameApiClient.SubmitGuess(new SubmitGuessModel
             {
                 Username = username,
                 Guess = decimalGuess

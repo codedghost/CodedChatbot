@@ -9,13 +9,13 @@ namespace CoreCodedChatbot.Api.Controllers
 {
     [Route("GuessingGame/[action]")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class GuessingGameApiController : Controller
+    public class GuessingGameController : Controller
     {
         private IGuessingGameService _guessingGameService;
 
         private object timerLock = new object();
 
-        public GuessingGameApiController(IGuessingGameService guessingGameService)
+        public GuessingGameController(IGuessingGameService guessingGameService)
         {
             _guessingGameService = guessingGameService;
         }

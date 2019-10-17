@@ -10,11 +10,11 @@ namespace CoreCodedChatbot.Api.Controllers
 {
     [Route("Playlist/[action]")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class PlaylistApiController : Controller
+    public class PlaylistController : Controller
     {
         private readonly IPlaylistService _playlistService;
 
-        public PlaylistApiController(IPlaylistService playlistService)
+        public PlaylistController(IPlaylistService playlistService)
         {
             _playlistService = playlistService;
         }

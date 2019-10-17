@@ -253,7 +253,7 @@ namespace CoreCodedChatbot.Helpers
             using (var context = this._contextFactory.Create())
             {
                 var user = this.FindUser(context, username);
-                return user != null && VipRequests.Create(user).TotalRemaining > 0;
+                return user != null && VipRequests.Create(user, _config).TotalRemaining > 0;
             }
         }
 
@@ -262,7 +262,7 @@ namespace CoreCodedChatbot.Helpers
             using (var context = _contextFactory.Create())
             {
                 var user = FindUser(context, username);
-                return user != null && (VipRequests.Create(user)).TotalRemaining >= _config.SuperVipCost;
+                return user != null && (VipRequests.Create(user, _config)).TotalRemaining >= _config.SuperVipCost;
             }
         }
 
@@ -320,7 +320,7 @@ namespace CoreCodedChatbot.Helpers
             using (var context = this._contextFactory.Create())
             {
                 var user = this.FindUser(context, username);
-                return user == null ? null : VipRequests.Create(user);
+                return user == null ? null : VipRequests.Create(user, _config);
             }
         }
     }
