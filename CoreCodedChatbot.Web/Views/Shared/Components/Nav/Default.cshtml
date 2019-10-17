@@ -1,28 +1,33 @@
-﻿<div class="navbar navbar-expand-lg bg-dark">
+﻿@model CoreCodedChatbot.Library.Models.View.ComponentViewModels.NavigationViewModel
+
+<div class="navbar navbar-expand-lg bg-dark">
     <div class="container">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="False" aria-label="Show nav menu">
             <img src="images/ghost-72.png" id="nav-brand" />
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="twitchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        🔴 Live
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="twitchDropdown">
-                        @Html.ActionLink("Info", "Index", "Chatbot", new {}, new {@class = "dropdown-item"})
-                        @Html.ActionLink("Playlist", "List", "Chatbot", new {}, new {@class = "dropdown-item"})
-                        @Html.ActionLink("Library", "Library", "Chatbot", new {}, new {@class = "dropdown-item"})
-                    </div>
-                </li>
+                @if (Model.IsBroadcasterOnline)
+                {
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="twitchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            🔴 Live
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="twitchDropdown">
+                            @Html.ActionLink("Info", "Index", "Chatbot", new {}, new {@class = "dropdown-item"})
+                            @Html.ActionLink("Playlist", "List", "Chatbot", new {}, new {@class = "dropdown-item"})
+                            @Html.ActionLink("Library", "Library", "Chatbot", new {}, new {@class = "dropdown-item"})
+                        </div>
+                    </li>
+                }
                 <li class="nav-item">
                     @Html.ActionLink("Socials", "Index", "Socials", new {}, new {@class = "nav-link"})
                 </li>
                 <li class="nav-item">
-                    @Html.ActionLink("Media", "Index", "Media", new { }, new { @class = "nav-link" })
+                    @Html.ActionLink("Media", "Index", "Media", new {}, new {@class = "nav-link"})
                 </li>
                 <li class="nav-item">
-                    @Html.ActionLink("Merch", "Index", "Merch", new { }, new { @class = "nav-link" })
+                    @Html.ActionLink("Merch", "Index", "Merch", new {}, new {@class = "nav-link"})
                 </li>
                 <li class="nav-item">
                     @Html.ActionLink("About", "Index", "About", new {}, new {@class = "nav-link"})
