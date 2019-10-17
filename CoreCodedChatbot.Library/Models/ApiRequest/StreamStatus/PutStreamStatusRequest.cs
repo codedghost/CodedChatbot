@@ -1,4 +1,4 @@
-﻿namespace CoreCodedChatbot.Library.Models.ApiRequest
+﻿namespace CoreCodedChatbot.Library.Models.ApiRequest.StreamStatus
 {
     public class PutStreamStatusRequest
     {
