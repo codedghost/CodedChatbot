@@ -108,7 +108,7 @@ namespace CoreCodedChatbot.Api.Controllers
         }
 
         [HttpPost]
-        public IActionResult RemoveSuperVipCommand([FromBody] RemoveSuperVipRequest requestModel)
+        public IActionResult RemoveSuperVip([FromBody] RemoveSuperVipRequest requestModel)
         {
             if (_playlistService.RemoveSuperRequest(requestModel.username)) return Ok();
 

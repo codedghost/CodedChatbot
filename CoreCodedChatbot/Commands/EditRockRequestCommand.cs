@@ -25,7 +25,7 @@ namespace CoreCodedChatbot.Commands
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            var result = _playlistApiClient.EditRequest(new EditSongRequest
+            var result = await _playlistApiClient.EditRequest(new EditSongRequest
             {
                 username = username,
                 commandText = commandText,

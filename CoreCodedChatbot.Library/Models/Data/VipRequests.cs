@@ -1,5 +1,6 @@
 ﻿using CoreCodedChatbot.Database.Context.Models;
 using CoreCodedChatbot.Library.Helpers;
+using CoreCodedChatbot.Library.Interfaces.Services;
 
 namespace CoreCodedChatbot.Library.Models.Data
 {
@@ -12,9 +13,9 @@ namespace CoreCodedChatbot.Library.Models.Data
             _config = config;
         }
 
-        public static VipRequests Create(User user)
+        public static VipRequests Create(User user, ConfigModel config)
         {
-            return new VipRequests(ConfigHelper.GetConfig())
+            return new VipRequests(config)
             {
                 Donations = user.DonationOrBitsVipRequests,
                 Follow = user.FollowVipRequest,

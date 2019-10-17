@@ -23,7 +23,7 @@ namespace CoreCodedChatbot.Commands
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            var request = _playlistApiClient.IsPlaylistOpen();
+            var request = await _playlistApiClient.IsPlaylistOpen();
 
             if (request == PlaylistState.Open)
             {

@@ -1,4 +1,5 @@
-﻿using CoreCodedChatbot.Library.Models.ApiRequest.Playlist;
+﻿using System.Threading.Tasks;
+using CoreCodedChatbot.Library.Models.ApiRequest.Playlist;
 using CoreCodedChatbot.Library.Models.ApiResponse.Playlist;
 using CoreCodedChatbot.Library.Models.Enums;
 
@@ -6,19 +7,19 @@ namespace CoreCodedChatbot.ApiClient.Interfaces.ApiClients
 {
     public interface IPlaylistApiClient
     {
-        EditRequestResponse EditRequest(EditSongRequest editSongRequest);
-        GetUserRequestsResponse GetUserRequests(string username);
-        bool OpenPlaylist();
-        bool VeryClosePlaylist();
-        bool ClosePlaylist();
-        PlaylistState IsPlaylistOpen();
-        bool ArchiveCurrentRequest();
-        bool RemoveRockRequests(RemoveSongRequest removeSongRequest);
-        bool RemoveSuperVip(RemoveSuperVipRequest removeSuperVipRequest);
-        AddRequestResponse AddSong(AddSongRequest addSongRequest);
-        AddRequestResponse AddSuperVip(AddSuperVipRequest addSuperVipRequest);
-        EditRequestResponse EditSuperVip(EditSuperVipRequest editSuperVipRequest);
-        int PromoteSong(PromoteSongRequest promoteSongRequest);
-        bool ClearRequests();
+        Task<EditRequestResponse> EditRequest(EditSongRequest editSongRequest);
+        Task<GetUserRequestsResponse> GetUserRequests(string username);
+        Task<bool> OpenPlaylist();
+        Task<bool> VeryClosePlaylist();
+        Task<bool> ClosePlaylist();
+        Task<PlaylistState> IsPlaylistOpen();
+        Task<bool> ArchiveCurrentRequest();
+        Task<bool> RemoveRockRequests(RemoveSongRequest removeSongRequest);
+        Task<bool> RemoveSuperVip(RemoveSuperVipRequest removeSuperVipRequest);
+        Task<AddRequestResponse> AddSong(AddSongRequest addSongRequest);
+        Task<AddRequestResponse> AddSuperVip(AddSuperVipRequest addSuperVipRequest);
+        Task<EditRequestResponse> EditSuperVip(EditSuperVipRequest editSuperVipRequest);
+        Task<int> PromoteSong(PromoteSongRequest promoteSongRequest);
+        Task<bool> ClearRequests();
     }
 }

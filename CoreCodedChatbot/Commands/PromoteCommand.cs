@@ -29,7 +29,7 @@ namespace CoreCodedChatbot.Commands
         {
             if (_vipHelper.CanUseVipRequest(username))
             {
-                var playlistPosition = _playlistApiClient.PromoteSong(new PromoteSongRequest
+                var playlistPosition = await _playlistApiClient.PromoteSong(new PromoteSongRequest
                 {
                     username = username
                 });

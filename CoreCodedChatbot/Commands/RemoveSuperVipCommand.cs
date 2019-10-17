@@ -26,7 +26,7 @@ namespace CoreCodedChatbot.Commands
         }
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            var success = _playlistApiClient.RemoveSuperVip(new RemoveSuperVipRequest
+            var success = await _playlistApiClient.RemoveSuperVip(new RemoveSuperVipRequest
             {
                 username = username
             });

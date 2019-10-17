@@ -22,7 +22,7 @@ namespace CoreCodedChatbot.Commands
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            var success = _playlistApiClient.ArchiveCurrentRequest();
+            var success = await _playlistApiClient.ArchiveCurrentRequest();
 
             if (success)
             {

@@ -38,7 +38,7 @@ namespace CoreCodedChatbot.Commands
 
             if (vipHelper.CanUseVipRequest(username))
             {
-                var addSongResult = _playlistApiClient.AddSong(new AddSongRequest
+                var addSongResult = await _playlistApiClient.AddSong(new AddSongRequest
                 {
                     username = username,
                     commandText = commandText,

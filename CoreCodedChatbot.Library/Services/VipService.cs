@@ -82,7 +82,7 @@ namespace CoreCodedChatbot.Library.Services
             {
                 var user = GetUser(username);
 
-                return user != null && VipRequests.Create(user).TotalRemaining > 0;
+                return user != null && VipRequests.Create(user, config).TotalRemaining > 0;
             }
             catch (Exception e)
             {
@@ -121,7 +121,7 @@ namespace CoreCodedChatbot.Library.Services
             {
                 var user = GetUser(username);
 
-                return user != null && VipRequests.Create(user).TotalRemaining > config.SuperVipCost;
+                return user != null && VipRequests.Create(user, config).TotalRemaining > config.SuperVipCost;
             }
             catch (Exception e)
             {

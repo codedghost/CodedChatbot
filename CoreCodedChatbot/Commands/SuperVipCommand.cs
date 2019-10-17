@@ -45,7 +45,7 @@ namespace CoreCodedChatbot.Commands
             // Check the user has enough VIPs
             if (_vipHelper.CanUseSuperVipRequest(username))
             {
-                var addSuperResponse = _playlistApiClient.AddSuperVip(new AddSuperVipRequest
+                var addSuperResponse = await _playlistApiClient.AddSuperVip(new AddSuperVipRequest
                 {
                     username = username,
                     commandText = commandText

@@ -25,11 +25,11 @@ namespace CoreCodedChatbot.Commands
             bool response;
             if (commandText.Equals("very", StringComparison.OrdinalIgnoreCase))
             {
-                response = _playlistApiClient.VeryClosePlaylist();
+                response = await _playlistApiClient.VeryClosePlaylist();
             } 
             else
             {
-                response = _playlistApiClient.ClosePlaylist();
+                response = await _playlistApiClient.ClosePlaylist();
             }
 
             client.SendMessage(joinedChannel, response

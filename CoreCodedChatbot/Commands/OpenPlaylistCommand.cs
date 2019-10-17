@@ -22,7 +22,7 @@ namespace CoreCodedChatbot.Commands
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            var success = _playlistApiClient.OpenPlaylist();
+            var success = await _playlistApiClient.OpenPlaylist();
 
             client.SendMessage(joinedChannel, success
                 ? $"Hey @{username}, I have opened the playlist for you" 

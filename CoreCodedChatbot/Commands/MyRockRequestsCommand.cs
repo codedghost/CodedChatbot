@@ -24,7 +24,7 @@ namespace CoreCodedChatbot.Commands
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            var requests = _playlistApiClient.GetUserRequests(username);
+            var requests = await _playlistApiClient.GetUserRequests(username);
 
             if (requests != null)
             {

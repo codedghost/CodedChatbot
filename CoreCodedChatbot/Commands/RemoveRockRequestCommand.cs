@@ -24,7 +24,7 @@ namespace CoreCodedChatbot.Commands
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            var success = _playlistApiClient.RemoveRockRequests(new RemoveSongRequest
+            var success = await _playlistApiClient.RemoveRockRequests(new RemoveSongRequest
             {
                 username = username,
                 commandText = commandText,

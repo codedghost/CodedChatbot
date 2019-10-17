@@ -33,7 +33,7 @@ namespace CoreCodedChatbot.Commands
                 return;
             }
 
-            var result = _playlistApiClient.AddSong(new AddSongRequest
+            var result = await _playlistApiClient.AddSong(new AddSongRequest
             {
                 username = username,
                 commandText = commandText,
