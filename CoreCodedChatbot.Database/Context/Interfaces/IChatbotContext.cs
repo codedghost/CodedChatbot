@@ -17,6 +17,7 @@ namespace CoreCodedChatbot.Database.Context.Interfaces
         DbSet<SongPercentageGuess> SongPercentageGuesses { get; set; }
         DbSet<InfoCommand> InfoCommands { get; set; }
         DbSet<InfoCommandKeyword> InfoCommandKeywords { get; set; }
+        DbSet<StreamStatus> StreamStatuses { get; set; }
 
         int SaveChanges();
 
