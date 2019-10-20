@@ -1,7 +1,6 @@
 ﻿using System;
 using CoreCodedChatbot.Database;
 using Microsoft.EntityFrameworkCore;
-
 using CoreCodedChatbot.Services;
 using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Helpers;
@@ -22,7 +21,6 @@ namespace CoreCodedChatbot
 
             var serviceProvider = new ServiceCollection()
                 .AddTwitchServices()
-                .AddLibraryServices()
                 .AddHelpers()
                 .AddChatCommands()
                 .AddChatbotServices()

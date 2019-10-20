@@ -46,15 +46,6 @@ namespace CoreCodedChatbot
             return services;
         }
 
-        public static ServiceCollection AddLibraryServices(this ServiceCollection services)
-        {
-            // TODO: Add a package class to library to do this.
-            // Register Transient types
-            services.AddTransient<IConfigService, ConfigService>();
-
-            return services;
-        }
-
         public static ServiceCollection AddHelpers(this ServiceCollection services)
         {
             // Register chatbot helpers (these should really be services)
