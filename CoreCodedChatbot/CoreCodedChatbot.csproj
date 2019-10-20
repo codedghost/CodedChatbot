@@ -35,6 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="CoreCodedChatbot.ApiClient" Version="1.0.248" />
     <PackageReference Include="CoreCodedChatbot.Database" Version="1.0.240" />
     <PackageReference Include="CoreCodedChatbot.Library" Version="1.0.247" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.0.4" />
@@ -52,10 +53,6 @@
     <PackageReference Include="System.Reflection.Extensions" Version="4.3.0" />
     <PackageReference Include="TwitchLib" Version="3.0.1" />
     <PackageReference Include="Unity" Version="5.8.11" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\CoreCodedChatbot.ApiClient\CoreCodedChatbot.ApiClient.csproj" />
   </ItemGroup>
 
   <ItemGroup>
