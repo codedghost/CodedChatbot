@@ -51,7 +51,6 @@ namespace CoreCodedChatbot
             // TODO: Add a package class to library to do this.
             // Register Transient types
             services.AddTransient<IConfigService, ConfigService>();
-            services.AddTransient<IChatbotContextFactory, ChatbotContextFactory>();
 
             return services;
         }
