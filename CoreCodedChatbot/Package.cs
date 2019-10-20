@@ -20,7 +20,7 @@ namespace CoreCodedChatbot
 {
     public static class Package
     {
-        public static ServiceCollection AddTwitchServices(this ServiceCollection services)
+        public static IServiceCollection AddTwitchServices(this IServiceCollection services)
         {
             var configService = new ConfigService();
 
@@ -46,7 +46,7 @@ namespace CoreCodedChatbot
             return services;
         }
 
-        public static ServiceCollection AddHelpers(this ServiceCollection services)
+        public static IServiceCollection AddHelpers(this IServiceCollection services)
         {
             // Register chatbot helpers (these should really be services)
             services.AddTransient<IRedditHelper, RedditHelper>();
@@ -54,7 +54,7 @@ namespace CoreCodedChatbot
             return services;
         }
 
-        public static ServiceCollection AddChatCommands(this ServiceCollection services)
+        public static IServiceCollection AddChatCommands(this IServiceCollection services)
         {
             services.AddTransient<ICommand, AddInfoCommand>();
             services.AddTransient<ICommand, AwwCommand>();
@@ -96,7 +96,7 @@ namespace CoreCodedChatbot
             return services;
         }
 
-        public static ServiceCollection AddChatbotServices(this ServiceCollection services)
+        public static IServiceCollection AddChatbotServices(this IServiceCollection services)
         {
             services.AddSingleton<IChatbotService, ChatbotService>();
 

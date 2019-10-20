@@ -35,9 +35,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CoreCodedChatbot.ApiClient" Version="1.0.248" />
-    <PackageReference Include="CoreCodedChatbot.Database" Version="1.0.240" />
-    <PackageReference Include="CoreCodedChatbot.Library" Version="1.0.247" />
+    <PackageReference Include="CoreCodedChatbot.ApiClient" Version="1.0.261" />
+    <PackageReference Include="CoreCodedChatbot.Database" Version="1.0.254" />
+    <PackageReference Include="CoreCodedChatbot.Library" Version="1.0.259" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="1.0.4" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.4" />

@@ -4,8 +4,8 @@
 	<TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CoreCodedChatbot.ApiClient" Version="1.0.248" />
-    <PackageReference Include="CoreCodedChatbot.Library" Version="1.0.247" />
+    <PackageReference Include="CoreCodedChatbot.ApiClient" Version="1.0.261" />
+    <PackageReference Include="CoreCodedChatbot.Library" Version="1.0.259" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.5" />
   </ItemGroup>
   <ItemGroup>

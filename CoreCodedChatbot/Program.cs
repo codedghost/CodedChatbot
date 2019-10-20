@@ -1,4 +1,5 @@
 ﻿using System;
+using CoreCodedChatbot.ApiClient;
 using CoreCodedChatbot.Database;
 using Microsoft.EntityFrameworkCore;
 using CoreCodedChatbot.Services;
@@ -24,6 +25,7 @@ namespace CoreCodedChatbot
                 .AddTwitchServices()
                 .AddLibraryServices()
                 .AddHelpers()
+                .AddApiClientServices()
                 .AddChatCommands()
                 .AddChatbotServices()
                 .AddDbContextFactory()
