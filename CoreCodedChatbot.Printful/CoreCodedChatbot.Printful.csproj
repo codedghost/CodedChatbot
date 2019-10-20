@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CoreCodedChatbot.Library\CoreCodedChatbot.Library.csproj" />
+    <PackageReference Include="CoreCodedChatbot.Library" Version="1.0.247" />
   </ItemGroup>
 
 </Project>

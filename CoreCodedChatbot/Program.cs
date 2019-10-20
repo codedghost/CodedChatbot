@@ -5,6 +5,7 @@ using CoreCodedChatbot.Services;
 using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
+using CoreCodedChatbot.Library;
 using Microsoft.Extensions.DependencyInjection;
 using Unity;
 
@@ -21,6 +22,7 @@ namespace CoreCodedChatbot
 
             var serviceProvider = new ServiceCollection()
                 .AddTwitchServices()
+                .AddLibraryServices()
                 .AddHelpers()
                 .AddChatCommands()
                 .AddChatbotServices()
