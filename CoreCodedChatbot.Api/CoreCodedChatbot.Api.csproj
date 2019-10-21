@@ -10,7 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="CoreCodedChatbot.Database" Version="1.0.254" />
-    <PackageReference Include="CoreCodedChatbot.Library" Version="1.0.259" />
+    <PackageReference Include="CoreCodedChatbot.Library" Version="1.0.271" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
   </ItemGroup>

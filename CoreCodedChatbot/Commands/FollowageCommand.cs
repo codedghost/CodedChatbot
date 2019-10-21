@@ -13,24 +13,24 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new []{"followage"}, false)]
     public class FollowageCommand : ICommand
     {
-        private ConfigModel config;
-        private TwitchAPI twitchApi;
+        private readonly IConfigService _configService;
+        private TwitchAPI _twitchApi;
 
         public FollowageCommand(IConfigService configService, TwitchAPI twitchApi)
         {
-            this.config = configService.GetConfig();
-            this.twitchApi = twitchApi;
+            _configService = configService;
+            this._twitchApi = twitchApi;
         }
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
             try
             {
-                var users = await twitchApi.Helix.Users.GetUsersAsync(logins: new List<string>(new[] {username}));
+                var users = await _twitchApi.Helix.Users.GetUsersAsync(logins: new List<string>(new[] {username}));
                 var userId = users.Users[0].Id;
 
                 if (userId == null) return;
 
-                var follows = await twitchApi.Helix.Users.GetUsersFollowsAsync(fromId:userId, toId:config.ChannelId);
+                var follows = await _twitchApi.Helix.Users.GetUsersFollowsAsync(fromId:userId, toId: _configService.Get<string>("ChannelId"));
 
                 var followedChannel = follows?.Follows?.SingleOrDefault();
                 if (followedChannel == null) return;
@@ -39,7 +39,7 @@ namespace CoreCodedChatbot.Commands
                                               followedChannel.FollowedAt.Month - DateTime.UtcNow.Month);
 
                 client.SendMessage(joinedChannel,
-                    $"Hey @{username}, you have followed {config.StreamerChannel} for {monthsFollowed} months!");
+                    $"Hey @{username}, you have followed {_configService.Get<string>("StreamerChannel")} for {monthsFollowed} months!");
             }
             catch (Exception e)
             {
@@ -49,7 +49,7 @@ namespace CoreCodedChatbot.Commands
 
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)
         {
-            client.SendMessage(joinedChannel, $"Hey @{username}, this command will tell you how long you've followed {config.StreamerChannel}!");
+            client.SendMessage(joinedChannel, $"Hey @{username}, this command will tell you how long you've followed {_configService.Get<string>("StreamerChannel")}!");
         }
     }
 }

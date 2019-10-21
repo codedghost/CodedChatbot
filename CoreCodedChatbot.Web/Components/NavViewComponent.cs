@@ -11,13 +11,12 @@ namespace CoreCodedChatbot.Web.Components
     public class NavViewComponent : ViewComponent
     {
         private readonly IStreamStatusClient _streamStatusClient;
-        private ConfigModel _config;
+        private readonly IConfigService _configService;
 
         public NavViewComponent(IStreamStatusClient streamStatusClient, IConfigService configService)
         {
             _streamStatusClient = streamStatusClient;
-
-            _config = configService.GetConfig();
+            _configService = configService;
         }
 
         public async Task<IViewComponentResult> InvokeAsync()
@@ -25,7 +24,7 @@ namespace CoreCodedChatbot.Web.Components
             var streamStatus = await _streamStatusClient.GetStreamStatus(
                 new GetStreamStatusRequest
                 {
-                    BroadcasterUsername = _config.StreamerChannel
+                    BroadcasterUsername = _configService.Get<string>("StreamerChannel")
                 });
             
             return View(new NavigationViewModel

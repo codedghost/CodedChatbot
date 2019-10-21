@@ -61,3 +61,4 @@
 /CoreCodedChatbot.Printful/bin/Debug/netcoreapp2.1
 /CoreCodedChatbot.ApiClient/obj
 /CoreCodedChatbot.ApiClient/bin/Debug/netcoreapp2.1
+/CoreCodedChatbot/appsettings.local.json

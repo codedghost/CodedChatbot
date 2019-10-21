@@ -9,24 +9,24 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new []{"instagram", "insta"}, false)]
     public class InstagramCommand : ICommand
     {
-        private ConfigModel config;
+        private readonly IConfigService _configService;
 
         public InstagramCommand(IConfigService configService)
         {
-            this.config = configService.GetConfig();
+            _configService = configService;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
             client.SendMessage(joinedChannel,
                 username == "Chatbot"
-                    ? $"Check me out on insta: {config.InstagramLink}"
-                    : $"Hey {username}, check me out on insta: {config.InstagramLink}");
+                    ? $"Check me out on insta: {_configService.Get<string>("InstagramLink")}"
+                    : $"Hey {username}, check me out on insta: {_configService.Get<string>("InstagramLink")}");
         }
 
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)
         {
-            client.SendMessage(joinedChannel, $"Hey {username}, this command will output {config.StreamerChannel}'s instagram link");
+            client.SendMessage(joinedChannel, $"Hey {username}, this command will output {_configService.Get<string>("StreamerChannel")}'s instagram link");
         }
     }
 }

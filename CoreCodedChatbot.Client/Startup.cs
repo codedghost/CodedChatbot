@@ -1,3 +1,6 @@
+using CoreCodedChatbot.ApiClient;
+using CoreCodedChatbot.Database;
+using CoreCodedChatbot.Library;
 using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Services;
 using Microsoft.AspNetCore.Builder;
@@ -22,11 +25,11 @@ namespace CoreCodedChatbot.Client
         {
             services.AddMvc();
 
-            services.AddSingleton<IConfigService, ConfigService>();
-
-            var configService = new ConfigService();
-            
-            services.AddSingleton(new GuessingGameService(configService));
+            services
+                .AddLibraryServices()
+                .AddApiClientServices()
+                .AddGuessingGameServices()
+                .BuildServiceProvider();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

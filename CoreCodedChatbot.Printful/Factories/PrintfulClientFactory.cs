@@ -8,17 +8,20 @@ namespace CoreCodedChatbot.Printful.Factories
 {
     public class PrintfulClientFactory : IPrintfulClientFactory
     {
-        private ConfigModel _config;
+        private readonly IConfigService _configService;
+        private readonly ISecretService _secretService;
 
-        public PrintfulClientFactory(IConfigService configService)
+        public PrintfulClientFactory(IConfigService configService, ISecretService secretService)
         {
-            _config = configService.GetConfig();
+            _configService = configService;
+            _secretService = secretService;
         }
 
 
         public IPrintfulClient Get()
         {
-            return new PrintfulClient(_config.PrintfulAPIKey, _config.PrintfulAPIBaseUrl);
+            return new PrintfulClient(_secretService.GetSecret<string>("PrintfulAPIKey"),
+                _configService.Get<string>("PrintfulAPIBaseUrl"));
         }
     }
 }

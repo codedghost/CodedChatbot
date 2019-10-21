@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography.X509Certificates;
 using CoreCodedChatbot.ApiClient;
 using CoreCodedChatbot.Commands;
 using CoreCodedChatbot.Database;
@@ -8,7 +9,10 @@ using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library;
+using Microsoft.Azure.KeyVault;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using Microsoft.Rest;
 using Unity;
 
 namespace CoreCodedChatbot
@@ -31,7 +35,7 @@ namespace CoreCodedChatbot
                 .AddChatbotServices()
                 .AddDbContextFactory()
                 .BuildServiceProvider();
-
+            
             var commandHelper = serviceProvider.GetService<ICommandHelper>();
             commandHelper.Init(serviceProvider);
 

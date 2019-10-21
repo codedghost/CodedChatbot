@@ -15,12 +15,12 @@ namespace CoreCodedChatbot.Helpers
     public class VipHelper : IVipHelper
     {
         private readonly IChatbotContextFactory _contextFactory;
-        private readonly ConfigModel _config;
+        private readonly IConfigService _configService;
 
         public VipHelper(IChatbotContextFactory contextFactory, IConfigService configService)
         {
             _contextFactory = contextFactory;
-            _config = configService.GetConfig();
+            _configService = configService;
         }
 
         public User FindUser(IChatbotContext context, string username, bool deferSave = false)
@@ -202,8 +202,8 @@ namespace CoreCodedChatbot.Helpers
                 var totalBitsGiven = user.TotalBitsDropped;
                 var totalDonated = user.TotalDonated;
 
-                var bitsVipPercentage = (double) totalBitsGiven / (double) _config.BitsToVip;
-                var donationVipPercentage = (double) totalDonated / (double) _config.DonationAmountToVip;
+                var bitsVipPercentage = (double) totalBitsGiven / _configService.Get<double>("BitsToVip");
+                var donationVipPercentage = (double) totalDonated / _configService.Get<double>("DonationAmountToVip");
 
                 user.DonationOrBitsVipRequests = (int) Math.Floor(bitsVipPercentage + donationVipPercentage);
                 return true;
@@ -253,7 +253,7 @@ namespace CoreCodedChatbot.Helpers
             using (var context = this._contextFactory.Create())
             {
                 var user = this.FindUser(context, username);
-                return user != null && VipRequests.Create(user, _config).TotalRemaining > 0;
+                return user != null && new VipRequests(_configService, user).TotalRemaining > 0;
             }
         }
 
@@ -262,7 +262,7 @@ namespace CoreCodedChatbot.Helpers
             using (var context = _contextFactory.Create())
             {
                 var user = FindUser(context, username);
-                return user != null && (VipRequests.Create(user, _config)).TotalRemaining >= _config.SuperVipCost;
+                return user != null && (new VipRequests(_configService, user)).TotalRemaining >= _configService.Get<int>("SuperVipCost");
             }
         }
 
@@ -320,7 +320,7 @@ namespace CoreCodedChatbot.Helpers
             using (var context = this._contextFactory.Create())
             {
                 var user = this.FindUser(context, username);
-                return user == null ? null : VipRequests.Create(user, _config);
+                return user == null ? null : new VipRequests(_configService, user);
             }
         }
     }

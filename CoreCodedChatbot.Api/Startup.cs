@@ -26,7 +26,8 @@ namespace CoreCodedChatbot.Api
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            var config = new ConfigService().GetConfig();
+            var configService = new ConfigService();
+            var secretService = new AzureKeyVaultSecretService(configService);
 
             services.AddOptions();
             services.AddMemoryCache();
@@ -44,23 +45,23 @@ namespace CoreCodedChatbot.Api
                     {
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey =
-                            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.ApiSecretSymmetricKey)),
+                            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretService.GetSecret<string>("ApiSecretSymmetricKey"))),
                         ValidateIssuer = true,
-                        ValidIssuer = config.ApiValidIssuer,
+                        ValidIssuer = secretService.GetSecret<string>("ApiValidIssuer"),
                         ValidateAudience = true,
-                        ValidAudience = config.ApiValidAudience
+                        ValidAudience = secretService.GetSecret<string>("ApiValidAudience")
                     };
                 });
 
             services.AddMvc();
 
             var api = new TwitchAPI();
-            api.Settings.AccessToken = config.ChatbotAccessToken;
+            api.Settings.AccessToken = secretService.GetSecret<string>("ChatbotAccessToken");
 
             // TODO: Remove the need for the playlist service to talk directly in chat when opening the playlist.
-            var creds = new ConnectionCredentials(config.ChatbotNick, config.ChatbotPass);
+            var creds = new ConnectionCredentials(configService.Get<string>("ChatbotNick"), secretService.GetSecret<string>("ChatbotPass"));
             var client = new TwitchClient();
-            client.Initialize(creds, config.StreamerChannel);
+            client.Initialize(creds, configService.Get<string>("StreamerChannel"));
             client.Connect();
 
             services.AddSingleton(api);

@@ -22,15 +22,14 @@ namespace CoreCodedChatbot.Commands
     public class SuperVipCommand : ICommand
     {
         private IVipHelper _vipHelper;
+        private readonly IConfigService _configService;
         private readonly IPlaylistApiClient _playlistApiClient;
-
-        private readonly ConfigModel _config;
 
         public SuperVipCommand(IVipHelper vipHelper, IConfigService configService, IPlaylistApiClient playlistApiClient)
         {
             _vipHelper = vipHelper;
+            _configService = configService;
             _playlistApiClient = playlistApiClient;
-            _config = configService.GetConfig();
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
@@ -75,7 +74,7 @@ namespace CoreCodedChatbot.Commands
             else
             {
                 client.SendMessage(joinedChannel,
-                    $"Hey @{username}, it looks like you don't have enough VIP tokens :( You need at least {_config.SuperVipCost} tokens to request a SuperVIP");
+                    $"Hey @{username}, it looks like you don't have enough VIP tokens :( You need at least {_configService.Get<string>("SuperVipCost")} tokens to request a SuperVIP");
             }
         }
 

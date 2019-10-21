@@ -16,12 +16,12 @@ namespace CoreCodedChatbot.Commands
     public class GuessCommand : ICommand
     {
         private readonly IGuessingGameApiClient _guessingGameApiClient;
-        private ConfigModel _config;
+        private readonly IConfigService _configService;
 
         public GuessCommand(IGuessingGameApiClient guessingGameApiClient, IConfigService configService)
         {
             _guessingGameApiClient = guessingGameApiClient;
-            _config = configService.GetConfig();
+            _configService = configService;
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
@@ -52,7 +52,7 @@ namespace CoreCodedChatbot.Commands
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)
         {
             client.SendMessage(joinedChannel,
-                $"Hey @{username}, this command lets you join the guessing game when {_config.StreamerChannel} is playing a song request!");
+                $"Hey @{username}, this command lets you join the guessing game when {_configService.Get<string>("StreamerChannel")} is playing a song request!");
         }
     }
 }
