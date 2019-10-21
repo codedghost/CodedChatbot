@@ -25,19 +25,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="appsettings.dev.json" />
+    <None Remove="appsettings.Development.json" />
     <None Remove="appsettings.json" />
     <None Remove="appsettings.local.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="appsettings.dev.json">
+    <Content Include="appsettings.Development.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="appsettings.local.json">
+    <Content Include="appsettings.Local.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

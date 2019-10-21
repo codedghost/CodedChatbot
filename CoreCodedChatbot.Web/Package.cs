@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using AspNet.Security.OAuth.Twitch;
 using CoreCodedChatbot.Library.Interfaces.Services;
+using CoreCodedChatbot.Web.Interfaces;
 using CoreCodedChatbot.Web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -68,6 +69,8 @@ namespace CoreCodedChatbot.Web
 
             services.AddSingleton(client);
             services.AddSingleton(api);
+
+            services.AddSingleton<IChatterService, ChatterService>();
 
             return services;
         }
