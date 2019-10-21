@@ -1,5 +1,6 @@
 ﻿using System;
 using CoreCodedChatbot.ApiClient;
+using CoreCodedChatbot.Commands;
 using CoreCodedChatbot.Database;
 using Microsoft.EntityFrameworkCore;
 using CoreCodedChatbot.Services;
@@ -31,7 +32,8 @@ namespace CoreCodedChatbot
                 .AddDbContextFactory()
                 .BuildServiceProvider();
 
-            serviceProvider.GetService<CommandHelper>().Init(serviceProvider);
+            var commandHelper = serviceProvider.GetService<ICommandHelper>();
+            commandHelper.Init(serviceProvider);
 
             var chatbotService = serviceProvider.GetService<IChatbotService>();
 

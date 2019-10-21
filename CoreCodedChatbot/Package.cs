@@ -50,48 +50,54 @@ namespace CoreCodedChatbot
         {
             // Register chatbot helpers (these should really be services)
             services.AddTransient<IRedditHelper, RedditHelper>();
+            services.AddSingleton<IBytesHelper, BytesHelper>();
+            services.AddSingleton<IHelpHelper, HelpHelper>();
+            services.AddSingleton<IStreamLabsHelper, StreamLabsHelper>();
+            services.AddSingleton<IVipHelper, VipHelper>();
 
             return services;
         }
 
         public static IServiceCollection AddChatCommands(this IServiceCollection services)
         {
-            services.AddTransient<ICommand, AddInfoCommand>();
-            services.AddTransient<ICommand, AwwCommand>();
-            services.AddTransient<ICommand, ClaimAllVipsCommand>();
-            services.AddTransient<ICommand, ClaimVipCommand>();
-            services.AddTransient<ICommand, ClosePlaylistCommand>();
-            services.AddTransient<ICommand, DiscordCommand>();
-            services.AddTransient<ICommand, EditRockRequestCommand>();
-            services.AddTransient<ICommand, FollowageCommand>();
-            services.AddTransient<ICommand, GiftVipCommand>();
-            services.AddTransient<ICommand, GiveVipCommand>();
-            services.AddTransient<ICommand, GuessCommand>();
-            services.AddTransient<ICommand, HelpCommand>();
-            services.AddTransient<ICommand, HowToRequestCommand>();
-            services.AddTransient<ICommand, InfoCommand>();
-            services.AddTransient<ICommand, InstagramCommand>();
-            services.AddTransient<ICommand, KittyCommand>();
-            services.AddTransient<ICommand, MerchCommand>();
-            services.AddTransient<ICommand, MyBytesCommand>();
-            services.AddTransient<ICommand, MyRockRequestsCommand>();
-            services.AddTransient<ICommand, MyVipsCommand>();
-            services.AddTransient<ICommand, OpenPlaylistCommand>();
-            services.AddTransient<ICommand, PromoteCommand>();
-            services.AddTransient<ICommand, RemoveCurrentRequestCommand>();
-            services.AddTransient<ICommand, RemoveSuperVipCommand>();
-            services.AddTransient<ICommand, RocksmithChallengeCommand>();
-            services.AddTransient<ICommand, ShoutoutCommand>();
-            services.AddTransient<ICommand, SocialCommand>();
-            services.AddTransient<ICommand, SongListCommand>();
-            services.AddTransient<ICommand, SuperVipCommand>();
-            services.AddTransient<ICommand, TwitterCommand>();
-            services.AddTransient<ICommand, UptimeCommand>();
-            services.AddTransient<ICommand, VipCommand>();
-            services.AddTransient<ICommand, YoutubeCommand>();
+            services.AddTransient<AddInfoCommand>();
+            services.AddTransient<AwwCommand>();
+            services.AddTransient<ClaimAllVipsCommand>();
+            services.AddTransient<ClaimVipCommand>();
+            services.AddTransient<ClosePlaylistCommand>();
+            services.AddTransient<DiscordCommand>();
+            services.AddTransient<EditRockRequestCommand>();
+            services.AddTransient<FollowageCommand>();
+            services.AddTransient<GiftVipCommand>();
+            services.AddTransient<GiveVipCommand>();
+            services.AddTransient<GuessCommand>();
+            services.AddTransient<HelpCommand>();
+            services.AddTransient<HowToRequestCommand>();
+            services.AddTransient<InfoCommand>();
+            services.AddTransient<InstagramCommand>();
+            services.AddTransient<KittyCommand>();
+            services.AddTransient<MerchCommand>();
+            services.AddTransient<MyBytesCommand>();
+            services.AddTransient<MyRockRequestsCommand>();
+            services.AddTransient<MyVipsCommand>();
+            services.AddTransient<OpenPlaylistCommand>();
+            services.AddTransient<PromoteCommand>();
+            services.AddTransient<RemoveCurrentRequestCommand>();
+            services.AddTransient<RemoveRockRequestCommand>();
+            services.AddTransient<RemoveSuperVipCommand>();
+            services.AddTransient<RockRequestCommand>();
+            services.AddTransient<RocksmithChallengeCommand>();
+            services.AddTransient<ShoutoutCommand>();
+            services.AddTransient<SocialCommand>();
+            services.AddTransient<SongListCommand>();
+            services.AddTransient<SuperVipCommand>();
+            services.AddTransient<TwitterCommand>();
+            services.AddTransient<UptimeCommand>();
+            services.AddTransient<VipCommand>();
+            services.AddTransient<YoutubeCommand>();
 
             // Register CommandHelper
-            services.AddScoped<ICommandHelper, CommandHelper>();
+            services.AddSingleton<ICommandHelper, CommandHelper>();
 
             return services;
         }
