@@ -1,6 +1,8 @@
 ﻿using System.Text;
 using AspNet.Security.OAuth.Twitch;
+using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Library.Interfaces.Services;
+using CoreCodedChatbot.Secrets;
 using CoreCodedChatbot.Web.Interfaces;
 using CoreCodedChatbot.Web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;

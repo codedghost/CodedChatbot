@@ -5,7 +5,6 @@ using System.Reflection;
 using CoreCodedChatbot.Commands;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Models.Data;
-using Unity;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 using ChatCommand = CoreCodedChatbot.CustomAttributes.ChatCommand;
@@ -36,7 +35,8 @@ namespace CoreCodedChatbot.Helpers
 
             foreach (var type in types)
             {
-                Commands.Add((ICommand)serviceProvider.GetService(type));
+                var service = serviceProvider.GetService(type);
+                Commands.Add((ICommand) service);
             }
         }
 

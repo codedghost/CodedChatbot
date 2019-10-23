@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Database.Context.Models;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
+using CoreCodedChatbot.Secrets;
 using Newtonsoft.Json;
 
 namespace CoreCodedChatbot.Helpers

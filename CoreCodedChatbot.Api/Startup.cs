@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Services;
+using CoreCodedChatbot.Secrets;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -27,7 +29,8 @@ namespace CoreCodedChatbot.Api
         public void ConfigureServices(IServiceCollection services)
         {
             var configService = new ConfigService();
-            var secretService = new AzureKeyVaultSecretService(configService);
+            var secretService = new AzureKeyVaultService(configService);
+            secretService.Initialize().Wait();
 
             services.AddOptions();
             services.AddMemoryCache();

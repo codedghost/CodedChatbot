@@ -37,7 +37,6 @@ namespace CoreCodedChatbot.Client
         {
             if (env.IsDevelopment())
             {
-                app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
             }
             else

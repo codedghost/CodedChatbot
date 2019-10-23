@@ -9,11 +9,7 @@ using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library;
-using Microsoft.Azure.KeyVault;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using Microsoft.Rest;
-using Unity;
 
 namespace CoreCodedChatbot
 {
@@ -21,11 +17,6 @@ namespace CoreCodedChatbot
     {
         public static void Main(string[] args)
         {
-            using (var context = new ChatbotContext())
-            {
-                context.Database.Migrate();
-            }
-
             var serviceProvider = new ServiceCollection()
                 .AddTwitchServices()
                 .AddLibraryServices()
@@ -35,7 +26,13 @@ namespace CoreCodedChatbot
                 .AddChatbotServices()
                 .AddDbContextFactory()
                 .BuildServiceProvider();
-            
+
+            using (var context = new ChatbotContext())
+            {
+                context.Database.Migrate();
+            }
+
+
             var commandHelper = serviceProvider.GetService<ICommandHelper>();
             commandHelper.Init(serviceProvider);
 

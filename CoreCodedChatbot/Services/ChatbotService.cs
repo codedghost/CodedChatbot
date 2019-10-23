@@ -3,12 +3,14 @@ using System.Net.Http;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using CoreCodedChatbot.Config;
 using Newtonsoft.Json;
 
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
+using CoreCodedChatbot.Secrets;
 using Microsoft.EntityFrameworkCore.Internal;
 using TwitchLib.Client.Events;
 using TwitchLib.PubSub.Events;

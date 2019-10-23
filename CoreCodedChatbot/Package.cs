@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 using CoreCodedChatbot.Commands;
+using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Services;
+using CoreCodedChatbot.Secrets;
 using CoreCodedChatbot.Services;
 using Microsoft.Extensions.DependencyInjection;
 using TwitchLib.Api;
@@ -23,7 +25,8 @@ namespace CoreCodedChatbot
         public static IServiceCollection AddTwitchServices(this IServiceCollection services)
         {
             var configService = new ConfigService();
-            var secretService = new AzureKeyVaultSecretService(configService);
+            var secretService = new AzureKeyVaultService(configService);
+            secretService.Initialize().Wait();
 
             var creds = new ConnectionCredentials(configService.Get<string>("ChatbotNick"), secretService.GetSecret<string>("ChatbotPass"));
             var client = new TwitchClient();

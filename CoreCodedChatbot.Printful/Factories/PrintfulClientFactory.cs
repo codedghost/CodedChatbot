@@ -1,8 +1,10 @@
-﻿using CoreCodedChatbot.Library.Interfaces.Services;
+﻿using CoreCodedChatbot.Config;
+using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Printful.ExternalClients;
 using CoreCodedChatbot.Printful.Interfaces.ExternalClients;
 using CoreCodedChatbot.Printful.Interfaces.Factories;
+using CoreCodedChatbot.Secrets;
 
 namespace CoreCodedChatbot.Printful.Factories
 {

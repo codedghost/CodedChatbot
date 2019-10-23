@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Helpers;
 using CoreCodedChatbot.Library.Interfaces.Services;

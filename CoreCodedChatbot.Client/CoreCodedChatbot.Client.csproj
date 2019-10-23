@@ -1,14 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
 	<TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CoreCodedChatbot.ApiClient" Version="1.0.261" />
-    <PackageReference Include="CoreCodedChatbot.Library" Version="1.0.271" />
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.5" />
+    <PackageReference Include="CoreCodedChatbot.ApiClient" Version="1.0.301" />
+    <PackageReference Include="CoreCodedChatbot.Config" Version="1.0.296" />
+    <PackageReference Include="CoreCodedChatbot.Library" Version="1.0.300" />
+    <PackageReference Include="CoreCodedChatbot.Secrets" Version="1.0.299" />
   </ItemGroup>
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="appsettings.Development.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="appsettings.Local.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>

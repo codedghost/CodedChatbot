@@ -1,30 +1,18 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
-using AspNet.Security.OAuth.Twitch;
+using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Database;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.IdentityModel.Tokens;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http;
 
-using CoreCodedChatbot.Database.Context;
-using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Library;
-using CoreCodedChatbot.Library.Interfaces.Services;
-using CoreCodedChatbot.Library.Services;
-using CoreCodedChatbot.Printful.Factories;
-using CoreCodedChatbot.Printful.Interfaces.Factories;
+using CoreCodedChatbot.Secrets;
 using CoreCodedChatbot.Web.Interfaces;
 using CoreCodedChatbot.Web.Services;
 using CoreCodedChatbot.Web.SignalRHubs;
-using TwitchLib.Api;
-using TwitchLib.Client;
-using TwitchLib.Client.Models;
 
 namespace CoreCodedChatbot.Web
 {
@@ -34,7 +22,8 @@ namespace CoreCodedChatbot.Web
         public void ConfigureServices(IServiceCollection services)
         {
             var configService = new ConfigService();
-            var secretService = new AzureKeyVaultSecretService(configService);
+            var secretService = new AzureKeyVaultService(configService);
+            secretService.Initialize().Wait();
 
             services.AddOptions();
             services.AddMemoryCache();
@@ -81,7 +70,6 @@ namespace CoreCodedChatbot.Web
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseBrowserLink();
             }
             else
             {

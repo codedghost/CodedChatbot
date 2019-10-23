@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Library.Models.SignalR;
+using CoreCodedChatbot.Secrets;
 using Microsoft.AspNetCore.SignalR;
 
 namespace CoreCodedChatbot.Web.SignalRHubs
