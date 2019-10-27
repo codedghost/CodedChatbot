@@ -80,9 +80,9 @@ namespace CoreCodedChatbot.Web
 
             app.UseStaticFiles();
 
-            app.UseSignalR(routes =>
+            app.UseEndpoints(config =>
             {
-                routes.MapHub<SongList>("/SongList");
+                config.MapHub<SongList>("/SongList");
             });
 
             var heartbeatService = serviceProvider.GetService<SignalRHeartbeatService>();
