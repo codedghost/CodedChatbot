@@ -2,53 +2,63 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Database.Context;
+using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Database.Context.Models;
+using CoreCodedChatbot.Interfaces;
+using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
+using CoreCodedChatbot.Secrets;
 using Newtonsoft.Json;
 
 namespace CoreCodedChatbot.Helpers
 {
-    public class StreamLabsHelper
+    public class StreamLabsHelper : IStreamLabsHelper
     {
-        private readonly ChatbotContextFactory chatbotContextFactory;
-        private readonly VipHelper vipHelper;
-        private readonly ConfigModel config;
+        private readonly IChatbotContextFactory _chatbotContextFactory;
+        private readonly IVipHelper _vipHelper;
+        private readonly IConfigService _configService;
+        private readonly ISecretService _secretService;
 
         private HttpClient httpClient = new HttpClient();
 
-        public StreamLabsHelper(ChatbotContextFactory chatbotContextFactory, VipHelper vipHelper, ConfigModel config)
+        public StreamLabsHelper(IChatbotContextFactory chatbotContextFactory, IVipHelper vipHelper,
+            IConfigService configService, ISecretService secretService)
         {
-            this.chatbotContextFactory = chatbotContextFactory;
-            this.vipHelper = vipHelper;
-            this.config = config;
+            _chatbotContextFactory = chatbotContextFactory;
+            _vipHelper = vipHelper;
+            _configService = configService;
+            _secretService = secretService;
         }
 
         public bool RefreshAuthToken()
         {
             try
             {
-                using (var context = chatbotContextFactory.Create())
+                using (var context = _chatbotContextFactory.Create())
                 {
-                    var refreshTokenRecord = context.Settings.SingleOrDefault(s => s.SettingName == "StreamLabsRefreshToken");
+                    var refreshTokenRecord =
+                        context.Settings.SingleOrDefault(s => s.SettingName == "StreamLabsRefreshToken");
                     if (refreshTokenRecord == null) return false;
 
                     var vals = new Dictionary<string, string>
                     {
                         {"grant_type", "refresh_token"},
-                        {"client_id", config.StreamLabsClientId},
-                        {"client_secret", config.StreamLabsClientSecret},
+                        {"client_id", _secretService.GetSecret<string>("StreamLabsClientId")},
+                        {"client_secret", _secretService.GetSecret<string>("StreamLabsClientSecret")},
                         {"redirect_uri", "localhost"},
                         {"refresh_token", refreshTokenRecord.SettingValue}
                     };
                     var content = new FormUrlEncodedContent(vals);
                     var tokenResponse = httpClient.PostAsync("https://streamlabs.com/api/v1.0/token", content).Result;
-                    
+
                     var tokenJsonString = tokenResponse.Content.ReadAsStringAsync().Result;
                     var tokenModel = JsonConvert.DeserializeObject<TokenJsonModel>(tokenJsonString);
 
                     var accessTokenRecord =
-                        context.Settings.SingleOrDefault(s => s.SettingName == "StreamLabsAccessToken") ?? new Setting {SettingName = "StreamLabsAccessToken"};
+                        context.Settings.SingleOrDefault(s => s.SettingName == "StreamLabsAccessToken") ??
+                        new Setting {SettingName = "StreamLabsAccessToken"};
 
                     accessTokenRecord.SettingValue = tokenModel.access_token;
                     refreshTokenRecord.SettingValue = tokenModel.refresh_token;
@@ -79,7 +89,8 @@ namespace CoreCodedChatbot.Helpers
                                              ?.SettingValue ?? "";
 
                     var getDonationsResponse = httpClient
-                        .GetAsync($"https://streamlabs.com/api/v1.0/donations?access_token={accessToken}&after={lastDonationId}&currency={config.DonationCurrency}&limit=100")
+                        .GetAsync(
+                            $"https://streamlabs.com/api/v1.0/donations?access_token={accessToken}&after={lastDonationId}&currency={_configService.Get<string>("DonationCurrency")}&limit=100")
                         .Result;
                     if (!getDonationsResponse.IsSuccessStatusCode) return null;
 
@@ -125,7 +136,8 @@ namespace CoreCodedChatbot.Helpers
                 if (latestDonationId == null) return true;
 
                 // Get all donation amounts together
-                var groupedDonations = donations.OrderByDescending(d => d.created_at).ToList().GroupBy(d => d.name.ToLower()).ToList()
+                var groupedDonations = donations.OrderByDescending(d => d.created_at).ToList()
+                    .GroupBy(d => d.name.ToLower()).ToList()
                     .Select(d => new
                     {
                         name = d.First().name.ToLower(),
@@ -144,10 +156,10 @@ namespace CoreCodedChatbot.Helpers
 
                     foreach (var donation in groupedDonations)
                     {
-                        var user = vipHelper.FindUser(context, donation.name);
+                        var user = _vipHelper.FindUser(context, donation.name);
                         user.TotalDonated += donation.amount;
 
-                        vipHelper.GiveDonationVipsDb(user);
+                        _vipHelper.GiveDonationVipsDb(user);
                         context.SaveChanges();
                     }
 

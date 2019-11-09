@@ -11,7 +11,7 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new []{"shoutout", "so"}, true)]
     public class ShoutoutCommand : ICommand
     {
-        private ITwitchAPI _twitchApi;
+        private TwitchAPI _twitchApi;
 
         public ShoutoutCommand(TwitchAPI twitchApi)
         {

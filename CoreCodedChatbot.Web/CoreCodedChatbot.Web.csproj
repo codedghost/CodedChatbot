@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
 	<TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
   </PropertyGroup>
 
@@ -22,7 +22,13 @@
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.Twitch" Version="2.1.0" />
     <PackageReference Include="AspNetCoreRateLimit" Version="3.0.3" />
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.5" />
+    <PackageReference Include="CoreCodedChatbot.ApiClient" Version="1.0.309" />
+    <PackageReference Include="CoreCodedChatbot.Config" Version="1.0.296" />
+    <PackageReference Include="CoreCodedChatbot.Database" Version="1.0.319" />
+    <PackageReference Include="CoreCodedChatbot.Library" Version="1.0.320" />
+    <PackageReference Include="CoreCodedChatbot.Printful" Version="1.0.323" />
+    <PackageReference Include="CoreCodedChatbot.Secrets" Version="1.0.317" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="1.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.WebUtilities" Version="2.2.0" />
@@ -39,16 +45,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CoreCodedChatbot.Database\CoreCodedChatbot.Database.csproj" />
-    <ProjectReference Include="..\CoreCodedChatbot.Library\CoreCodedChatbot.Library.csproj" />
-    <ProjectReference Include="..\CoreCodedChatbot\CoreCodedChatbot.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Content Update="appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Update="config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Update="SongsMasterGrid.json">

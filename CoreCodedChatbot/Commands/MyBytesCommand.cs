@@ -10,14 +10,11 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new[] { "mybytes", "mybites" }, false)]
     public class MyBytesCommand : ICommand
     {
-        private readonly BytesHelper bytesHelper;
+        private readonly IBytesHelper bytesHelper;
 
-        private readonly ConfigModel config;
-
-        public MyBytesCommand(BytesHelper bytesHelper, ConfigModel config)
+        public MyBytesCommand(IBytesHelper bytesHelper)
         {
             this.bytesHelper = bytesHelper;
-            this.config = config;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)

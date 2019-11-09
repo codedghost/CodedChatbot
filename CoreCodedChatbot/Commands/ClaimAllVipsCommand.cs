@@ -8,9 +8,9 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new []{ "claimallvips", "claimall"}, false)]
     public class ClaimAllVipsCommand : ICommand
     {
-        private BytesHelper bytesHelper;
+        private IBytesHelper bytesHelper;
 
-        public ClaimAllVipsCommand(BytesHelper bytesHelper)
+        public ClaimAllVipsCommand(IBytesHelper bytesHelper)
         {
             this.bytesHelper = bytesHelper;
         }

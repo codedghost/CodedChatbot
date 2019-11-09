@@ -5,33 +5,28 @@ using System.Reflection;
 using CoreCodedChatbot.Commands;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Models.Data;
-using Unity;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 using ChatCommand = CoreCodedChatbot.CustomAttributes.ChatCommand;
 using CoreCodedChatbot.Database.Context.Interfaces;
+using CoreCodedChatbot.Library.Services;
 
 namespace CoreCodedChatbot.Helpers
 {
-    public class CommandHelper
+    public class CommandHelper : ICommandHelper
     {
-        private readonly IUnityContainer container;
 
         private List<ICommand> Commands { get; set; }
         private bool allowModCommand = true;
         private System.Threading.Timer ModCommandTimeout { get; set; }
-
-        private readonly ConfigModel config;
         private IChatbotContextFactory chatbotContextFactory;
 
-        public CommandHelper(IUnityContainer container, ConfigModel config, IChatbotContextFactory chatbotContextFactory)
+        public CommandHelper(IChatbotContextFactory chatbotContextFactory)
         {
-            this.container = container;
-            this.config = config;
             this.chatbotContextFactory = chatbotContextFactory;
         }
 
-        public void Init()
+        public void Init(IServiceProvider serviceProvider)
         {
             Commands = new List<ICommand>();
 
@@ -40,7 +35,8 @@ namespace CoreCodedChatbot.Helpers
 
             foreach (var type in types)
             {
-                Commands.Add((ICommand)container.Resolve(type));
+                var service = serviceProvider.GetService(type);
+                Commands.Add((ICommand) service);
             }
         }
 

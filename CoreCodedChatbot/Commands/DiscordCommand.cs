@@ -1,4 +1,6 @@
-﻿using CoreCodedChatbot.Interfaces;
+﻿using CoreCodedChatbot.Config;
+using CoreCodedChatbot.Interfaces;
+using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
 
 using TwitchLib.Client;
@@ -9,17 +11,17 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new[] { "discord" }, false)]
     public class DiscordCommand : ICommand
     {
-        private readonly ConfigModel config;
+        private readonly IConfigService _configService;
 
-        public DiscordCommand(ConfigModel config)
+        public DiscordCommand(IConfigService configService)
         {
-            this.config = config;
+            _configService = configService;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
             // load discord link from config
-            client.SendMessage(joinedChannel, $"Join us on discord: { config.DiscordLink }");
+            client.SendMessage(joinedChannel, $"Join us on discord: { _configService.Get<string>("DiscordLink") }");
         }
 
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)

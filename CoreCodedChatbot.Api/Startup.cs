@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Database.Context;
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Services;
+using CoreCodedChatbot.Secrets;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -15,6 +17,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using TwitchLib.Api;
 using TwitchLib.Client;
@@ -26,7 +29,9 @@ namespace CoreCodedChatbot.Api
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            var config = new ConfigService().GetConfig();
+            var configService = new ConfigService();
+            var secretService = new AzureKeyVaultService(configService);
+            secretService.Initialize().Wait();
 
             services.AddOptions();
             services.AddMemoryCache();
@@ -44,23 +49,23 @@ namespace CoreCodedChatbot.Api
                     {
                         ValidateIssuerSigningKey = true,
                         IssuerSigningKey =
-                            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.ApiSecretSymmetricKey)),
+                            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretService.GetSecret<string>("ApiSecretSymmetricKey"))),
                         ValidateIssuer = true,
-                        ValidIssuer = config.ApiValidIssuer,
+                        ValidIssuer = secretService.GetSecret<string>("ApiValidIssuer"),
                         ValidateAudience = true,
-                        ValidAudience = config.ApiValidAudience
+                        ValidAudience = secretService.GetSecret<string>("ApiValidAudience")
                     };
                 });
 
             services.AddMvc();
 
             var api = new TwitchAPI();
-            api.Settings.AccessToken = config.ChatbotAccessToken;
+            api.Settings.AccessToken = secretService.GetSecret<string>("ChatbotAccessToken");
 
             // TODO: Remove the need for the playlist service to talk directly in chat when opening the playlist.
-            var creds = new ConnectionCredentials(config.ChatbotNick, config.ChatbotPass);
+            var creds = new ConnectionCredentials(configService.Get<string>("ChatbotNick"), secretService.GetSecret<string>("ChatbotPass"));
             var client = new TwitchClient();
-            client.Initialize(creds, config.StreamerChannel);
+            client.Initialize(creds, configService.Get<string>("StreamerChannel"));
             client.Connect();
 
             services.AddSingleton(api);
@@ -73,7 +78,7 @@ namespace CoreCodedChatbot.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {

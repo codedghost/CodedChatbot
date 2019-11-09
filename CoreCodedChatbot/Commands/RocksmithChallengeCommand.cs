@@ -1,4 +1,6 @@
-﻿using CoreCodedChatbot.Interfaces;
+﻿using CoreCodedChatbot.Config;
+using CoreCodedChatbot.Interfaces;
+using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
@@ -8,20 +10,19 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new[] { "rocksmithchallenge", "challenge"}, false)]
     public class RocksmithChallengeCommand : ICommand
     {
-        private ConfigModel config;
+        private readonly IConfigService _configService;
 
-        public RocksmithChallengeCommand(ConfigModel config)
+        public RocksmithChallengeCommand(IConfigService configService)
         {
-            this.config = config;
+            _configService = configService;
         }
-
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
             client.SendMessage(joinedChannel,
                 username == "Chatbot"
-                    ? $"Want to take part in our challenge where we learn a new song every month? Join the discord and react on the info page to get access to the challenge channel: {config.DiscordLink}"
-                    : $"Hey @{username} want to take part in our challenge where we learn a new song every month? Join the discord and react on the info page to get access to the challenge channel: {config.DiscordLink}");
+                    ? $"Want to take part in our challenge where we learn a new song every month? Join the discord and react on the info page to get access to the challenge channel: {_configService.Get<string>("DiscordLink")}"
+                    : $"Hey @{username} want to take part in our challenge where we learn a new song every month? Join the discord and react on the info page to get access to the challenge channel: {_configService.Get<string>("DiscordLink")}");
         }
 
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)

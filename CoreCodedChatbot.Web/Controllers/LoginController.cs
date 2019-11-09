@@ -8,11 +8,8 @@ namespace CoreCodedChatbot.Web.Controllers
 {
     public class LoginController : Controller
     {
-        private readonly ConfigModel config;
-
-        public LoginController(IConfigService configService)
+        public LoginController()
         {
-            this.config = configService.GetConfig();
         }
 
         public IActionResult Index()
