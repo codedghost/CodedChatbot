@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Helpers;
+using CoreCodedChatbot.Library.Models.ApiRequest.Playlist;
 using CoreCodedChatbot.Library.Models.Data;
 using Newtonsoft.Json;
 using TwitchLib.Client;
@@ -14,36 +16,27 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new [] { "promote"}, false)]
     public class PromoteCommand : ICommand
     {
-        private VipHelper vipHelper;
-        private HttpClient playlistClient;
-        private ConfigModel config;
+        private readonly IPlaylistApiClient _playlistApiClient;
+        private readonly IVipHelper _vipHelper;
 
-        public PromoteCommand(ConfigModel config, VipHelper vipHelper)
+        public PromoteCommand(IPlaylistApiClient playlistApiClient, IVipHelper vipHelper)
         {
-            this.vipHelper = vipHelper;
-            this.config = config;
-
-            this.playlistClient = new HttpClient
-            {
-                BaseAddress = new Uri(config.PlaylistApiUrl),
-                DefaultRequestHeaders =
-                {
-                    Authorization = new AuthenticationHeaderValue("Bearer", config.JwtTokenString)
-                }
-            };
+            _playlistApiClient = playlistApiClient;
+            _vipHelper = vipHelper;
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            if (vipHelper.CanUseVipRequest(username))
+            if (_vipHelper.CanUseVipRequest(username))
             {
-                var request = await playlistClient.PostAsync("PromoteRequest",
-                    HttpClientHelper.GetJsonData(new {username}));
-
-                if (request.IsSuccessStatusCode)
+                var playlistPosition = await _playlistApiClient.PromoteSong(new PromoteSongRequest
                 {
-                    var playlistPosition =
-                        JsonConvert.DeserializeObject<int>(await request.Content.ReadAsStringAsync());
+                    username = username
+                });
+
+                // TODO: This really should be an object returned
+                if (playlistPosition != -1)
+                {
                     client.SendMessage(joinedChannel, playlistPosition == -1
                         ? $"Hey @{username}, I can't find a song at that position! Please check your requests with !myrequests"
                         : playlistPosition == -2
@@ -53,7 +46,7 @@ namespace CoreCodedChatbot.Commands
                                 : $"Hey @{username}, I have promoted your request to #{playlistPosition} for you!");
 
 
-                    if (playlistPosition > 0) vipHelper.UseVipRequest(username);
+                    if (playlistPosition > 0) _vipHelper.UseVipRequest(username);
                     return;
                 }
 

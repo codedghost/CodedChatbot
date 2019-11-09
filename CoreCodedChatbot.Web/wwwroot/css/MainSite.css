@@ -18,3 +18,7 @@ body {
 .jumbotron {
     background-color: #303030;
 }
+
+#nav-brand {
+    height: 50px;
+}

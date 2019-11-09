@@ -9,10 +9,10 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new[] { "claimvip", "convertvip" }, false)]
     public class ClaimVipCommand : ICommand
     {
-        private readonly BytesHelper bytesHelper;
+        private readonly IBytesHelper bytesHelper;
 
 
-        public ClaimVipCommand(BytesHelper bytesHelper)
+        public ClaimVipCommand(IBytesHelper bytesHelper)
         {
             this.bytesHelper = bytesHelper;
         }

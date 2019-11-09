@@ -3,22 +3,23 @@ using System.Threading.Tasks;
 using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Library.Models.SignalR;
+using CoreCodedChatbot.Secrets;
 using Microsoft.AspNetCore.SignalR;
 
 namespace CoreCodedChatbot.Web.SignalRHubs
 {
     public class SongList : Hub
     {
-        private ConfigModel config { get; set; }
+        private readonly ISecretService _secretService;
 
-        public SongList(IConfigService configService)
+        public SongList(ISecretService secretService)
         {
-            this.config = configService.GetConfig();
+            _secretService = secretService;
         }
 
         public async Task SendAll(SongListHubModel data)
         {
-            var psk = config.SignalRKey;
+            var psk = _secretService.GetSecret<string>("SignalRKey");
 
             if (psk == data.psk)
             {
@@ -31,7 +32,7 @@ namespace CoreCodedChatbot.Web.SignalRHubs
 
         public async Task UpdateById(SongListSingleSongModel updateModel)
         {
-            var psk = config.SignalRKey;
+            var psk = _secretService.GetSecret<string>("SignalRKey");
 
             if (psk == updateModel.psk)
             {
@@ -43,7 +44,7 @@ namespace CoreCodedChatbot.Web.SignalRHubs
         
         public async Task RemoveById(SongListSingleSongModel removeModel)
         {
-            var psk = config.SignalRKey;
+            var psk = _secretService.GetSecret<string>("SignalRKey");
 
             if (psk == removeModel.psk)
             {

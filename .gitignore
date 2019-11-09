@@ -57,3 +57,12 @@
 /CoreCodedChatbot.Api/Properties/launchSettings.json
 /CoreCodedChatbot.Api/config.json
 /CoreCodedChatbot.Api/hosting.json
+/CoreCodedChatbot.Printful/obj
+/CoreCodedChatbot.Printful/bin/Debug/netcoreapp2.1
+/CoreCodedChatbot.ApiClient/obj
+/CoreCodedChatbot.ApiClient/bin/Debug/netcoreapp2.1
+/CoreCodedChatbot/appsettings.local.json
+/CoreCodedChatbot.Web/appsettings.local.json
+/CoreCodedChatbot.Client/appsettings.Local.json
+/CoreCodedChatbot.Api/bin/Debug/netcoreapp3.0
+/CoreCodedChatbot.Web/bin/Debug/netcoreapp3.0

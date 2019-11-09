@@ -1,4 +1,6 @@
-﻿using CoreCodedChatbot.Interfaces;
+﻿using CoreCodedChatbot.Config;
+using CoreCodedChatbot.Interfaces;
+using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
 
 using TwitchLib.Client;
@@ -9,19 +11,19 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new []{ "songlist", "playlist", "requests", "list", "songs", "sl" }, false)]
     public class SongListCommand: ICommand
     {
-        private readonly ConfigModel config;
+        private readonly IConfigService _configService;
 
-        public SongListCommand(ConfigModel config)
+        public SongListCommand(IConfigService configService)
         {
-            this.config = config;
+            _configService = configService;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
             client.SendMessage(joinedChannel,
                 username == "Chatbot"
-                    ? $"The full playlist can be found at: {config.WebPlaylistUrl}/Chatbot/List You can now request/edit/remove requests over there too!"
-                    : $"Hey @{username}, the full playlist can be found at: {config.WebPlaylistUrl}/Chatbot/List You can now request/edit/remove requests over there too!");
+                    ? $"The full playlist can be found at: {_configService.Get<string>("WebPlaylistUrl")}/Chatbot/List You can now request/edit/remove requests over there too!"
+                    : $"Hey @{username}, the full playlist can be found at: {_configService.Get<string>("WebPlaylistUrl")}/Chatbot/List You can now request/edit/remove requests over there too!");
         }
 
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)

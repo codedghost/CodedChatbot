@@ -4,6 +4,8 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Library.Helpers;
 using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.ApiRequest.GuessingGame;
@@ -11,45 +13,38 @@ using CoreCodedChatbot.Library.Models.Data;
 
 namespace CoreCodedChatbot.Client.Services
 {
-    public class GuessingGameService
+    public class GuessingGameService : Interfaces.IGuessingGameService
     {
-        private ConfigModel config;
-        private Timer checkFileTimer;
+        private readonly IConfigService _configService;
+        private readonly IGuessingGameApiClient _guessingGameApiClient;
+        private Timer _checkFileTimer;
 
-        private HttpClient guessingGameClient;
+        private string _rocksnifferDirectory;
 
         private bool hasGameStarted = false;
         private bool hasGameBeenCompleted = false;
 
         private int totalTime = 0;
 
-        public GuessingGameService(IConfigService configService)
+        public GuessingGameService(IConfigService configService, IGuessingGameApiClient guessingGameApiClient)
         {
-            config = configService.GetConfig();
+            _configService = configService;
+            _guessingGameApiClient = guessingGameApiClient;
 
-            this.guessingGameClient = new HttpClient
-            {
-                BaseAddress = new Uri(config.GuessingGameApiUrl),
-                DefaultRequestHeaders =
-                {
-                    Authorization = new AuthenticationHeaderValue("Bearer", config.JwtTokenString)
-                }
-            };
+            _rocksnifferDirectory = _configService.Get<string>("RocksnifferSongDetailsLocation");
 
             // Using a polling model rather than FileWatcher.
             // File watcher is triggered a lot due to the file being continually written to.
-            checkFileTimer = new Timer(async x => await CheckRocksnifferFiles(),
+            _checkFileTimer = new Timer(async x => await CheckRocksnifferFiles(),
                 null, TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(1));
         }
 
         private async Task CheckRocksnifferFiles()
         {
 
-            var songDetailsLocation = config.RocksnifferSongDetailsLocation + "song_details.txt";
-            var songTimerLocation =
-                config.RocksnifferSongDetailsLocation +
-                "song_timer.txt"; // split on / left is current time, right is total.
-            var songAccuracyLocation = config.RocksnifferSongDetailsLocation + "accuracy.txt";
+            var songDetailsLocation = _rocksnifferDirectory + "song_details.txt";
+            var songTimerLocation = _rocksnifferDirectory + "song_timer.txt"; // split on / left is current time, right is total.
+            var songAccuracyLocation = _rocksnifferDirectory + "accuracy.txt";
 
             //TempWriteToFile($"SongDetails: {GetFileContents(songDetailsLocation)}");
             //TempWriteToFile($"SongTimer: {GetFileContents(songTimerLocation)}");
@@ -79,9 +74,9 @@ namespace CoreCodedChatbot.Client.Services
                     hasGameStarted = true;
                     hasGameBeenCompleted = false;
 
-                    var result = await guessingGameClient.PostAsync("StartGuessingGame", HttpClientHelper.GetJsonData(songInfoModel));
+                    var success = await _guessingGameApiClient.StartGuessingGame(songInfoModel);
 
-                    if (!result.IsSuccessStatusCode) return;
+                    if (!success) return;
 
                     totalTime = ConvertTimerToSeconds(timer[1]);
                     return;
@@ -91,10 +86,10 @@ namespace CoreCodedChatbot.Client.Services
                 if (runningTimeInSeconds != totalTime || hasGameBeenCompleted) return;
 
                 // send percentage to server and finish game
-                var completedResult = await guessingGameClient.PostAsync("FinishGuessingGame",
-                    HttpClientHelper.GetJsonData(finalPercentage));
+                decimal.TryParse(finalPercentage, out var finalPercentageDecimal);
+                var completedResult = await _guessingGameApiClient.FinishGuessingGame(finalPercentageDecimal);
 
-                if (!completedResult.IsSuccessStatusCode) return;
+                if (!completedResult) return;
 
                 hasGameStarted = false;
                 hasGameBeenCompleted = true;
@@ -123,22 +118,6 @@ namespace CoreCodedChatbot.Client.Services
             catch (Exception)
             {
                 return string.Empty;
-            }
-        }
-            
-        private void TempWriteToFile(string textToAppend)
-        {
-            var tempLocation = config.RocksnifferSongDetailsLocation + "combo_output_text.txt";
-            try
-            {
-                using (var sw = new StreamWriter(File.Open(tempLocation, FileMode.Append)))
-                {
-                    sw.WriteLine(textToAppend);
-                }
-            }
-            catch (Exception)
-            {
-                // File probably in use, pass over
             }
         }
     }
