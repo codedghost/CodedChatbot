@@ -4,10 +4,10 @@
 	<TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="CoreCodedChatbot.ApiClient" Version="1.0.301" />
+    <PackageReference Include="CoreCodedChatbot.ApiClient" Version="1.0.309" />
     <PackageReference Include="CoreCodedChatbot.Config" Version="1.0.296" />
-    <PackageReference Include="CoreCodedChatbot.Library" Version="1.0.300" />
-    <PackageReference Include="CoreCodedChatbot.Secrets" Version="1.0.299" />
+    <PackageReference Include="CoreCodedChatbot.Library" Version="1.0.308" />
+    <PackageReference Include="CoreCodedChatbot.Secrets" Version="1.0.307" />
   </ItemGroup>
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="2.0.4" />

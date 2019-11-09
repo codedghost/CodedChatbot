@@ -11,8 +11,8 @@
   <ItemGroup>
     <PackageReference Include="CoreCodedChatbot.Config" Version="1.0.296" />
     <PackageReference Include="CoreCodedChatbot.Database" Version="1.0.292" />
-    <PackageReference Include="CoreCodedChatbot.Library" Version="1.0.300" />
-    <PackageReference Include="CoreCodedChatbot.Secrets" Version="1.0.299" />
+    <PackageReference Include="CoreCodedChatbot.Library" Version="1.0.308" />
+    <PackageReference Include="CoreCodedChatbot.Secrets" Version="1.0.307" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />

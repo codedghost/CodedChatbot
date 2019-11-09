@@ -28,10 +28,10 @@ namespace CoreCodedChatbot
                     config.Get<string>("KeyVaultCertThumbprint"),
                     config.Get<string>("KeyVaultBaseUrl")
                 )
+                .AddApiClientServices()
                 .AddTwitchServices()
                 .AddLibraryServices()
                 .AddHelpers()
-                .AddApiClientServices()
                 .AddChatCommands()
                 .AddChatbotServices()
                 .AddDbContextFactory()
@@ -41,7 +41,6 @@ namespace CoreCodedChatbot
             {
                 context.Database.Migrate();
             }
-
 
             var commandHelper = serviceProvider.GetService<ICommandHelper>();
             commandHelper.Init(serviceProvider);

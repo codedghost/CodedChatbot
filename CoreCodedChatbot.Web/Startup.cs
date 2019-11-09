@@ -81,21 +81,19 @@ namespace CoreCodedChatbot.Web
 
             app.UseStaticFiles();
 
-            app.UseEndpoints(config =>
-            {
-                config.MapHub<SongList>("/SongList");
-            });
-
             var heartbeatService = serviceProvider.GetService<SignalRHeartbeatService>();
             var chatterService = serviceProvider.GetService<IChatterService>();
 
+            app.UseRouting();
+
             app.UseAuthentication();
 
-            app.UseMvc(routes =>
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllers();
+                endpoints.MapRazorPages();
+                endpoints.MapHub<SongList>("/SongList");
+                endpoints.MapHealthChecks("/health");
             });
         }
     }

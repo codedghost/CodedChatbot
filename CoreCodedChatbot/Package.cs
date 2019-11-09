@@ -24,13 +24,10 @@ namespace CoreCodedChatbot
     {
         public static IServiceCollection AddTwitchServices(this IServiceCollection services)
         {
-            var configService = new ConfigService();
-            var secretService = new AzureKeyVaultService(
-                configService.Get<string>("KeyVaultAppId"),
-                configService.Get<string>("KeyVaultCertThumbprint"),
-                configService.Get<string>("KeyVaultBaseUrl")
-                );
-            secretService.Initialize().Wait();
+            var provider = services.BuildServiceProvider();
+
+            var configService = provider.GetService<IConfigService>();
+            var secretService = provider.GetService<ISecretService>();
 
             var creds = new ConnectionCredentials(configService.Get<string>("ChatbotNick"), secretService.GetSecret<string>("ChatbotPass"));
             var client = new TwitchClient();

@@ -22,11 +22,12 @@
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.Twitch" Version="2.1.0" />
     <PackageReference Include="AspNetCoreRateLimit" Version="3.0.3" />
-    <PackageReference Include="CoreCodedChatbot.ApiClient" Version="1.0.301" />
+    <PackageReference Include="CoreCodedChatbot.ApiClient" Version="1.0.309" />
     <PackageReference Include="CoreCodedChatbot.Config" Version="1.0.296" />
-    <PackageReference Include="CoreCodedChatbot.Database" Version="1.0.292" />
-    <PackageReference Include="CoreCodedChatbot.Library" Version="1.0.300" />
-    <PackageReference Include="CoreCodedChatbot.Secrets" Version="1.0.299" />
+    <PackageReference Include="CoreCodedChatbot.Database" Version="1.0.319" />
+    <PackageReference Include="CoreCodedChatbot.Library" Version="1.0.320" />
+    <PackageReference Include="CoreCodedChatbot.Printful" Version="1.0.323" />
+    <PackageReference Include="CoreCodedChatbot.Secrets" Version="1.0.317" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.0.4" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="1.0.4" />
@@ -41,10 +42,6 @@
 
   <ItemGroup>
     <None Include="wwwroot\favicon.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\CoreCodedChatbot.Printful\CoreCodedChatbot.Printful.csproj" />
   </ItemGroup>
 
   <ItemGroup>
