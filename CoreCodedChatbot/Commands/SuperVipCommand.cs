@@ -1,19 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+﻿using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.ApiContract.Enums.Playlist;
+using CoreCodedChatbot.ApiContract.RequestModels.Playlist;
 using CoreCodedChatbot.Config;
-using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Library.Helpers;
-using CoreCodedChatbot.Library.Interfaces.Services;
-using CoreCodedChatbot.Library.Models.ApiRequest.Playlist;
-using CoreCodedChatbot.Library.Models.ApiResponse.Playlist;
-using CoreCodedChatbot.Library.Models.Data;
-using CoreCodedChatbot.Library.Models.Enums;
-using Newtonsoft.Json;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
@@ -47,8 +36,8 @@ namespace CoreCodedChatbot.Commands
             {
                 var addSuperResponse = await _playlistApiClient.AddSuperVip(new AddSuperVipRequest
                 {
-                    username = username,
-                    commandText = commandText
+                    Username = username,
+                    CommandText = commandText
                 });
 
                 if (addSuperResponse != null)

@@ -58,13 +58,13 @@ namespace CoreCodedChatbot.Services
         private Timer RocksmithChallengeTimer { get; set; }
         private Timer ChatConnectionTimer { get; set; }
 
-        private int _maxTimerMinutesRocksmith = 56;
-        private int _maxTimerMinutesGaming = 35;
+        private int _maxTimerMinutesRocksmith = 135;
+        private int _maxTimerMinutesGaming = 90;
 
         private int _chattyTimerCounter = 0;
         private int _minutesBetweenChattyCommands = 15;
 
-        private static readonly HttpClient HttpClient = new HttpClient();
+        private static readonly HttpClient _httpClient = new HttpClient();
 
         private readonly string _developmentRoomId = string.Empty; // Only for use in debug mode
 
@@ -346,7 +346,8 @@ namespace CoreCodedChatbot.Services
             
 
             var joinedRoom = _client.JoinedChannels.FirstOrDefault(jc =>
-                _isDevelopmentBuild ? jc.Channel.Contains(_developmentRoomId) : jc.Channel == _streamerChannel);
+                // config.DevelopmentBuild ? jc.Channel.Contains(DevelopmentRoomId) :
+                jc.Channel == _configService.Get<string>("StreamerChannel"));
             // Set threads for sending out stream info to the chat.
             if (isStreamingRocksmith)
             {
@@ -397,7 +398,7 @@ namespace CoreCodedChatbot.Services
                 {
                     try
                     {
-                        var currentChattersJson = await HttpClient.GetAsync($"https://tmi.twitch.tv/group/user/{_streamerChannel}/chatters");
+                        var currentChattersJson = await _httpClient.GetAsync($"https://tmi.twitch.tv/group/user/{_streamerChannel}/chatters");
 
                         if (currentChattersJson.IsSuccessStatusCode)
                         {
@@ -437,12 +438,30 @@ namespace CoreCodedChatbot.Services
                 TimeSpan.FromMinutes(1));
 
             ChatConnectionTimer = new Timer(
-                e =>
+                async e =>
                 {
-                    if (!_client.IsConnected)
+                    try
                     {
-                        Console.Error.WriteLine($"DISCONNECTED FROM CHAT, RECONNECTING");
-                        JoinChannel();
+                        var currentChattersJson = await _httpClient.GetAsync($"https://tmi.twitch.tv/group/user/{_configService.Get<string>("StreamerChannel")}/chatters");
+
+                        if (currentChattersJson.IsSuccessStatusCode)
+                        {
+                            // process json into username list.
+                            var chattersModel =
+                                JsonConvert.DeserializeObject<ChatViewersModel>(currentChattersJson.Content
+                                    .ReadAsStringAsync().Result);
+
+                            if (chattersModel.chatters.moderators.Contains(_configService.Get<string>("ChatbotNick"))) return;
+
+                            Console.Error.WriteLine($"DISCONNECTED FROM CHAT, RECONNECTING");
+
+                            _client.Connect();
+                        }
+                        else Console.Out.WriteLine("Could not retrieve Chatters JSON");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Out.WriteLine(ex.ToString());
                     }
                 },
                 null,

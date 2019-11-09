@@ -1,11 +1,6 @@
-﻿using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+﻿using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.ApiContract.Enums.Playlist;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Library.Models.Data;
-using CoreCodedChatbot.Library.Models.Enums;
-using Newtonsoft.Json;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 

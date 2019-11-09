@@ -2,12 +2,11 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.ApiContract.RequestModels;
+using CoreCodedChatbot.ApiContract.RequestModels.GuessingGame;
 using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Helpers;
-using CoreCodedChatbot.Library.Interfaces.Services;
-using CoreCodedChatbot.Library.Models.ApiRequest.GuessingGame;
-using CoreCodedChatbot.Library.Models.Data;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
@@ -34,7 +33,7 @@ namespace CoreCodedChatbot.Commands
                 return;
             }
 
-            var success = await _guessingGameApiClient.SubmitGuess(new SubmitGuessModel
+            var success = await _guessingGameApiClient.SubmitGuess(new SubmitGuessRequest
             {
                 Username = username,
                 Guess = decimalGuess
