@@ -1,13 +1,6 @@
-﻿using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+﻿using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.ApiContract.RequestModels.Playlist;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Library.Helpers;
-using CoreCodedChatbot.Library.Models.ApiRequest.Playlist;
-using CoreCodedChatbot.Library.Models.ApiResponse.Playlist;
-using CoreCodedChatbot.Library.Models.Data;
-using Newtonsoft.Json;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
@@ -27,9 +20,9 @@ namespace CoreCodedChatbot.Commands
         {
             var result = await _playlistApiClient.EditRequest(new EditSongRequest
             {
-                username = username,
-                commandText = commandText,
-                isMod = isMod
+                Username = username,
+                CommandText = commandText,
+                IsMod = isMod
             });
 
             client.SendMessage(joinedChannel,

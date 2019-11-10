@@ -1,13 +1,6 @@
-﻿using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
-using CoreCodedChatbot.Helpers;
+﻿using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.ApiContract.RequestModels.Playlist;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Library.Helpers;
-using CoreCodedChatbot.Library.Models.ApiRequest.Playlist;
-using CoreCodedChatbot.Library.Models.Data;
-using Newtonsoft.Json;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
@@ -31,7 +24,7 @@ namespace CoreCodedChatbot.Commands
             {
                 var playlistPosition = await _playlistApiClient.PromoteSong(new PromoteSongRequest
                 {
-                    username = username
+                    Username = username
                 });
 
                 // TODO: This really should be an object returned

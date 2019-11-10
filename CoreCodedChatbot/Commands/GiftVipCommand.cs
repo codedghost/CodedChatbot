@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
 using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.ApiContract.RequestModels.Vip;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Library.Models.ApiRequest.Vip;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
@@ -28,7 +28,7 @@ namespace CoreCodedChatbot.Commands
                 return;
             }
 
-            var giftVipModel = new GiftVipModel
+            var giftVipModel = new GiftVipRequest
             {
                 DonorUsername = username,
                 ReceiverUsername = commandSplit[0].Trim('@')

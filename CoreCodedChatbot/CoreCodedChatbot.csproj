@@ -43,11 +43,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CoreCodedChatbot.ApiClient" Version="1.0.325" />
-    <PackageReference Include="CoreCodedChatbot.Config" Version="1.0.296" />
-    <PackageReference Include="CoreCodedChatbot.Database" Version="1.0.319" />
-    <PackageReference Include="CoreCodedChatbot.Library" Version="1.0.320" />
-    <PackageReference Include="CoreCodedChatbot.Secrets" Version="1.0.317" />
+    <PackageReference Include="CoreCodedChatbot.ApiClient" Version="1.0.351" />
+    <PackageReference Include="CoreCodedChatbot.Config" Version="1.0.345" />
+    <PackageReference Include="CoreCodedChatbot.Database" Version="1.0.341" />
+    <PackageReference Include="CoreCodedChatbot.Library" Version="1.0.342" />
+    <PackageReference Include="CoreCodedChatbot.Secrets" Version="1.0.346" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.0.0" />
     <PackageReference Include="Microsoft.Azure.KeyVault" Version="3.0.4" />
