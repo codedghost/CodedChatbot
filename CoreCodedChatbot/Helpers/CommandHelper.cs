@@ -62,8 +62,8 @@ namespace CoreCodedChatbot.Helpers
             // Check if this command exists in the db as an info command
             using (var context = chatbotContextFactory.Create())
             {
-                var selectedInfoCommand = context.InfoCommandKeywords.FirstOrDefault(ik =>
-                    string.Equals(ik.InfoCommandKeywordText, userCommand, StringComparison.CurrentCultureIgnoreCase));
+                var selectedInfoCommand = context.InfoCommandKeywords.FirstOrDefault(ik => 
+                    ik.InfoCommandKeywordText == userCommand);
 
                 if (selectedInfoCommand != null)
                 {
@@ -129,8 +129,7 @@ namespace CoreCodedChatbot.Helpers
                 using (var context = chatbotContextFactory.Create())
                 {
                     var selectedInfoCommand = context.InfoCommandKeywords.FirstOrDefault(ik =>
-                        string.Equals(ik.InfoCommandKeywordText, commandName,
-                            StringComparison.CurrentCultureIgnoreCase));
+                        ik.InfoCommandKeywordText == commandName);
 
                     if (selectedInfoCommand != null)
                     {
