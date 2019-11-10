@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
-using CoreCodedChatbot.Helpers;
+using CoreCodedChatbot.ApiContract.RequestModels.Vip;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Library.Helpers;
-using CoreCodedChatbot.Library.Models.ApiRequest.Vip;
-using CoreCodedChatbot.Library.Models.Data;
 
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
@@ -31,7 +26,7 @@ namespace CoreCodedChatbot.Commands
 
             if (commandText.Contains("@"))
             {
-                var giveVipModel = new ModGiveVipModel
+                var giveVipModel = new ModGiveVipRequest
                 {
                     ReceivingUsername = commandText.TrimStart('@'),
                     VipsToGive = 1
@@ -42,7 +37,7 @@ namespace CoreCodedChatbot.Commands
                     var giveUser = splitCommandText.SingleOrDefault(x => x.Contains("@")).TrimStart('@');
 
                     if (int.TryParse(splitCommandText.SingleOrDefault(x => !x.Contains("@")), out var giveAmount))
-                        giveVipModel = new ModGiveVipModel
+                        giveVipModel = new ModGiveVipRequest
                         {
                             ReceivingUsername = giveUser,
                             VipsToGive = giveAmount

@@ -1,12 +1,6 @@
-﻿using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+﻿using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.ApiContract.RequestModels.Playlist;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Library.Helpers;
-using CoreCodedChatbot.Library.Models.ApiRequest.Playlist;
-using CoreCodedChatbot.Library.Models.Data;
-
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
@@ -26,9 +20,9 @@ namespace CoreCodedChatbot.Commands
         {
             var success = await _playlistApiClient.RemoveRockRequests(new RemoveSongRequest
             {
-                username = username,
-                commandText = commandText,
-                isMod = isMod
+                Username = username,
+                CommandText = commandText,
+                IsMod = isMod
             });
 
             client.SendMessage(joinedChannel, success
