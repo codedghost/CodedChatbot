@@ -38,15 +38,15 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="appsettings.Local.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CoreCodedChatbot.ApiClient" Version="1.0.351" />
     <PackageReference Include="CoreCodedChatbot.Config" Version="1.0.345" />
-    <PackageReference Include="CoreCodedChatbot.Database" Version="1.0.341" />
-    <PackageReference Include="CoreCodedChatbot.Library" Version="1.0.342" />
+    <PackageReference Include="CoreCodedChatbot.Database" Version="1.0.356" />
+    <PackageReference Include="CoreCodedChatbot.Library" Version="1.0.357" />
     <PackageReference Include="CoreCodedChatbot.Secrets" Version="1.0.346" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.0.0" />

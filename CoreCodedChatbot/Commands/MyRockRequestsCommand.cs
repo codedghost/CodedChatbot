@@ -3,8 +3,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Library.Helpers;
-using CoreCodedChatbot.Library.Models.ApiResponse.Playlist;
 using CoreCodedChatbot.Library.Models.Data;
 using Newtonsoft.Json;
 using TwitchLib.Client;
