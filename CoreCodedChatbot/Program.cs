@@ -38,7 +38,7 @@ namespace CoreCodedChatbot
                 .AddDbContextFactory()
                 .BuildServiceProvider();
 
-            using (var context = (ChatbotContext)serviceProvider.GetService<IChatbotContextFactory>())
+            using (var context = (ChatbotContext)serviceProvider.GetService<IChatbotContextFactory>().Create())
             {
                 context.Database.Migrate();
             }
