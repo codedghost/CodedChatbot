@@ -7,6 +7,7 @@ using CoreCodedChatbot.Database;
 using Microsoft.EntityFrameworkCore;
 using CoreCodedChatbot.Services;
 using CoreCodedChatbot.Database.Context;
+using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library;
@@ -37,7 +38,7 @@ namespace CoreCodedChatbot
                 .AddDbContextFactory()
                 .BuildServiceProvider();
 
-            using (var context = new ChatbotContext())
+            using (var context = (ChatbotContext)serviceProvider.GetService<IChatbotContextFactory>())
             {
                 context.Database.Migrate();
             }

@@ -6,7 +6,6 @@ using CoreCodedChatbot.ApiContract.RequestModels;
 using CoreCodedChatbot.ApiContract.RequestModels.GuessingGame;
 using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Library.Helpers;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 

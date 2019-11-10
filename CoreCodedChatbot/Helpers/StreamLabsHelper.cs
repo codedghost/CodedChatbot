@@ -77,7 +77,7 @@ namespace CoreCodedChatbot.Helpers
 
         private List<StreamLabsDonation> GetRecentDonations()
         {
-            using (var context = new ChatbotContextFactory().Create())
+            using (var context = _chatbotContextFactory.Create())
             {
                 try
                 {
@@ -144,7 +144,7 @@ namespace CoreCodedChatbot.Helpers
                         amount = (int) Math.Round(d.Sum(rec => rec.amount) * 100)
                     });
 
-                using (var context = new ChatbotContextFactory().Create())
+                using (var context = _chatbotContextFactory.Create())
                 {
                     var latestDonationIdSetting =
                         context.Settings.FirstOrDefault(s => s.SettingName == "LatestDonationId") ?? new Setting
