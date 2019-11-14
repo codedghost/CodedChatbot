@@ -12,6 +12,7 @@ using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Secrets;
 using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.Logging;
 using TwitchLib.Client.Events;
 using TwitchLib.PubSub.Events;
 using TwitchLib.Client;
@@ -40,6 +41,7 @@ namespace CoreCodedChatbot.Services
         private readonly IStreamLabsHelper _streamLabsHelper;
         private readonly IConfigService _configService;
         private readonly ISecretService _secretService;
+        private readonly ILogger<ChatbotService> _logger;
         private readonly LiveStreamMonitorService _liveStreamMonitor;
 
         private readonly string _streamerChannel;
@@ -71,7 +73,8 @@ namespace CoreCodedChatbot.Services
         public ChatbotService(ICommandHelper commandHelper, TwitchClient client, TwitchAPI api, 
             TwitchPubSub pubsub, LiveStreamMonitorService liveStreamMonitor,
             IVipHelper vipHelper, IBytesHelper bytesHelper, IStreamLabsHelper streamLabsHelper, 
-            IConfigService configService, ISecretService secretService)
+            IConfigService configService, ISecretService secretService,
+            ILogger<ChatbotService> logger)
         {
             _commandHelper = commandHelper;
             _client = client;
@@ -83,6 +86,7 @@ namespace CoreCodedChatbot.Services
             _streamLabsHelper = streamLabsHelper;
             _configService = configService;
             _secretService = secretService;
+            _logger = logger;
 
             _streamerChannel = _configService.Get<string>("StreamerChannel");
             _isDevelopmentBuild = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" ||
@@ -308,8 +312,8 @@ namespace CoreCodedChatbot.Services
 
         private void OnRaidNotification(object sender, OnRaidNotificationArgs e)
         {
-            int.TryParse(e.RaidNotificaiton.MsgParamViewerCount, out var viewersCount);
-            WelcomeRaidOrHost(e.Channel, e.RaidNotificaiton.MsgParamDisplayName, viewersCount, true);
+            int.TryParse(e.RaidNotification.MsgParamViewerCount, out var viewersCount);
+            WelcomeRaidOrHost(e.Channel, e.RaidNotification.MsgParamDisplayName, viewersCount, true);
         }
 
         private void OnBeingHosted(object sender, OnBeingHostedArgs e)
