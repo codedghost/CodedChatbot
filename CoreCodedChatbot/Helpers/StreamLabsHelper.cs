@@ -10,6 +10,7 @@ using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Secrets;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace CoreCodedChatbot.Helpers
@@ -20,16 +21,22 @@ namespace CoreCodedChatbot.Helpers
         private readonly IVipHelper _vipHelper;
         private readonly IConfigService _configService;
         private readonly ISecretService _secretService;
+        private readonly ILogger<IStreamLabsHelper> _logger;
 
         private HttpClient httpClient = new HttpClient();
 
-        public StreamLabsHelper(IChatbotContextFactory chatbotContextFactory, IVipHelper vipHelper,
-            IConfigService configService, ISecretService secretService)
+        public StreamLabsHelper(
+            IChatbotContextFactory chatbotContextFactory, 
+            IVipHelper vipHelper,
+            IConfigService configService, 
+            ISecretService secretService, 
+            ILogger<IStreamLabsHelper> logger)
         {
             _chatbotContextFactory = chatbotContextFactory;
             _vipHelper = vipHelper;
             _configService = configService;
             _secretService = secretService;
+            _logger = logger;
         }
 
         public bool RefreshAuthToken()
@@ -68,9 +75,9 @@ namespace CoreCodedChatbot.Helpers
 
                 return true;
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                Console.Out.WriteLine("Could not refresh Streamlabs token");
+                _logger.LogError(e, "Could not refresh StreamLabs token");
                 return false;
             }
         }

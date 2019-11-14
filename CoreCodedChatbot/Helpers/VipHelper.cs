@@ -7,6 +7,8 @@ using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Database.Context.Models;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Interfaces.Services;
+using Microsoft.Extensions.Logging;
+using NLog;
 using TwitchLib.Api.V5.Models.Subscriptions;
 
 
@@ -16,11 +18,16 @@ namespace CoreCodedChatbot.Helpers
     {
         private readonly IChatbotContextFactory _contextFactory;
         private readonly IConfigService _configService;
+        private readonly ILogger<IVipHelper> _logger;
 
-        public VipHelper(IChatbotContextFactory contextFactory, IConfigService configService)
+        public VipHelper(
+            IChatbotContextFactory contextFactory, 
+            IConfigService configService,
+            ILogger<IVipHelper> logger)
         {
             _contextFactory = contextFactory;
             _configService = configService;
+            _logger = logger;
         }
 
         public User FindUser(IChatbotContext context, string username, bool deferSave = false)
@@ -283,7 +290,7 @@ namespace CoreCodedChatbot.Helpers
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"{e} - {e.InnerException}");
+                    _logger.LogError(e,$"Error in UseVipRequest");
                     return false;
                 }
             }
@@ -307,7 +314,7 @@ namespace CoreCodedChatbot.Helpers
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"{e} - {e.InnerException}");
+                    _logger.LogError(e, $"Error in UseSuperVipRequest");
                     return false;
                 }
             }

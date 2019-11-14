@@ -3,7 +3,7 @@ using System.Linq;
 using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.ApiContract.RequestModels.Vip;
 using CoreCodedChatbot.Interfaces;
-
+using Microsoft.Extensions.Logging;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
@@ -13,10 +13,14 @@ namespace CoreCodedChatbot.Commands
     public class GiveVipCommand : ICommand
     {
         private readonly IVipApiClient _vipApiClient;
+        private readonly ILogger<GiveVipCommand> _logger;
 
-        public GiveVipCommand(IVipApiClient vipApiClient)
+        public GiveVipCommand(
+            IVipApiClient vipApiClient,
+            ILogger<GiveVipCommand> logger)
         {
             _vipApiClient = vipApiClient;
+            _logger = logger;
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod,
@@ -51,8 +55,8 @@ namespace CoreCodedChatbot.Commands
                         ? $"Hey @{username}, I have successfully given {giveVipModel.ReceivingUsername} {giveVipModel.VipsToGive} VIPs!"
                         : $"Hey @{username}, sorry something seems to be wrong here. Please check your command usage. Type !help gvip for more detailed help");
 
-                if (!result)
-                    Console.Error.WriteLine($"Error encountered when giving a single VIP");
+                if (!result) 
+                    _logger.LogError($"Error encountered when giving a single VIP", new object [] {username, commandText, isMod});
 
             }
         }

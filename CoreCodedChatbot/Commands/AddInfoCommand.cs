@@ -3,6 +3,8 @@ using System.Linq;
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Database.Context.Models;
 using CoreCodedChatbot.Interfaces;
+using Microsoft.Extensions.Logging;
+using NLog;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
@@ -12,10 +14,15 @@ namespace CoreCodedChatbot.Commands
     public class AddInfoCommand : ICommand
     {
         private IChatbotContextFactory _chatbotContextFactory;
+        private readonly ILogger<AddInfoCommand> _logger;
 
-        public AddInfoCommand(IChatbotContextFactory chatbotContextFactory)
+        public AddInfoCommand(
+            IChatbotContextFactory chatbotContextFactory,
+            ILogger<AddInfoCommand> logger
+            )
         {
             _chatbotContextFactory = chatbotContextFactory;
+            _logger = logger;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
@@ -82,7 +89,7 @@ namespace CoreCodedChatbot.Commands
             }
             catch (Exception e)
             {
-                Console.Out.WriteLine($"{e} + {e.InnerException}");
+                _logger.LogError(e, "Error in AddInfoCommand");
                 client.SendMessage(joinedChannel,
                     $"Hey @{username}, sorry but I couldn't manage to add that command at the moment, please try again later");
             }
