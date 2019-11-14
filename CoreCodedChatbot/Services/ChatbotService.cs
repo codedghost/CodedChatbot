@@ -6,26 +6,21 @@ using System.Threading;
 using CoreCodedChatbot.Config;
 using Newtonsoft.Json;
 
-using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Secrets;
-using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.Logging;
 using TwitchLib.Client.Events;
 using TwitchLib.PubSub.Events;
 using TwitchLib.Client;
 using TwitchLib.Api;
 using TwitchLib.Api.Core.Exceptions;
-using TwitchLib.Api.Interfaces;
 using TwitchLib.Api.Services;
 using TwitchLib.Api.Services.Events;
 using TwitchLib.Api.Services.Events.LiveStreamMonitor;
-using TwitchLib.Client.Interfaces;
 using TwitchLib.Client.Models;
 using TwitchLib.Communication.Events;
 using TwitchLib.PubSub;
-using TwitchLib.PubSub.Interfaces;
 
 namespace CoreCodedChatbot.Services
 {
@@ -40,6 +35,7 @@ namespace CoreCodedChatbot.Services
         private readonly IStreamLabsHelper _streamLabsHelper;
         private readonly IConfigService _configService;
         private readonly ISecretService _secretService;
+        private readonly ILogger<ChatbotService> _logger;
         private readonly LiveStreamMonitorService _liveStreamMonitor;
 
         private readonly string _streamerChannel;
@@ -68,10 +64,17 @@ namespace CoreCodedChatbot.Services
 
         private readonly string _developmentRoomId = string.Empty; // Only for use in debug mode
 
-        public ChatbotService(ICommandHelper commandHelper, TwitchClient client, TwitchAPI api, 
-            TwitchPubSub pubsub, LiveStreamMonitorService liveStreamMonitor,
-            IVipHelper vipHelper, IBytesHelper bytesHelper, IStreamLabsHelper streamLabsHelper, 
-            IConfigService configService, ISecretService secretService)
+        public ChatbotService(ICommandHelper commandHelper,
+            TwitchClient client, 
+            TwitchAPI api, 
+            TwitchPubSub pubsub, 
+            LiveStreamMonitorService liveStreamMonitor,
+            IVipHelper vipHelper, 
+            IBytesHelper bytesHelper, 
+            IStreamLabsHelper streamLabsHelper, 
+            IConfigService configService, 
+            ISecretService secretService,
+            ILogger<ChatbotService> logger)
         {
             _commandHelper = commandHelper;
             _client = client;
@@ -83,6 +86,7 @@ namespace CoreCodedChatbot.Services
             _streamLabsHelper = streamLabsHelper;
             _configService = configService;
             _secretService = secretService;
+            _logger = logger;
 
             _streamerChannel = _configService.Get<string>("StreamerChannel");
             _isDevelopmentBuild = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" ||
@@ -168,7 +172,7 @@ namespace CoreCodedChatbot.Services
             }
             catch (Exception ex)
             {
-                Console.Out.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Error on processing incoming command");
             }
         }
 
@@ -176,13 +180,12 @@ namespace CoreCodedChatbot.Services
         {
             try
             {
-                Console.Out.WriteLine("New Sub! WOOOOO");
-                Console.Out.WriteLine(e.Subscriber.DisplayName);
+                _logger.LogInformation($"New Sub! WOOOOO - {e.Subscriber.DisplayName}");
                 _vipHelper.GiveSubVip(e.Subscriber.DisplayName);
             }
             catch (Exception ex)
             {
-                Console.Out.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Error OnNewSub");
             }
         }
 
@@ -190,13 +193,12 @@ namespace CoreCodedChatbot.Services
         {
             try
             {
-                Console.Out.WriteLine("ReSub!!! WOOOOO");
-                Console.Out.WriteLine(e.ReSubscriber.DisplayName);
+                _logger.LogInformation($"ReSub!!! WOOOO - {e.ReSubscriber.DisplayName} - {e.ReSubscriber.Months}");
                 _vipHelper.GiveSubVip(e.ReSubscriber.DisplayName, e.ReSubscriber.Months);
             }
             catch (Exception ex)
             {
-                Console.Out.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Error OnReSub");
             }
         }
 
@@ -204,7 +206,7 @@ namespace CoreCodedChatbot.Services
         {
             try
             {
-                Console.Out.WriteLine($"Gifted Sub! {e.GiftedSubscription.MsgParamRecipientUserName} has received a sub from {e.GiftedSubscription.DisplayName}");
+                _logger.LogInformation($"Gifted Sub! {e.GiftedSubscription.MsgParamRecipientUserName} has received a sub from {e.GiftedSubscription.DisplayName}");
 
                 // A whole vip for the recipient
                 _vipHelper.GiveSubVip(e.GiftedSubscription.MsgParamRecipientUserName);
@@ -214,7 +216,7 @@ namespace CoreCodedChatbot.Services
             }
             catch (Exception ex)
             {
-                Console.Out.WriteLine(ex);
+                _logger.LogError(ex, "Error OnGiftSub");
             }
         }
 
@@ -222,13 +224,13 @@ namespace CoreCodedChatbot.Services
         {
             try
             {
-                Console.Out.WriteLine($"Sub Bomb!!! {e.GiftedSubscription.DisplayName} has gifted {e.GiftedSubscription.MsgParamMassGiftCount} subs!");
+                _logger.LogInformation($"Sub Bomb!!! {e.GiftedSubscription.DisplayName} has gifted {e.GiftedSubscription.MsgParamMassGiftCount} subs!");
                 
                 // Leaving blank for now, it is assumed that subbomb gifts go through gift event too, so relevant vips and bytes will be handled there.
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                _logger.LogError(ex, "Error OnSubBomb");
             }
         }
 
@@ -236,7 +238,7 @@ namespace CoreCodedChatbot.Services
         {
             try
             {
-                Console.Out.WriteLine("PubSub Connected!");
+                _logger.LogInformation("PubSub Connected!");
 
                 _pubsub.ListenToBitsEvents(_configService.Get<string>("ChannelId"));
 
@@ -244,72 +246,94 @@ namespace CoreCodedChatbot.Services
             }
             catch (Exception ex)
             {
-                Console.Out.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Error OnPubSubConnected");
             }
         }
 
         private void OnListenResponse(object sender, OnListenResponseArgs e)
         {
-            Console.Out.WriteLine(e.Successful
-                ? $"Successfully verified listening to topic: {e.Topic}"
-                : $"Failed to listen! {e.Topic} - Error: {e.Response.Error}");
+            if (e.Successful)
+                _logger.LogInformation($"Successfully verified listening to topic: {e.Topic}");
+            else 
+                _logger.LogError($"OnListenResponse - Failed to listen! {e.Topic} - Error: {e.Response.Error}");
         }
 
         private void OnBitsReceived(object sender, OnBitsReceivedArgs e)
         {
             try
             {
-                Console.Out.WriteLine("Bits Dropped :O!");
-                Console.Out.WriteLine($"{e.Username} dropped {e.BitsUsed} - Total {e.TotalBitsUsed}");
+                _logger.LogInformation(
+                    $"Bits Dropped :O!  {e.Username} dropped {e.BitsUsed} - Total {e.TotalBitsUsed}");
                 if (_vipHelper.GiveBitsVip(e.Username, e.TotalBitsUsed))
                     _vipHelper.GiveDonationVips(e.Username);
 
             }
             catch (Exception ex)
             {
-                Console.Out.WriteLine(ex.ToString());
+                _logger.LogError(ex, "Error OnBitsReceived");
             }
         }
 
         private void OnStreamOnline(object sender, OnStreamOnlineArgs e)
         {
-            Console.Out.WriteLine("Streamer is online");
-            JoinedChannel channel = null;
+            try
+            {
+                _logger.LogInformation("Streamer is online");
+                JoinedChannel channel = null;
 
-            channel = _client.GetJoinedChannel(_streamerChannel);
-            _client.SendMessage(channel.Channel, $"Looks like @{channel.Channel} has come online, better get to work!");
+                channel = _client.GetJoinedChannel(_streamerChannel);
+                _client.SendMessage(channel.Channel,
+                    $"Looks like @{channel.Channel} has come online, better get to work!");
 
-            ScheduleStreamTasks(e.Stream.Title);
+                ScheduleStreamTasks(e.Stream.Title);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error OnStreamOnline");
+            }
         }
 
         private void OnStreamOffline(object sender, OnStreamOfflineArgs e)
         {
-            Console.Out.WriteLine("Streamer is offline");
-
-            if (_client.IsConnected)
+            try
             {
-                _client.SendMessage(e.Channel, $"Looks like @{e.Channel} has gone offline, *yawn* powering down");
+                _logger.LogInformation("Streamer is offline");
+
+                if (_client.IsConnected)
+                {
+                    _client.SendMessage(e.Channel, $"Looks like @{e.Channel} has gone offline, *yawn* powering down");
+                }
+
+                UnScheduleStreamTasks();
             }
-            UnScheduleStreamTasks();
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error OnStreamOffline");
+            }
         }
 
         private void OnStreamMonitorStarted(object sender, OnServiceStartedArgs e)
         {
-            Console.Out.WriteLine("Stream Monitor Started");
-            Console.Out.WriteLine($"Monitoring Channels: {e}");
+            _logger.LogInformation($"Stream Monitor Started - Monitoring Channels: {e}");
         }
 
         private void OnStreamUpdate(object sender, OnStreamUpdateArgs e)
         {
-            Console.Out.WriteLine("Assuming stream category or title has updated, rescheduling tasks");
+            _logger.LogInformation("Assuming stream category or title has updated, rescheduling tasks");
             UnScheduleStreamTasks();
             //ScheduleStreamTasks(e.Stream.Title);
         }
 
         private void OnRaidNotification(object sender, OnRaidNotificationArgs e)
         {
-            int.TryParse(e.RaidNotificaiton.MsgParamViewerCount, out var viewersCount);
-            WelcomeRaidOrHost(e.Channel, e.RaidNotificaiton.MsgParamDisplayName, viewersCount, true);
+            if (int.TryParse(e.RaidNotification.MsgParamViewerCount, out var viewersCount))
+            {
+                WelcomeRaidOrHost(e.Channel, e.RaidNotification.MsgParamDisplayName, viewersCount, true);
+            }
+            else
+            {
+                _logger.LogError($"Raid Notification count is not a number: {e.RaidNotification?.MsgParamViewerCount}");
+            }
         }
 
         private void OnBeingHosted(object sender, OnBeingHostedArgs e)
@@ -341,7 +365,7 @@ namespace CoreCodedChatbot.Services
             }
             catch (NotPartneredException)
             {
-                Console.Out.WriteLine("Not a partner. Skipping sub setup.");
+                _logger.LogWarning("Schedule stream tasks. Not really an issue - Not a partner. Skipping sub setup.");
             }
             
 
@@ -408,11 +432,11 @@ namespace CoreCodedChatbot.Services
                                     .ReadAsStringAsync().Result);
                             _bytesHelper.GiveViewershipBytes(chattersModel);
                         }
-                        else Console.Out.WriteLine("Could not retrieve Chatters JSON");
+                        else _logger.LogWarning("Could not retrieve Chatters JSON from tmi service");
                     }
                     catch (Exception ex)
                     {
-                        Console.Out.WriteLine(ex.ToString());
+                        _logger.LogError(ex, "Could not access the TMI service at all");
                     }
                 },
                 null,
@@ -430,7 +454,7 @@ namespace CoreCodedChatbot.Services
                     }
                     catch (Exception ex)
                     {
-                        Console.Out.WriteLine(ex.ToString());
+                        _logger.LogError(ex, "Error in Donations timer");
                     }
                 },
                 null,
@@ -453,15 +477,15 @@ namespace CoreCodedChatbot.Services
 
                             if (chattersModel.chatters.moderators.Contains(_configService.Get<string>("ChatbotNick"))) return;
 
-                            Console.Error.WriteLine($"DISCONNECTED FROM CHAT, RECONNECTING");
+                            _logger.LogError($"DISCONNECTED FROM CHAT, RECONNECTING");
 
                             _client.Connect();
                         }
-                        else Console.Out.WriteLine("Could not retrieve Chatters JSON");
+                        else _logger.LogError("Could not retrieve Chatters JSON from TMI service in ChatConnectionTimer");
                     }
                     catch (Exception ex)
                     {
-                        Console.Out.WriteLine(ex.ToString());
+                        _logger.LogError(ex, "Could not check tmi service inside ChatConnectionTimer");
                     }
                 },
                 null,
@@ -471,12 +495,12 @@ namespace CoreCodedChatbot.Services
         
         private void OnError(object sender, OnErrorEventArgs e)
         {
-            Console.Error.WriteLine($"EXCEPTION - {DateTime.Now} \n Exception:\n{e.Exception} \n\n Inner: {e.Exception.InnerException}");
+            _logger.LogError(e.Exception, $"Error encountered in Client.OnError method");
         }
 
         private void OnDisconnected(object sender, OnDisconnectedEventArgs e)
         {
-            Console.Error.WriteLine($"DISCONNECTED FROM CHAT");
+            _logger.LogError("DISCONNECTED FROM CHAT");
         }
 
         private void UnScheduleStreamTasks()

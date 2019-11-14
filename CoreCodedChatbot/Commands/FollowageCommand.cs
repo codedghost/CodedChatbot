@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Library.Interfaces.Services;
-using CoreCodedChatbot.Library.Models.Data;
+using Microsoft.Extensions.Logging;
 using TwitchLib.Api;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
@@ -16,11 +15,16 @@ namespace CoreCodedChatbot.Commands
     {
         private readonly IConfigService _configService;
         private TwitchAPI _twitchApi;
+        private readonly ILogger<FollowageCommand> _logger;
 
-        public FollowageCommand(IConfigService configService, TwitchAPI twitchApi)
+        public FollowageCommand(
+            IConfigService configService, 
+            TwitchAPI twitchApi,
+            ILogger<FollowageCommand> logger)
         {
             _configService = configService;
             this._twitchApi = twitchApi;
+            _logger = logger;
         }
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
@@ -44,7 +48,7 @@ namespace CoreCodedChatbot.Commands
             }
             catch (Exception e)
             {
-                Console.WriteLine($"{e} - {e.InnerException}");
+                _logger.LogError(e, "Error in FollowageCommand");
             }
         }
 

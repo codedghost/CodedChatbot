@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using CoreCodedChatbot.Commands;
+﻿using CoreCodedChatbot.Commands;
 using CoreCodedChatbot.Config;
-using CoreCodedChatbot.Database.Context;
-using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Library.Interfaces.Services;
-using CoreCodedChatbot.Library.Services;
 using CoreCodedChatbot.Secrets;
 using CoreCodedChatbot.Services;
 using Microsoft.Extensions.DependencyInjection;

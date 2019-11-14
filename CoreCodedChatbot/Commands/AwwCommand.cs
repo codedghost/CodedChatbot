@@ -1,5 +1,6 @@
 ﻿using System;
 using CoreCodedChatbot.Interfaces;
+using Microsoft.Extensions.Logging;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
@@ -9,10 +10,14 @@ namespace CoreCodedChatbot.Commands
     public class AwwCommand : ICommand
     {
         private IRedditHelper _redditHelper;
+        private readonly ILogger<AwwCommand> _logger;
 
-        public AwwCommand(IRedditHelper redditHelper)
+        public AwwCommand(
+            IRedditHelper redditHelper,
+            ILogger<AwwCommand> logger)
         {
             _redditHelper = redditHelper;
+            _logger = logger;
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
@@ -33,7 +38,7 @@ namespace CoreCodedChatbot.Commands
             }
             catch (Exception e)
             {
-                Console.WriteLine($"Exception in {nameof(this.GetType)}\n{e} - {e.InnerException}");
+                _logger.LogError(e, $"Exception in AwwCommand");
                 client.SendMessage(joinedChannel,
                     $"Hey @{username}, I'm having some trouble talking to reddit right now, sorry :(");
             }
