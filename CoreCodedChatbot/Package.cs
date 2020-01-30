@@ -57,6 +57,7 @@ namespace CoreCodedChatbot
         public static IServiceCollection AddChatCommands(this IServiceCollection services)
         {
             services.AddTransient<AddInfoCommand>();
+            services.AddTransient<AddQuoteCommand>();
             services.AddTransient<AwwCommand>();
             services.AddTransient<ClaimAllVipsCommand>();
             services.AddTransient<ClaimVipCommand>();
@@ -64,6 +65,7 @@ namespace CoreCodedChatbot
             services.AddTransient<DiscordCommand>();
             services.AddTransient<EditRockRequestCommand>();
             services.AddTransient<FollowageCommand>();
+            services.AddTransient<GetQuoteCommand>();
             services.AddTransient<GiftVipCommand>();
             services.AddTransient<GiveVipCommand>();
             services.AddTransient<GuessCommand>();
