@@ -94,7 +94,7 @@ namespace CoreCodedChatbot.Helpers
                 {
                     var user = _vipHelper.FindUser(context, username);
                     if (tokensToConvert < 0) return false;
-                    if ((user.TokenBytes * tokensToConvert) >= _configService.Get<int>("BytesToVip") * tokensToConvert)
+                    if (user.TokenBytes >= _configService.Get<int>("BytesToVip") * tokensToConvert)
                     {
                         for (int i = 0; i < tokensToConvert; i++)
                         {
