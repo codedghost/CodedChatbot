@@ -13,11 +13,8 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new[] { "help", "commands" }, false)]
     public class HelpCommand : ICommand
     {
-        private readonly ConfigModel config;
-
-        public HelpCommand(ConfigModel config)
+        public HelpCommand()
         {
-            this.config = config;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)

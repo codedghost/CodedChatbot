@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Helpers;
-using CoreCodedChatbot.Library.Helpers;
-using CoreCodedChatbot.Library.Models.ApiResponse.Playlist;
 using CoreCodedChatbot.Library.Models.Data;
 using Newtonsoft.Json;
 using TwitchLib.Client;
@@ -15,31 +13,19 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new[] { "myrequests", "mrr", "myrockrequests", "mysongs", "myrequest", "mysong", "pos", "position" }, false)]
     public class MyRockRequestsCommand : ICommand
     {
-        private readonly ConfigModel config;
-        private HttpClient playlistClient;
+        private readonly IPlaylistApiClient _playlistApiClient;
 
-        public MyRockRequestsCommand(ConfigModel config)
+        public MyRockRequestsCommand(IPlaylistApiClient playlistApiClient)
         {
-            this.playlistClient = new HttpClient
-            {
-                BaseAddress = new Uri(config.PlaylistApiUrl),
-                DefaultRequestHeaders =
-                {
-                    Authorization = new AuthenticationHeaderValue("Bearer", config.JwtTokenString)
-                }
-            };
-            this.config = config;
+            _playlistApiClient = playlistApiClient;
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            var request = await playlistClient.PostAsync("GetUserRequests", HttpClientHelper.GetJsonData(username));
+            var requests = await _playlistApiClient.GetUserRequests(username);
 
-            if (request.IsSuccessStatusCode)
+            if (requests != null)
             {
-                var requests =
-                    JsonConvert.DeserializeObject<GetUserRequestsResponse>(await request.Content.ReadAsStringAsync());
-
                 client.SendMessage(joinedChannel,
                     $"Hey @{username}, you have requested: {requests.UserRequests}");
                 return;

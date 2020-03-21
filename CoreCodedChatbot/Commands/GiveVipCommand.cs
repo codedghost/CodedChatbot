@@ -1,52 +1,63 @@
-﻿using System.Linq;
-using CoreCodedChatbot.Helpers;
+﻿using System;
+using System.Linq;
+using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.ApiContract.RequestModels.Vip;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Library.Models.Data;
-
+using Microsoft.Extensions.Logging;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
 namespace CoreCodedChatbot.Commands
 {
-    [CustomAttributes.ChatCommand(new []{ "gvip", "givevip" }, true)]
+    [CustomAttributes.ChatCommand(new[] {"gvip", "givevip"}, true)]
     public class GiveVipCommand : ICommand
     {
-        private readonly VipHelper vipHelper;
+        private readonly IVipApiClient _vipApiClient;
+        private readonly ILogger<GiveVipCommand> _logger;
 
-        private readonly ConfigModel config;
-
-        public GiveVipCommand(VipHelper vipHelper, ConfigModel config)
+        public GiveVipCommand(
+            IVipApiClient vipApiClient,
+            ILogger<GiveVipCommand> logger)
         {
-            this.vipHelper = vipHelper;
-            this.config = config;
+            _vipApiClient = vipApiClient;
+            _logger = logger;
         }
 
-        public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
+        public async void Process(TwitchClient client, string username, string commandText, bool isMod,
+            JoinedChannel joinedChannel)
         {
             var splitCommandText = commandText.Split(" ");
 
             if (commandText.Contains("@"))
             {
-                if (splitCommandText.Length == 1)
+                var giveVipModel = new ModGiveVipRequest
                 {
-                    client.SendMessage(joinedChannel,
-                        vipHelper.GiveVipRequest(commandText.TrimStart('@'))
-                            ? $"Hey @{username}, I have successfully given {commandText} a VIP request!"
-                            : $"Hey @{username}, sorry something seems to be wrong here. Please check your command usage. Type !help gvip for more detailed help");
-                } else if (splitCommandText.Length == 2)
+                    ReceivingUsername = commandText.TrimStart('@'),
+                    VipsToGive = 1
+                };
+
+                if (splitCommandText.Length == 2)
                 {
                     var giveUser = splitCommandText.SingleOrDefault(x => x.Contains("@")).TrimStart('@');
-                    var giveAmount = 0;
-                    int.TryParse(splitCommandText.SingleOrDefault(x => !x.Contains("@")), out giveAmount);
-                    for (int i = 0; i < giveAmount; i++)
-                    {
-                        if (!vipHelper.GiveVipRequest(giveUser))
+
+                    if (int.TryParse(splitCommandText.SingleOrDefault(x => !x.Contains("@")), out var giveAmount))
+                        giveVipModel = new ModGiveVipRequest
                         {
-                            client.SendMessage(joinedChannel, $"Hey @{username}, sorry something seems to be wrong here. I managed to give {i} VIPs. Please check your command usage. Type !help gvip for more detailed help");
-                        }
-                    }
-                    client.SendMessage(joinedChannel, $"Hey @{username}, I have successfully given @{giveUser} {giveAmount} VIPs");
+                            ReceivingUsername = giveUser,
+                            VipsToGive = giveAmount
+                        };
                 }
+
+                var result = await _vipApiClient.ModGiveVip(giveVipModel);
+
+                client.SendMessage(joinedChannel,
+                    result
+                        ? $"Hey @{username}, I have successfully given {giveVipModel.ReceivingUsername} {giveVipModel.VipsToGive} VIPs!"
+                        : $"Hey @{username}, sorry something seems to be wrong here. Please check your command usage. Type !help gvip for more detailed help");
+
+                if (!result) 
+                    _logger.LogError($"Error encountered when giving a single VIP", new object [] {username, commandText, isMod});
+
             }
         }
 

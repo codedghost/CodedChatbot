@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using CoreCodedChatbot.Helpers.Interfaces;
+﻿using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Interfaces;
+using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
@@ -12,16 +10,16 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new [] {"youtube", "yt"}, false)]
     public class YoutubeCommand : ICommand
     {
-        private readonly ConfigModel config;
+        private readonly IConfigService _configService;
 
-        public YoutubeCommand(IConfigHelper configHelper)
+        public YoutubeCommand(IConfigService configService)
         {
-            config = configHelper.GetConfig();
+            _configService = configService;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            client.SendMessage(joinedChannel, $"Check out the Youtube channel here: {config.YoutubeLink}");
+            client.SendMessage(joinedChannel, $"Check out the Youtube channel here: {_configService.Get<string>("YoutubeLink")}");
         }
 
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)

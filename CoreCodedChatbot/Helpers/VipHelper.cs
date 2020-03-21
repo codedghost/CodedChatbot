@@ -1,25 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Database.Context.Models;
-using CoreCodedChatbot.Helpers.Interfaces;
+using CoreCodedChatbot.Interfaces;
+using CoreCodedChatbot.Library.Interfaces.Services;
+using Microsoft.Extensions.Logging;
+using NLog;
 using TwitchLib.Api.V5.Models.Subscriptions;
 
 
 namespace CoreCodedChatbot.Helpers
 {
-    public class VipHelper
+    public class VipHelper : IVipHelper
     {
-        private readonly IChatbotContextFactory contextFactory;
-        private readonly ConfigModel config;
+        private readonly IChatbotContextFactory _contextFactory;
+        private readonly IConfigService _configService;
+        private readonly ILogger<IVipHelper> _logger;
 
-        public VipHelper(IChatbotContextFactory contextFactory, IConfigHelper configHelper)
+        public VipHelper(
+            IChatbotContextFactory contextFactory, 
+            IConfigService configService,
+            ILogger<IVipHelper> logger)
         {
-            this.contextFactory = contextFactory;
-            this.config = configHelper.GetConfig();
+            _contextFactory = contextFactory;
+            _configService = configService;
+            _logger = logger;
         }
 
         public User FindUser(IChatbotContext context, string username, bool deferSave = false)
@@ -69,7 +77,7 @@ namespace CoreCodedChatbot.Helpers
 
         public bool GiveVipRequest(string username)
         {
-            using (var context = this.contextFactory.Create())
+            using (var context = this._contextFactory.Create())
             {
                 var user = this.FindUser(context, username);
 
@@ -90,7 +98,7 @@ namespace CoreCodedChatbot.Helpers
 
         public bool StartupSubVips(List<Subscription> subs)
         {
-            using (var context = this.contextFactory.Create())
+            using (var context = this._contextFactory.Create())
             {
                 try
                 {
@@ -129,7 +137,7 @@ namespace CoreCodedChatbot.Helpers
 
         public bool GiveSubVip(string username, int subStreak = 1)
         {
-            using (var context = this.contextFactory.Create())
+            using (var context = this._contextFactory.Create())
             {
                 var user = this.FindUser(context, username);
                 if (user == null) return false;
@@ -148,9 +156,9 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        public bool GiveSubBombVips(string[] usernames, int subs)
+        public bool GiveSubBombVips(string[] usernames)
         {
-            using (var context = contextFactory.Create())
+            using (var context = _contextFactory.Create())
             {
                 try
                 {
@@ -175,7 +183,7 @@ namespace CoreCodedChatbot.Helpers
 
         public bool GiveBitsVip(string username, int totalBitsToDate)
         {
-            using (var context = this.contextFactory.Create())
+            using (var context = this._contextFactory.Create())
             {
                 var user = this.FindUser(context, username);
                 if (user == null) return false;
@@ -201,8 +209,8 @@ namespace CoreCodedChatbot.Helpers
                 var totalBitsGiven = user.TotalBitsDropped;
                 var totalDonated = user.TotalDonated;
 
-                var bitsVipPercentage = (double) totalBitsGiven / (double) config.BitsToVip;
-                var donationVipPercentage = (double) totalDonated / (double) config.DonationAmountToVip;
+                var bitsVipPercentage = (double) totalBitsGiven / _configService.Get<double>("BitsToVip");
+                var donationVipPercentage = (double) totalDonated / _configService.Get<double>("DonationAmountToVip");
 
                 user.DonationOrBitsVipRequests = (int) Math.Floor(bitsVipPercentage + donationVipPercentage);
                 return true;
@@ -217,7 +225,7 @@ namespace CoreCodedChatbot.Helpers
         {
             try
             {
-                using (var context = contextFactory.Create())
+                using (var context = _contextFactory.Create())
                 {
                     var user = FindUser(context, username);
                     GiveDonationVipsDb(user);
@@ -249,19 +257,19 @@ namespace CoreCodedChatbot.Helpers
 
         public bool CanUseVipRequest(string username)
         {
-            using (var context = this.contextFactory.Create())
+            using (var context = this._contextFactory.Create())
             {
                 var user = this.FindUser(context, username);
-                return user != null && VipRequests.Create(user).TotalRemaining > 0;
+                return user != null && new VipRequests(_configService, user).TotalRemaining > 0;
             }
         }
 
         public bool CanUseSuperVipRequest(string username)
         {
-            using (var context = contextFactory.Create())
+            using (var context = _contextFactory.Create())
             {
                 var user = FindUser(context, username);
-                return user != null && (VipRequests.Create(user)).TotalRemaining >= config.SuperVipCost;
+                return user != null && (new VipRequests(_configService, user)).TotalRemaining >= _configService.Get<int>("SuperVipCost");
             }
         }
 
@@ -272,7 +280,7 @@ namespace CoreCodedChatbot.Helpers
                 return false;
             }
 
-            using (var context = this.contextFactory.Create())
+            using (var context = this._contextFactory.Create())
             {
                 try
                 {
@@ -282,7 +290,7 @@ namespace CoreCodedChatbot.Helpers
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"{e} - {e.InnerException}");
+                    _logger.LogError(e,$"Error in UseVipRequest");
                     return false;
                 }
             }
@@ -296,7 +304,7 @@ namespace CoreCodedChatbot.Helpers
                 return false;
             }
 
-            using (var context = contextFactory.Create())
+            using (var context = _contextFactory.Create())
             {
                 try
                 {
@@ -306,7 +314,7 @@ namespace CoreCodedChatbot.Helpers
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"{e} - {e.InnerException}");
+                    _logger.LogError(e, $"Error in UseSuperVipRequest");
                     return false;
                 }
             }
@@ -316,10 +324,10 @@ namespace CoreCodedChatbot.Helpers
 
         public VipRequests GetVipRequests(string username)
         {
-            using (var context = this.contextFactory.Create())
+            using (var context = this._contextFactory.Create())
             {
                 var user = this.FindUser(context, username);
-                return user == null ? null : VipRequests.Create(user);
+                return user == null ? null : new VipRequests(_configService, user);
             }
         }
     }

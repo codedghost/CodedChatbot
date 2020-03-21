@@ -1,11 +1,6 @@
-﻿using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
+﻿using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.ApiContract.RequestModels.Playlist;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Helpers;
-using CoreCodedChatbot.Library.Helpers;
-using CoreCodedChatbot.Library.Models.Data;
-
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
@@ -14,27 +9,21 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new[] { "removerequest", "rrr", "removerockrequest", "removesong", "removerequest" }, false)]
     public class RemoveRockRequestCommand : ICommand
     {
-        private HttpClient playlistClient;
-        private readonly ConfigModel config;
+        private readonly IPlaylistApiClient _playlistApiClient;
 
-        public RemoveRockRequestCommand(ConfigModel config)
+        public RemoveRockRequestCommand(IPlaylistApiClient playlistApiClient)
         {
-            this.playlistClient = new HttpClient
-            {
-                BaseAddress = new Uri(config.PlaylistApiUrl),
-                DefaultRequestHeaders =
-                {
-                    Authorization = new AuthenticationHeaderValue("Bearer", config.JwtTokenString)
-                }
-            };
-            this.config = config;
+            _playlistApiClient = playlistApiClient;
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            var request = await playlistClient.PostAsync("RemoveRockRequests",
-                HttpClientHelper.GetJsonData(new {username, commandText, isMod}));
-            var success = request.IsSuccessStatusCode;
+            var success = await _playlistApiClient.RemoveRockRequests(new RemoveSongRequest
+            {
+                Username = username,
+                CommandText = commandText,
+                IsMod = isMod
+            });
 
             client.SendMessage(joinedChannel, success
                 ? $"Hi @{username}, I have removed number: {commandText} from the queue."

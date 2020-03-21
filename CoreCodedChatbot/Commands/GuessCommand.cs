@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
+using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.ApiContract.RequestModels;
+using CoreCodedChatbot.ApiContract.RequestModels.GuessingGame;
+using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Library.Helpers;
-using CoreCodedChatbot.Library.Interfaces.Services;
-using CoreCodedChatbot.Library.Models.Data;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
@@ -15,21 +14,13 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new []{ "guess" }, false)]
     public class GuessCommand : ICommand
     {
-        private ConfigModel Config;
-        private HttpClient GuessingGameClient;
+        private readonly IGuessingGameApiClient _guessingGameApiClient;
+        private readonly IConfigService _configService;
 
-        public GuessCommand(ConfigModel config)
+        public GuessCommand(IGuessingGameApiClient guessingGameApiClient, IConfigService configService)
         {
-            this.Config = config;
-            
-            this.GuessingGameClient = new HttpClient
-            {
-                BaseAddress = new Uri(Config.GuessingGameApiUrl),
-                DefaultRequestHeaders =
-                {
-                    Authorization = new AuthenticationHeaderValue("Bearer", Config.JwtTokenString)
-                }
-            };
+            _guessingGameApiClient = guessingGameApiClient;
+            _configService = configService;
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
@@ -41,8 +32,13 @@ namespace CoreCodedChatbot.Commands
                 return;
             }
 
-            var response = await GuessingGameClient.PostAsync("SubmitGuess", HttpClientHelper.GetJsonData(new { Username = username, Guess = decimalGuess}));
-            if (response.IsSuccessStatusCode)
+            var success = await _guessingGameApiClient.SubmitGuess(new SubmitGuessRequest
+            {
+                Username = username,
+                Guess = decimalGuess
+            });
+
+            if (success)
             {
                 client.SendMessage(joinedChannel, $"@{username} has guessed {trimPercent}. Good luck!");
                 return;
@@ -55,7 +51,7 @@ namespace CoreCodedChatbot.Commands
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)
         {
             client.SendMessage(joinedChannel,
-                $"Hey @{username}, this command lets you join the guessing game when {Config.StreamerChannel} is playing a song request!");
+                $"Hey @{username}, this command lets you join the guessing game when {_configService.Get<string>("StreamerChannel")} is playing a song request!");
         }
     }
 }

@@ -15,8 +15,8 @@
     @RenderSection("Styles", false)
 </head>
 <body>
-    @Html.Partial("Nav")
-    <div class="container body-content">
+@await Component.InvokeAsync("Nav")
+<div class="container body-content">
         @RenderBody()
     </div>
     <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>

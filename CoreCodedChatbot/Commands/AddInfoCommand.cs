@@ -1,23 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using CoreCodedChatbot.Database.Context;
+using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Database.Context.Models;
 using CoreCodedChatbot.Interfaces;
+using Microsoft.Extensions.Logging;
+using NLog;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
 namespace CoreCodedChatbot.Commands
 {
-    [CustomAttributes.ChatCommand(new []{ "addinfo" }, true)]
+    [CustomAttributes.ChatCommand(new[] { "addinfo" }, true)]
     public class AddInfoCommand : ICommand
     {
-        private ChatbotContextFactory chatbotContextFactory;
+        private IChatbotContextFactory _chatbotContextFactory;
+        private readonly ILogger<AddInfoCommand> _logger;
 
-        public AddInfoCommand(ChatbotContextFactory chatbotContextFactory)
+        public AddInfoCommand(
+            IChatbotContextFactory chatbotContextFactory,
+            ILogger<AddInfoCommand> logger
+            )
         {
-            this.chatbotContextFactory = chatbotContextFactory;
+            _chatbotContextFactory = chatbotContextFactory;
+            _logger = logger;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
@@ -25,7 +30,7 @@ namespace CoreCodedChatbot.Commands
             try
             {
                 // Parse Input
-                var splitInput = commandText.Split('"').Where(c => !string.IsNullOrWhiteSpace(c)).ToArray();
+                var splitInput = commandText.Split('"', StringSplitOptions.RemoveEmptyEntries).ToArray();
                 if (splitInput.Length != 3)
                 {
                     client.SendMessage(joinedChannel,
@@ -33,13 +38,15 @@ namespace CoreCodedChatbot.Commands
                     return;
                 }
 
-                var aliases = splitInput[0].Split(new[] {", ", ","}, StringSplitOptions.None)
-                    .Where(a => !string.IsNullOrWhiteSpace(a)).ToArray();
+                var aliases = splitInput[0]
+                    .Split(new[] { ", ", "," }, StringSplitOptions.RemoveEmptyEntries)
+                    .ToArray();
                 var info = splitInput[1];
                 var helpText = splitInput[2];
 
-                if (aliases.All(string.IsNullOrWhiteSpace) || string.IsNullOrWhiteSpace(info) ||
-                    string.IsNullOrWhiteSpace(helpText))
+                if (aliases.Length == 0
+                    || string.IsNullOrWhiteSpace(info)
+                    || string.IsNullOrWhiteSpace(helpText))
                 {
                     client.SendMessage(joinedChannel,
                         $"Hey @{username}, it doesn't look like you've provided everything I need. I need aliases, text, and helptext :)");
@@ -47,7 +54,7 @@ namespace CoreCodedChatbot.Commands
                 }
 
                 // Check that info aliases aren't already in use
-                using (var context = chatbotContextFactory.Create())
+                using (var context = _chatbotContextFactory.Create())
                 {
                     if (context.InfoCommandKeywords.Any(ik => aliases.Contains(ik.InfoCommandKeywordText)))
                     {
@@ -64,8 +71,6 @@ namespace CoreCodedChatbot.Commands
                     };
 
                     context.InfoCommands.Add(infoCommand);
-
-                    context.SaveChanges();
 
                     // Add aliases
                     var infoCommandKeywords = aliases.Select(a => new InfoCommandKeyword
@@ -84,7 +89,7 @@ namespace CoreCodedChatbot.Commands
             }
             catch (Exception e)
             {
-                Console.Out.WriteLine($"{e} + {e.InnerException}");
+                _logger.LogError(e, "Error in AddInfoCommand");
                 client.SendMessage(joinedChannel,
                     $"Hey @{username}, sorry but I couldn't manage to add that command at the moment, please try again later");
             }

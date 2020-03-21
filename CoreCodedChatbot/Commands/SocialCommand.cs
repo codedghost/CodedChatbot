@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Interfaces.Services;
@@ -13,27 +11,27 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new []{"social", "socials"}, false)]
     public class SocialCommand : ICommand
     {
-        private ConfigModel config;
-        private CommandHelper commandHelper;
+        private readonly IConfigService _configService;
+        private ICommandHelper _commandHelper;
 
-        public SocialCommand(ConfigModel config, CommandHelper commandHelper)
+        public SocialCommand(IConfigService configService, ICommandHelper commandHelper)
         {
-            this.config = config;
-            this.commandHelper = commandHelper;
+            _configService = configService;
+            this._commandHelper = commandHelper;
         }
 
         public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            commandHelper.ProcessCommand("discord", client, "Chatbot", string.Empty, true, joinedChannel);
-            commandHelper.ProcessCommand("yt", client, "Chatbot", string.Empty, true, joinedChannel);
-            commandHelper.ProcessCommand("insta", client, "Chatbot", string.Empty, true, joinedChannel);
-            commandHelper.ProcessCommand("twitter", client, "Chatbot", string.Empty, true, joinedChannel);
+            _commandHelper.ProcessCommand("discord", client, "Chatbot", string.Empty, true, joinedChannel);
+            _commandHelper.ProcessCommand("yt", client, "Chatbot", string.Empty, true, joinedChannel);
+            _commandHelper.ProcessCommand("insta", client, "Chatbot", string.Empty, true, joinedChannel);
+            _commandHelper.ProcessCommand("twitter", client, "Chatbot", string.Empty, true, joinedChannel);
         }
 
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)
         {
             client.SendMessage(joinedChannel,
-                $"Hey @{username}, this command will output all of {config.StreamerChannel}'s social media links");
+                $"Hey @{username}, this command will output all of {_configService.Get<string>("StreamerChannel")}'s social media links");
         }
     }
 }

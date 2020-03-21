@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using CoreCodedChatbot.Helpers;
+﻿using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.ApiContract.Enums.Playlist;
+using CoreCodedChatbot.ApiContract.RequestModels.Playlist;
+using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Library.Helpers;
-using CoreCodedChatbot.Library.Models.ApiResponse.Playlist;
-using CoreCodedChatbot.Library.Models.Data;
-using CoreCodedChatbot.Library.Models.Enums;
-using Newtonsoft.Json;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
@@ -18,24 +11,15 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new []{"supervip", "svip", "super"}, false)]
     public class SuperVipCommand : ICommand
     {
-        private HttpClient _playlistClient;
-        private VipHelper _vipHelper;
+        private IVipHelper _vipHelper;
+        private readonly IConfigService _configService;
+        private readonly IPlaylistApiClient _playlistApiClient;
 
-        private readonly ConfigModel _config;
-
-        public SuperVipCommand(VipHelper vipHelper, ConfigModel config)
+        public SuperVipCommand(IVipHelper vipHelper, IConfigService configService, IPlaylistApiClient playlistApiClient)
         {
             _vipHelper = vipHelper;
-            _config = config;
-
-            _playlistClient = new HttpClient
-            {
-                BaseAddress = new Uri(config.PlaylistApiUrl),
-                DefaultRequestHeaders =
-                {
-                    Authorization = new AuthenticationHeaderValue("Bearer", config.JwtTokenString)
-                }
-            };
+            _configService = configService;
+            _playlistApiClient = playlistApiClient;
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
@@ -50,14 +34,15 @@ namespace CoreCodedChatbot.Commands
             // Check the user has enough VIPs
             if (_vipHelper.CanUseSuperVipRequest(username))
             {
-                var addSuperRequest = await _playlistClient.PostAsync("AddSuperRequest",
-                    HttpClientHelper.GetJsonData(new { username, commandText }));
-
-                if (addSuperRequest.IsSuccessStatusCode)
+                var addSuperResponse = await _playlistApiClient.AddSuperVip(new AddSuperVipRequest
                 {
-                    var addResult =
-                        JsonConvert.DeserializeObject<AddSuperVipResponse>(await addSuperRequest.Content.ReadAsStringAsync());
-                    switch (addResult.Result)
+                    Username = username,
+                    CommandText = commandText
+                });
+
+                if (addSuperResponse != null)
+                {
+                    switch (addSuperResponse.Result)
                     {
                         case AddRequestResult.PlaylistVeryClosed:
                             client.SendMessage(joinedChannel,
@@ -79,7 +64,7 @@ namespace CoreCodedChatbot.Commands
             else
             {
                 client.SendMessage(joinedChannel,
-                    $"Hey @{username}, it looks like you don't have enough VIP tokens :( You need at least {_config.SuperVipCost} tokens to request a SuperVIP");
+                    $"Hey @{username}, it looks like you don't have enough VIP tokens :( You need at least {_configService.Get<string>("SuperVipCost")} tokens to request a SuperVIP");
             }
         }
 

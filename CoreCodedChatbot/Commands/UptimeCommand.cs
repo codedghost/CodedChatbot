@@ -1,6 +1,7 @@
 ﻿using System;
+using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Helpers.Interfaces;
+using CoreCodedChatbot.Library.Interfaces.Services;
 using CoreCodedChatbot.Library.Models.Data;
 
 using TwitchLib.Api;
@@ -12,30 +13,30 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new[] { "uptime", "live" }, false)]
     public class UptimeCommand : ICommand
     {
-        private readonly ConfigModel config;
         private readonly TwitchAPI api;
+        private readonly IConfigService _configService;
 
-        public UptimeCommand(TwitchAPI api, IConfigHelper configHelper)
+        public UptimeCommand(TwitchAPI api, IConfigService configService)
         {
             this.api = api;
-            this.config = configHelper.GetConfig();
+            _configService = configService;
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            var Stream = await api.V5.Streams.GetStreamByUserAsync(config.ChannelId);
+            var Stream = await api.V5.Streams.GetStreamByUserAsync(_configService.Get<string>("ChannelId"));
             var streamGoLiveTime = Stream?.Stream?.CreatedAt;
 
             if (streamGoLiveTime != null)
             {
                 var timeLiveFor = DateTime.UtcNow.Subtract(streamGoLiveTime.Value.ToUniversalTime());
 
-                client.SendMessage(joinedChannel, $"Hey @{username}, {config.StreamerChannel} has been live for: {timeLiveFor.Hours} hours and {timeLiveFor.Minutes} minutes.");
+                client.SendMessage(joinedChannel, $"Hey @{username}, {_configService.Get<string>("StreamerChannel")} has been live for: {timeLiveFor.Hours} hours and {timeLiveFor.Minutes} minutes.");
             }
             else
             {
                 client.SendMessage(joinedChannel,
-                    $"Hey @{username}, {config.StreamerChannel} seems to be offline right now");
+                    $"Hey @{username}, {_configService.Get<string>("StreamerChannel")} seems to be offline right now");
             }
         }
 

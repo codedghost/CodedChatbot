@@ -1,16 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using CoreCodedChatbot.Helpers;
-using CoreCodedChatbot.Helpers.Interfaces;
+using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.ApiContract.RequestModels.Vip;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Library.Helpers;
-using CoreCodedChatbot.Library.Interfaces.Services;
-using CoreCodedChatbot.Library.Models.ApiRequest.Vip;
-using CoreCodedChatbot.Library.Models.Data;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
@@ -19,21 +11,11 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new []{ "giftvip", "iamasaintto"}, false)]
     public class GiftVipCommand : ICommand
     {
-        private ConfigModel config;
-        private HttpClient vipClient;
+        private readonly IVipApiClient _vipApiClient;
 
-        public GiftVipCommand(IConfigHelper configHelper)
+        public GiftVipCommand(IVipApiClient vipApiClient)
         {
-            this.config = configHelper.GetConfig();
-
-            this.vipClient = new HttpClient
-            {
-                BaseAddress = new Uri(config.VipApiUrl),
-                DefaultRequestHeaders =
-                {
-                    Authorization = new AuthenticationHeaderValue("Bearer", config.JwtTokenString)
-                }
-            };
+            _vipApiClient = vipApiClient;
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
@@ -46,16 +28,15 @@ namespace CoreCodedChatbot.Commands
                 return;
             }
 
-            var giftVipModel = new GiftVipModel
+            var giftVipModel = new GiftVipRequest
             {
                 DonorUsername = username,
                 ReceiverUsername = commandSplit[0].Trim('@')
             };
             
-            var giftVipResult = await vipClient.PostAsync("GiftVip",
-                HttpClientHelper.GetJsonData(giftVipModel));
+            var giftVipResult = await _vipApiClient.GiftVip(giftVipModel);
 
-            if (giftVipResult.IsSuccessStatusCode)
+            if (giftVipResult)
             {
                 client.SendMessage(joinedChannel,
                     $"Hey @{username}, I have given @{giftVipModel.ReceiverUsername} one of your VIPs");
