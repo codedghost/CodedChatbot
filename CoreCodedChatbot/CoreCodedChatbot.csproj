@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
 	<TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
     <AssemblyName>CoreCodedChatbot</AssemblyName>
     <OutputType>Exe</OutputType>
@@ -43,29 +43,29 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CoreCodedChatbot.ApiClient" Version="1.0.491" />
+    <PackageReference Include="CoreCodedChatbot.ApiClient" Version="1.0.552" />
     <PackageReference Include="CoreCodedChatbot.Config" Version="1.0.345" />
-    <PackageReference Include="CoreCodedChatbot.Database" Version="1.0.486" />
-    <PackageReference Include="CoreCodedChatbot.Library" Version="1.0.439" />
+    <PackageReference Include="CoreCodedChatbot.Database" Version="1.0.550" />
+    <PackageReference Include="CoreCodedChatbot.Library" Version="1.0.551" />
     <PackageReference Include="CoreCodedChatbot.Logging" Version="1.0.401" />
-    <PackageReference Include="CoreCodedChatbot.Secrets" Version="1.0.346" />
+    <PackageReference Include="CoreCodedChatbot.Secrets" Version="1.0.548" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.0.0" />
-    <PackageReference Include="Microsoft.Azure.KeyVault" Version="3.0.4" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="1.0.19269.1" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="3.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.1.3" />
+    <PackageReference Include="Microsoft.Azure.KeyVault" Version="3.0.5" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="1.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="3.1.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="3.1.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.3" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.3" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="NLog.Web.AspNetCore" Version="4.9.0" />
+    <PackageReference Include="NLog.Web.AspNetCore" Version="4.9.1" />
     <PackageReference Include="System.Net.Sockets" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Extensions" Version="4.3.0" />
-    <PackageReference Include="TwitchLib" Version="3.0.1" />
+    <PackageReference Include="TwitchLib" Version="3.1.0" />
   </ItemGroup>
 
 </Project>

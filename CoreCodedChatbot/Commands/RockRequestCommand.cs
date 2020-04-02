@@ -45,8 +45,8 @@ namespace CoreCodedChatbot.Commands
                         message =
                             $"Hey @{username}, the playlist is currently closed. If you want to request a song still, try !vip";
                         break;
-                    case AddRequestResult.NoMultipleRequests:
-                        message = $"Hey @{username}, you can only have one non-vip request in the list!";
+                    case AddRequestResult.MaximumRegularRequests:
+                        message = $"Hey @{username}, you've requested the max regular requests!";
                         break;
                     default:
                         message = $"Hey @{username}, I have queued {commandText} for you!";
