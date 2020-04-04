@@ -38,8 +38,6 @@ namespace CoreCodedChatbot.Commands
                                 ? $"Hey @{username}, something seems to have gone wrong. Please try again in a minute or two"
                                 : $"Hey @{username}, I have promoted your request to #{playlistPosition} for you!");
 
-
-                    if (playlistPosition > 0) _vipHelper.UseVipRequest(username);
                     return;
                 }
 
