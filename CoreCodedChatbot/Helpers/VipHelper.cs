@@ -250,30 +250,5 @@ namespace CoreCodedChatbot.Helpers
             }
             return true;
         }
-
-        public bool UseSuperVipRequest(string username)
-        {
-            if (!CanUseSuperVipRequest(username))
-            {
-                return false;
-            }
-
-            using (var context = _contextFactory.Create())
-            {
-                try
-                {
-                    var user = FindUser(context, username);
-                    user.UsedSuperVipRequests++;
-                    context.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    _logger.LogError(e, $"Error in UseSuperVipRequest");
-                    return false;
-                }
-            }
-
-            return true;
-        }
     }
 }
