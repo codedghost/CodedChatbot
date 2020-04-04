@@ -75,27 +75,6 @@ namespace CoreCodedChatbot.Helpers
             return userModel;
         }
 
-        public bool GiveVipRequest(string username)
-        {
-            using (var context = this._contextFactory.Create())
-            {
-                var user = this.FindUser(context, username);
-
-                if (user == null) return false;
-                try
-                {
-                    user.ModGivenVipRequests++;
-                    context.SaveChanges();
-                }
-                catch (Exception)
-                {
-                    return false;
-                }
-
-                return true;
-            }
-        }
-
         public bool StartupSubVips(List<Subscription> subs)
         {
             using (var context = this._contextFactory.Create())
@@ -153,31 +132,6 @@ namespace CoreCodedChatbot.Helpers
                 }
 
                 return true;
-            }
-        }
-
-        public bool GiveSubBombVips(string[] usernames)
-        {
-            using (var context = _contextFactory.Create())
-            {
-                try
-                {
-                    foreach (var username in usernames)
-                    {
-                        var user = FindUser(context, username);
-                        if (user == null) return false;
-
-                        user.SubVipRequests++;
-
-                    }
-
-                    context.SaveChanges();
-                    return true;
-                }
-                catch (Exception)
-                {
-                    return false;
-                }
             }
         }
 
@@ -320,15 +274,6 @@ namespace CoreCodedChatbot.Helpers
             }
 
             return true;
-        }
-
-        public VipRequests GetVipRequests(string username)
-        {
-            using (var context = this._contextFactory.Create())
-            {
-                var user = this.FindUser(context, username);
-                return user == null ? null : new VipRequests(_configService, user);
-            }
         }
     }
 }

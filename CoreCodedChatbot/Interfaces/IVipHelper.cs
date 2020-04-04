@@ -22,6 +22,5 @@ namespace CoreCodedChatbot.Interfaces
         bool CanUseSuperVipRequest(string username);
         bool UseVipRequest(string username);
         bool UseSuperVipRequest(string username);
-        VipRequests GetVipRequests(string username);
     }
 }
