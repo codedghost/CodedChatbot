@@ -1,4 +1,5 @@
 ﻿using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.ApiContract.Enums.Playlist;
 using CoreCodedChatbot.ApiContract.RequestModels.Playlist;
 using CoreCodedChatbot.Interfaces;
 using TwitchLib.Client;
@@ -18,36 +19,32 @@ namespace CoreCodedChatbot.Commands
             _vipHelper = vipHelper;
         }
 
-        public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
+        public async void Process(TwitchClient client, string username, string commandText, bool isMod,
+            JoinedChannel joinedChannel)
         {
-            if (_vipHelper.CanUseVipRequest(username))
+            var promoteSongResponse = await _playlistApiClient.PromoteSong(new PromoteSongRequest
             {
-                var playlistPosition = await _playlistApiClient.PromoteSong(new PromoteSongRequest
-                {
-                    Username = username
-                });
+                Username = username
+            });
 
-                // TODO: This really should be an object returned
-                if (playlistPosition != -1)
-                {
-                    client.SendMessage(joinedChannel, playlistPosition == -1
-                        ? $"Hey @{username}, I can't find a song at that position! Please check your requests with !myrequests"
-                        : playlistPosition == -2
-                            ? $"Hey @{username}, I'm sorry but that request doesn't seem to belong to you. Please check your requests with !myrequests"
-                            : playlistPosition == 0
-                                ? $"Hey @{username}, something seems to have gone wrong. Please try again in a minute or two"
-                                : $"Hey @{username}, I have promoted your request to #{playlistPosition} for you!");
-
+            switch (promoteSongResponse.PromoteRequestResult)
+            {
+                case PromoteRequestResult.NotYourRequest:
+                    client.SendMessage(joinedChannel,
+                        $"Hey @{username}, I'm sorry but that request doesn't seem to belong to you. Please check your requests with !myrequests");
                     return;
-                }
-
-                client.SendMessage(joinedChannel,
-                    $"Hey @{username}, sorry I can't promote your request right now, please try again in a sec");
-            }
-            else
-            {
-                client.SendMessage(joinedChannel,
-                    $"Hey @{username}, it looks like you don't have any remaining VIP requests. Please use the standard !request command.");
+                case PromoteRequestResult.UnSuccessful:
+                    client.SendMessage(joinedChannel,
+                        $"Hey @{username}, sorry I can't promote your request right now, please try again in a sec");
+                    return;
+                case PromoteRequestResult.NoVipAvailable:
+                    client.SendMessage(joinedChannel,
+                        $"Hey @{username}, sorry but you don't have a VIP to promote this request");
+                    return;
+                case PromoteRequestResult.Successful:
+                    client.SendMessage(joinedChannel,
+                        $"Hey @{username}, I have promoted your request to #{promoteSongResponse.PlaylistIndex} for you!");
+                    return;
             }
         }
 

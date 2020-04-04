@@ -16,7 +16,5 @@ namespace CoreCodedChatbot.Interfaces
         bool GiveDonationVipsDb(User user);
         bool GiveDonationVips(string username, bool deferSave = false);
         bool GiveTokenVip(IChatbotContext context, User user, int bytesToRemove);
-        bool CanUseVipRequest(string username);
-        bool UseVipRequest(string username);
     }
 }

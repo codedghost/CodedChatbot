@@ -217,29 +217,5 @@ namespace CoreCodedChatbot.Helpers
                 return user != null && new VipRequests(_configService, user).TotalRemaining > 0;
             }
         }
-
-        public bool UseVipRequest(string username)
-        {
-            if (!CanUseVipRequest(username))
-            {
-                return false;
-            }
-
-            using (var context = this._contextFactory.Create())
-            {
-                try
-                {
-                    var user = this.FindUser(context, username);
-                    user.UsedVipRequests++;
-                    context.SaveChanges();
-                }
-                catch (Exception e)
-                {
-                    _logger.LogError(e,$"Error in UseVipRequest");
-                    return false;
-                }
-            }
-            return true;
-        }
     }
 }
