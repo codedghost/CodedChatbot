@@ -19,7 +19,8 @@ namespace CoreCodedChatbot.Commands
             _playlistApiClient = playlistApiClient;
         }
 
-        public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
+        public async void Process(TwitchClient client, string username, string commandText, bool isMod,
+            JoinedChannel joinedChannel)
         {
             if (string.IsNullOrWhiteSpace(commandText))
             {
@@ -28,35 +29,41 @@ namespace CoreCodedChatbot.Commands
                 return;
             }
 
-            if (vipHelper.CanUseVipRequest(username))
+            var addSongResult = await _playlistApiClient.AddSong(new AddSongRequest
             {
-                var addSongResult = await _playlistApiClient.AddSong(new AddSongRequest
-                {
-                    Username = username,
-                    CommandText = commandText,
-                    IsVipRequest = true
-                });
+                Username = username,
+                CommandText = commandText,
+                IsVipRequest = true
+            });
 
-                if (addSongResult != null)
+            if (addSongResult != null)
+            {
+                switch (addSongResult.Result)
                 {
-                    if (addSongResult.Result == AddRequestResult.PlaylistVeryClosed)
-                    {
+                    case AddRequestResult.Success:
+                        var playlistPosition = addSongResult.PlaylistPosition;
+
                         client.SendMessage(joinedChannel,
-                            $"Hey @{username}, the playlist is currently very closed. No Requests allowed.");
+                            $"Hey @{username}, I have queued {commandText} for you, you're #{playlistPosition} in the queue!");
+
                         return;
-                    }
-
-                    var playlistPosition = addSongResult.PlaylistPosition;
-
-                    vipHelper.UseVipRequest(username);
-                    client.SendMessage(joinedChannel,
-                        $"Hey @{username}, I have queued {commandText} for you, you're #{playlistPosition} in the queue!");
-
-                    return;
+                    case AddRequestResult.PlaylistVeryClosed:
+                        client.SendMessage(joinedChannel,
+                            $"Hey @{username}, the playlist is currently closed. No Requests allowed.");
+                        return;
+                    case AddRequestResult.NoRequestEntered:
+                        client.SendMessage(joinedChannel,
+                            $"Hey @{username}, looks like you haven't included a request there!");
+                        return;
+                    case AddRequestResult.NotEnoughVips:
+                        client.SendMessage(joinedChannel,
+                            $"Hey @{username}, sorry but you don't have a VIP token.");
+                        return;
+                    case AddRequestResult.UnSuccessful:
+                        client.SendMessage(joinedChannel,
+                            $"Hey @{username}, I can't queue your VIP request right now, please try again in a sec");
+                        return;
                 }
-
-                client.SendMessage(joinedChannel,
-                    $"Hey @{username}, I can't queue your VIP request right now, please try again in a sec");
             }
             else
             {
