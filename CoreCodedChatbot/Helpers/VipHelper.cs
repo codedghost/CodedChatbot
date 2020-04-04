@@ -218,15 +218,6 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        public bool CanUseSuperVipRequest(string username)
-        {
-            using (var context = _contextFactory.Create())
-            {
-                var user = FindUser(context, username);
-                return user != null && (new VipRequests(_configService, user)).TotalRemaining >= _configService.Get<int>("SuperVipCost");
-            }
-        }
-
         public bool UseVipRequest(string username)
         {
             if (!CanUseVipRequest(username))
