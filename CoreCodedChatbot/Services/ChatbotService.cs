@@ -3,6 +3,8 @@ using System.Net.Http;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.ApiContract.RequestModels.Vip;
 using CoreCodedChatbot.Config;
 using Newtonsoft.Json;
 
@@ -33,8 +35,9 @@ namespace CoreCodedChatbot.Services
         private readonly IVipHelper _vipHelper;
         private readonly IBytesHelper _bytesHelper;
         private readonly IStreamLabsHelper _streamLabsHelper;
+        private readonly IVipApiClient _vipApiClient;
         private readonly IConfigService _configService;
-        private readonly ISecretService _secretService;
+        private readonly ISecretService _secretService; 
         private readonly ILogger<ChatbotService> _logger;
         private readonly LiveStreamMonitorService _liveStreamMonitor;
 
@@ -71,7 +74,8 @@ namespace CoreCodedChatbot.Services
             LiveStreamMonitorService liveStreamMonitor,
             IVipHelper vipHelper, 
             IBytesHelper bytesHelper, 
-            IStreamLabsHelper streamLabsHelper, 
+            IStreamLabsHelper streamLabsHelper,
+            IVipApiClient vipApiClient,
             IConfigService configService, 
             ISecretService secretService,
             ILogger<ChatbotService> logger)
@@ -84,6 +88,7 @@ namespace CoreCodedChatbot.Services
             _vipHelper = vipHelper;
             _bytesHelper = bytesHelper;
             _streamLabsHelper = streamLabsHelper;
+            _vipApiClient = vipApiClient;
             _configService = configService;
             _secretService = secretService;
             _logger = logger;
@@ -181,7 +186,11 @@ namespace CoreCodedChatbot.Services
             try
             {
                 _logger.LogInformation($"New Sub! WOOOOO - {e.Subscriber.DisplayName}");
-                _vipHelper.GiveSubVip(e.Subscriber.DisplayName);
+
+                _vipApiClient.GiveSubscriptionVips(new GiveSubscriptionVipsRequest
+                {
+                    Username = new List<string> {e.Subscriber.DisplayName}
+                });
             }
             catch (Exception ex)
             {
@@ -194,7 +203,11 @@ namespace CoreCodedChatbot.Services
             try
             {
                 _logger.LogInformation($"ReSub!!! WOOOO - {e.ReSubscriber.DisplayName} - {e.ReSubscriber.Months}");
-                _vipHelper.GiveSubVip(e.ReSubscriber.DisplayName, e.ReSubscriber.Months);
+
+                _vipApiClient.GiveSubscriptionVips(new GiveSubscriptionVipsRequest
+                {
+                    Username = new List<string> {e.ReSubscriber.DisplayName}
+                });
             }
             catch (Exception ex)
             {
@@ -209,7 +222,10 @@ namespace CoreCodedChatbot.Services
                 _logger.LogInformation($"Gifted Sub! {e.GiftedSubscription.MsgParamRecipientUserName} has received a sub from {e.GiftedSubscription.DisplayName}");
 
                 // A whole vip for the recipient
-                _vipHelper.GiveSubVip(e.GiftedSubscription.MsgParamRecipientUserName);
+                _vipApiClient.GiveSubscriptionVips(new GiveSubscriptionVipsRequest
+                {
+                    Username = new List<string> { e.GiftedSubscription.MsgParamRecipientUserName }
+                });
 
                 // Half as thanks to the gifter
                 _bytesHelper.GiveGiftSubBytes(e.GiftedSubscription.DisplayName);

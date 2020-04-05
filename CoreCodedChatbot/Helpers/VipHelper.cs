@@ -208,14 +208,5 @@ namespace CoreCodedChatbot.Helpers
                 return false;
             }
         }
-
-        public bool CanUseVipRequest(string username)
-        {
-            using (var context = this._contextFactory.Create())
-            {
-                var user = this.FindUser(context, username);
-                return user != null && new VipRequests(_configService, user).TotalRemaining > 0;
-            }
-        }
     }
 }
