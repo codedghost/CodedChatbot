@@ -10,12 +10,10 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new []{"vip", "viprequest"}, false)]
     public class VipCommand : ICommand
     {
-        private readonly IVipHelper vipHelper;
         private readonly IPlaylistApiClient _playlistApiClient;
 
-        public VipCommand(IVipHelper vipHelper, IPlaylistApiClient playlistApiClient)
+        public VipCommand(IPlaylistApiClient playlistApiClient)
         {
-            this.vipHelper = vipHelper;
             _playlistApiClient = playlistApiClient;
         }
 

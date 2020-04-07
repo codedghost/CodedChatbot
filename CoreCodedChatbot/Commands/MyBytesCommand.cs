@@ -1,4 +1,5 @@
-﻿using CoreCodedChatbot.Helpers;
+﻿using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Models.Data;
 
@@ -10,17 +11,26 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new[] { "mybytes", "mybites" }, false)]
     public class MyBytesCommand : ICommand
     {
-        private readonly IBytesHelper bytesHelper;
+        private readonly IVipApiClient _vipApiClient;
 
-        public MyBytesCommand(IBytesHelper bytesHelper)
+        public MyBytesCommand(IVipApiClient vipApiClient)
         {
-            this.bytesHelper = bytesHelper;
+            _vipApiClient = vipApiClient;
         }
 
-        public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
+        public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            var bytes = bytesHelper.CheckBytes(username);
-            client.SendMessage(joinedChannel, $"Hey @{username}, you have {bytes} Bytes!");
+            var bytes = await _vipApiClient.GetUserByteCount(username);
+
+            if (bytes == null)
+            {
+                client.SendMessage(joinedChannel,
+                    $"Hey @{username}, I can't check that right now, check back in a few minutes");
+                return;
+            }
+
+
+            client.SendMessage(joinedChannel, $"Hey @{username}, you have {bytes.Bytes} Bytes!");
         }
 
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)

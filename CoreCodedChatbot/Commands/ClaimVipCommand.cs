@@ -1,4 +1,6 @@
-﻿using CoreCodedChatbot.Helpers;
+﻿using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.ApiContract.RequestModels.Vip;
+using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
 
 using TwitchLib.Client;
@@ -9,21 +11,31 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new[] { "claimvip", "convertvip" }, false)]
     public class ClaimVipCommand : ICommand
     {
-        private readonly IBytesHelper bytesHelper;
+        private readonly IVipApiClient _vipApiClient;
 
-
-        public ClaimVipCommand(IBytesHelper bytesHelper)
+        public ClaimVipCommand(IVipApiClient vipApiClient)
         {
-            this.bytesHelper = bytesHelper;
+            _vipApiClient = vipApiClient;
         }
 
-        public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
+        public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            var giveTokenSuccess = int.TryParse(commandText, out var numberOfTokens)
-                ? bytesHelper.ConvertByte(username, numberOfTokens)
-                : bytesHelper.ConvertByte(username);
+            int.TryParse(commandText, out var numberOfTokens);
+            if (numberOfTokens == 0) numberOfTokens = 1;
+            var convertResponse = await _vipApiClient.ConvertBytes(new ConvertVipsRequest
+            {
+                Username = username,
+                NumberOfBytes = numberOfTokens
+            });
 
-            client.SendMessage(joinedChannel, giveTokenSuccess ? $"Hey @{username}, I've converted your Byte(s) to VIP(s) :D" : $"Hey @{username}, it looks like you don't have enough byte(s) to do that. Stick around and you'll have enough in no time!");
+            if (convertResponse == null)
+            {
+                client.SendMessage(joinedChannel,
+                    $"Hey @{username}, Sorry I can't do that at the moment, please try again in a few minutes");
+                return;
+            }
+
+            client.SendMessage(joinedChannel, convertResponse.ConvertedBytes > 0 ? $"Hey @{username}, I've converted {convertResponse.ConvertedBytes} Byte(s) to VIP(s) :D" : $"Hey @{username}, it looks like you don't have enough byte(s) to do that. Stick around and you'll have enough in no time!");
         }
 
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)

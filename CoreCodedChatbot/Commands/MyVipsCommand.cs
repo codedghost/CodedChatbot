@@ -12,36 +12,30 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new []{ "myvips", "mvip", "myvip", "vips"}, false)]
     public class MyVipsCommand : ICommand
     {
-        private readonly IVipHelper vipHelper;
         private readonly IVipApiClient _vipApiClient;
 
-        public MyVipsCommand(IVipHelper vipHelper,
-            IVipApiClient vipApiClient)
+        public MyVipsCommand(IVipApiClient vipApiClient)
         {
-            this.vipHelper = vipHelper;
             _vipApiClient = vipApiClient;
         }
 
-        public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
+        public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            var getVipCountTask = _vipApiClient.GetUserVipCount(new GetUserVipCountRequest
+            var getVipCountTask = await _vipApiClient.GetUserVipCount(new GetUserVipCountRequest
             {
                 Username = username
             });
 
-            getVipCountTask.Wait();
-            var result = getVipCountTask.Result;
-
-            if (result == null)
+            if (getVipCountTask == null)
             {
                 client.SendMessage(joinedChannel, $"Hey @{username}, something went wrong with the chatbot. Ask @CodedGhost2 what he's playing at!");
                 return;
             }
 
             client.SendMessage(joinedChannel,
-                result.Vips == 0
-                    ? $"Hey @{username}, it looks like you have {result.Vips}. :("
-                    : $"Hey @{username}, it looks like you have {result.Vips} VIPs left!");
+                getVipCountTask.Vips == 0
+                    ? $"Hey @{username}, it looks like you have {getVipCountTask.Vips}. :("
+                    : $"Hey @{username}, it looks like you have {getVipCountTask.Vips} VIPs left!");
         }
 
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)

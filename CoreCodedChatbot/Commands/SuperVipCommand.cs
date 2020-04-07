@@ -11,13 +11,11 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new []{"supervip", "svip", "super"}, false)]
     public class SuperVipCommand : ICommand
     {
-        private IVipHelper _vipHelper;
         private readonly IConfigService _configService;
         private readonly IPlaylistApiClient _playlistApiClient;
 
-        public SuperVipCommand(IVipHelper vipHelper, IConfigService configService, IPlaylistApiClient playlistApiClient)
+        public SuperVipCommand(IConfigService configService, IPlaylistApiClient playlistApiClient)
         {
-            _vipHelper = vipHelper;
             _configService = configService;
             _playlistApiClient = playlistApiClient;
         }

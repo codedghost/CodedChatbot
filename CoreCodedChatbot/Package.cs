@@ -46,10 +46,7 @@ namespace CoreCodedChatbot
         {
             // Register chatbot helpers (these should really be services)
             services.AddTransient<IRedditHelper, RedditHelper>();
-            services.AddSingleton<IBytesHelper, BytesHelper>();
             services.AddSingleton<IHelpHelper, HelpHelper>();
-            services.AddSingleton<IStreamLabsHelper, StreamLabsHelper>();
-            services.AddSingleton<IVipHelper, VipHelper>();
 
             return services;
         }

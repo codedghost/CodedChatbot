@@ -11,12 +11,10 @@ namespace CoreCodedChatbot.Commands
     public class PromoteCommand : ICommand
     {
         private readonly IPlaylistApiClient _playlistApiClient;
-        private readonly IVipHelper _vipHelper;
 
-        public PromoteCommand(IPlaylistApiClient playlistApiClient, IVipHelper vipHelper)
+        public PromoteCommand(IPlaylistApiClient playlistApiClient)
         {
             _playlistApiClient = playlistApiClient;
-            _vipHelper = vipHelper;
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod,

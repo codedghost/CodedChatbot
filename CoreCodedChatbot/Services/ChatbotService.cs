@@ -32,9 +32,6 @@ namespace CoreCodedChatbot.Services
         private readonly TwitchClient _client;
         private readonly TwitchAPI _api;
         private readonly TwitchPubSub _pubsub;
-        private readonly IVipHelper _vipHelper;
-        private readonly IBytesHelper _bytesHelper;
-        private readonly IStreamLabsHelper _streamLabsHelper;
         private readonly IVipApiClient _vipApiClient;
         private readonly IConfigService _configService;
         private readonly ISecretService _secretService; 
@@ -72,9 +69,6 @@ namespace CoreCodedChatbot.Services
             TwitchAPI api, 
             TwitchPubSub pubsub, 
             LiveStreamMonitorService liveStreamMonitor,
-            IVipHelper vipHelper, 
-            IBytesHelper bytesHelper, 
-            IStreamLabsHelper streamLabsHelper,
             IVipApiClient vipApiClient,
             IConfigService configService, 
             ISecretService secretService,
@@ -85,9 +79,6 @@ namespace CoreCodedChatbot.Services
             _api = api;
             _pubsub = pubsub;
             _liveStreamMonitor = liveStreamMonitor;
-            _vipHelper = vipHelper;
-            _bytesHelper = bytesHelper;
-            _streamLabsHelper = streamLabsHelper;
             _vipApiClient = vipApiClient;
             _configService = configService;
             _secretService = secretService;
@@ -228,7 +219,10 @@ namespace CoreCodedChatbot.Services
                 });
 
                 // Half as thanks to the gifter
-                _bytesHelper.GiveGiftSubBytes(e.GiftedSubscription.DisplayName);
+                _vipApiClient.GiveGiftSubBytes(new GiveGiftSubBytesRequest
+                {
+                    Username = e.GiftedSubscription.DisplayName
+                });
             }
             catch (Exception ex)
             {
@@ -280,9 +274,12 @@ namespace CoreCodedChatbot.Services
             {
                 _logger.LogInformation(
                     $"Bits Dropped :O!  {e.Username} dropped {e.BitsUsed} - Total {e.TotalBitsUsed}");
-                if (_vipHelper.GiveBitsVip(e.Username, e.TotalBitsUsed))
-                    _vipHelper.GiveDonationVips(e.Username);
 
+                _vipApiClient.UpdateBitsDropped(new UpdateTotalBitsDroppedRequest
+                {
+                    Username = e.Username,
+                    TotalBitsDropped = e.TotalBitsUsed
+                });
             }
             catch (Exception ex)
             {
@@ -377,7 +374,10 @@ namespace CoreCodedChatbot.Services
                     _secretService.GetSecret<string>("ChatbotAccessToken"));
 
                 // TODO: Need to consider length of sub in db alignment
-                _vipHelper.StartupSubVips(subs);
+                await _vipApiClient.GiveSubscriptionVips(new GiveSubscriptionVipsRequest
+                {
+                    Username = subs.Select(s => s.User.DisplayName).ToList()
+                });
             }
             catch (NotPartneredException)
             {
@@ -429,53 +429,6 @@ namespace CoreCodedChatbot.Services
                 e => _commandHelper.ProcessCommand("merch", _client, "Chatbot", string.Empty, true, joinedRoom),
                 null,
                 AssignChattyTimer(), maxTimerMinutes);
-
-
-            // Set thread for checking viewers in chat and giving out Bytes.
-
-            BytesTimer = new Timer(
-                async e =>
-                {
-                    try
-                    {
-                        var currentChattersJson = await _httpClient.GetAsync($"https://tmi.twitch.tv/group/user/{_streamerChannel}/chatters");
-
-                        if (currentChattersJson.IsSuccessStatusCode)
-                        {
-                            // process json into username list.
-                            var chattersModel =
-                                JsonConvert.DeserializeObject<ChatViewersModel>(currentChattersJson.Content
-                                    .ReadAsStringAsync().Result);
-                            _bytesHelper.GiveViewershipBytes(chattersModel);
-                        }
-                        else _logger.LogWarning("Could not retrieve Chatters JSON from tmi service");
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Could not access the TMI service at all");
-                    }
-                },
-                null,
-                TimeSpan.Zero,
-                TimeSpan.FromMinutes(1));
-
-            // Set thread for checking for any new Donations from streamlabs and synchronise with the db.
-            
-            DonationsTimer = new System.Threading.Timer(
-                e =>
-                {
-                    try
-                    {
-                        var success = _streamLabsHelper.CheckDonationVips();
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError(ex, "Error in Donations timer");
-                    }
-                },
-                null,
-                TimeSpan.Zero,
-                TimeSpan.FromMinutes(1));
 
             ChatConnectionTimer = new Timer(
                 async e =>

@@ -1,4 +1,6 @@
-﻿using CoreCodedChatbot.Helpers;
+﻿using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.ApiContract.RequestModels.Vip;
+using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
@@ -8,18 +10,28 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new []{ "claimallvips", "claimall"}, false)]
     public class ClaimAllVipsCommand : ICommand
     {
-        private IBytesHelper bytesHelper;
+        private readonly IVipApiClient _vipApiClient;
 
-        public ClaimAllVipsCommand(IBytesHelper bytesHelper)
+        public ClaimAllVipsCommand(IVipApiClient vipApiClient)
         {
-            this.bytesHelper = bytesHelper;
+            _vipApiClient = vipApiClient;
         }
 
-        public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
+        public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            var giveTokenSuccess = bytesHelper.ConvertAllBytes(username);
+            var convertResponse = await _vipApiClient.ConvertAllBytes(new ConvertAllVipsRequest
+            {
+                Username = username
+            });
 
-            client.SendMessage(joinedChannel, giveTokenSuccess ? $"Hey @{username}, I've converted your Byte(s) to VIP(s) :D" : $"Hey @{username}, it looks like you don't have enough byte(s) to do that. Stick around and you'll have enough in no time!");
+            if (convertResponse == null)
+            {
+                client.SendMessage(joinedChannel,
+                    $"Hey @{username}, Sorry I can't do that at the moment, please try again in a few minutes");
+                return;
+            }
+
+            client.SendMessage(joinedChannel, convertResponse.ConvertedBytes > 0 ? $"Hey @{username}, I've converted {convertResponse.ConvertedBytes} Byte(s) to VIP(s) :D" : $"Hey @{username}, it looks like you don't have enough byte(s) to do that. Stick around and you'll have enough in no time!");
         }
 
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)
