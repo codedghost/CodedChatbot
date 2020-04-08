@@ -98,7 +98,7 @@ namespace CoreCodedChatbot.Commands
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)
         {
             client.SendMessage(joinedChannel,
-                $"Hey {username}, this command allows mods to add information commands to the chatbot database! !addinfo \"newcommandalias, nca, commandalias\" \"This is the new info command text\" \"This is a piece of help text for when a user types !help newcommandalias\" ");
+                $"Hey @{username}, this command allows mods to add information commands to the chatbot database! !addinfo \"newcommandalias, nca, commandalias\" \"This is the new info command text\" \"This is a piece of help text for when a user types !help newcommandalias\" ");
         }
     }
 }

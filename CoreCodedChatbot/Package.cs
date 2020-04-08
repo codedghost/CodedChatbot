@@ -59,10 +59,12 @@ namespace CoreCodedChatbot
             services.AddTransient<ClaimAllVipsCommand>();
             services.AddTransient<ClaimVipCommand>();
             services.AddTransient<ClosePlaylistCommand>();
+            services.AddTransient<CurrentSongCommand>();
             services.AddTransient<DiscordCommand>();
             services.AddTransient<EditRockRequestCommand>();
             services.AddTransient<FollowageCommand>();
             services.AddTransient<GetQuoteCommand>();
+            services.AddTransient<GiftedVipsCommand>();
             services.AddTransient<GiftVipCommand>();
             services.AddTransient<GiveVipCommand>();
             services.AddTransient<GuessCommand>();
