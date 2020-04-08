@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.ApiContract.RequestModels.StreamStatus;
 using CoreCodedChatbot.ApiContract.RequestModels.Vip;
 using CoreCodedChatbot.Config;
 using Newtonsoft.Json;
@@ -34,6 +35,7 @@ namespace CoreCodedChatbot.Services
         private readonly TwitchPubSub _pubsub;
         private readonly IVipApiClient _vipApiClient;
         private readonly IConfigService _configService;
+        private readonly IStreamStatusApiClient _streamStatusApiClient;
         private readonly ISecretService _secretService; 
         private readonly ILogger<ChatbotService> _logger;
         private readonly LiveStreamMonitorService _liveStreamMonitor;
@@ -70,7 +72,8 @@ namespace CoreCodedChatbot.Services
             TwitchPubSub pubsub, 
             LiveStreamMonitorService liveStreamMonitor,
             IVipApiClient vipApiClient,
-            IConfigService configService, 
+            IConfigService configService,
+            IStreamStatusApiClient streamStatusApiClient,
             ISecretService secretService,
             ILogger<ChatbotService> logger)
         {
@@ -81,6 +84,7 @@ namespace CoreCodedChatbot.Services
             _liveStreamMonitor = liveStreamMonitor;
             _vipApiClient = vipApiClient;
             _configService = configService;
+            _streamStatusApiClient = streamStatusApiClient;
             _secretService = secretService;
             _logger = logger;
 
@@ -292,11 +296,15 @@ namespace CoreCodedChatbot.Services
             try
             {
                 _logger.LogInformation("Streamer is online");
-                JoinedChannel channel = null;
 
-                channel = _client.GetJoinedChannel(_streamerChannel);
-                _client.SendMessage(channel.Channel,
-                    $"Looks like @{channel.Channel} has come online, better get to work!");
+                _client.SendMessage(e.Channel,
+                    $"Looks like @{e.Channel} has come online, better get to work!");
+                
+                _streamStatusApiClient.SaveStreamStatus(new PutStreamStatusRequest
+                {
+                    BroadcasterUsername = e.Channel.ToLower(),
+                    IsOnline = true
+                }).Wait();
 
                 ScheduleStreamTasks(e.Stream.Title);
             }
@@ -316,6 +324,12 @@ namespace CoreCodedChatbot.Services
                 {
                     _client.SendMessage(e.Channel, $"Looks like @{e.Channel} has gone offline, *yawn* powering down");
                 }
+
+                _streamStatusApiClient.SaveStreamStatus(new PutStreamStatusRequest
+                {
+                    BroadcasterUsername = e.Channel.ToLower(),
+                    IsOnline = false
+                }).Wait();
 
                 UnScheduleStreamTasks();
             }
