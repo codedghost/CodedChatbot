@@ -28,8 +28,11 @@ namespace CoreCodedChatbot.Commands
             var quote = await _quoteApiClient.GetQuote(request);
 
             if (quote == null)
+            {
                 client.SendMessage(joinedChannel,
                     $"Hey @{username}, I had some trouble getting that Quote, please try again soon");
+                return;
+            }
 
             client.SendMessage(joinedChannel,
                 $"Hey @{username}, Here is Quote {quote.QuoteId}: {quote.QuoteText}");
