@@ -88,6 +88,7 @@ namespace CoreCodedChatbot
             services.AddTransient<SocialCommand>();
             services.AddTransient<SongListCommand>();
             services.AddTransient<SuperVipCommand>();
+            services.AddTransient<TopTenCommand>();
             services.AddTransient<TwitterCommand>();
             services.AddTransient<UptimeCommand>();
             services.AddTransient<VipCommand>();
