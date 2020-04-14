@@ -1,6 +1,5 @@
 ﻿using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.ApiContract.RequestModels.Vip;
-using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
 
 using TwitchLib.Client;

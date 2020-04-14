@@ -1,8 +1,4 @@
-﻿using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
-using CoreCodedChatbot.ApiContract.RequestModels;
+﻿using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.ApiContract.RequestModels.GuessingGame;
 using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Interfaces;

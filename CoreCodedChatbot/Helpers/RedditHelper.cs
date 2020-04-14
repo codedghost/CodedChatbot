@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using CoreCodedChatbot.ApiContract.SharedExternalRequestModels;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Library.Models.Data;
 using Newtonsoft.Json;
 
 namespace CoreCodedChatbot.Helpers

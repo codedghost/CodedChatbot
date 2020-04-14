@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using CoreCodedChatbot.Library.Models.Data;
+using CoreCodedChatbot.ApiContract.SharedExternalRequestModels;
 
 namespace CoreCodedChatbot.Interfaces
 {

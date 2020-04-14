@@ -6,11 +6,11 @@ using System.Threading;
 using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.ApiContract.RequestModels.StreamStatus;
 using CoreCodedChatbot.ApiContract.RequestModels.Vip;
+using CoreCodedChatbot.ApiContract.SharedExternalRequestModels;
 using CoreCodedChatbot.Config;
 using Newtonsoft.Json;
 
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Library.Models.Data;
 using CoreCodedChatbot.Secrets;
 using Microsoft.Extensions.Logging;
 using TwitchLib.Client.Events;
@@ -21,7 +21,6 @@ using TwitchLib.Api.Core.Exceptions;
 using TwitchLib.Api.Services;
 using TwitchLib.Api.Services.Events;
 using TwitchLib.Api.Services.Events.LiveStreamMonitor;
-using TwitchLib.Client.Models;
 using TwitchLib.Communication.Events;
 using TwitchLib.PubSub;
 
@@ -455,10 +454,10 @@ namespace CoreCodedChatbot.Services
                         {
                             // process json into username list.
                             var chattersModel =
-                                JsonConvert.DeserializeObject<ChatViewersModel>(currentChattersJson.Content
+                                JsonConvert.DeserializeObject<TmiChattersIntermediate>(currentChattersJson.Content
                                     .ReadAsStringAsync().Result);
 
-                            if (chattersModel.chatters.moderators.Contains(_configService.Get<string>("ChatbotNick"))) return;
+                            if (chattersModel.ChattersIntermediate.Mods.Contains(_configService.Get<string>("ChatbotNick"))) return;
 
                             _logger.LogError($"DISCONNECTED FROM CHAT, RECONNECTING");
 

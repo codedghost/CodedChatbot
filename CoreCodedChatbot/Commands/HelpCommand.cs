@@ -2,8 +2,6 @@
 using System.Linq;
 using System.Reflection;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Library.Models.Data;
-
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 using ChatCommand = CoreCodedChatbot.CustomAttributes.ChatCommand;

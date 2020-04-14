@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Library.Interfaces.Services;
-using CoreCodedChatbot.Library.Models.Data;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 

@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+﻿using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.ApiContract.RequestModels.Quotes;
 using CoreCodedChatbot.Interfaces;
 using TwitchLib.Client;
