@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using CoreCodedChatbot.ApiClient.ApiClients;
+using CoreCodedChatbot.ApiContract.RequestModels.CustomChatCommands;
 using CoreCodedChatbot.Database.Context.Interfaces;
 using CoreCodedChatbot.Database.Context.Models;
 using CoreCodedChatbot.Interfaces;
@@ -13,24 +15,25 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new[] { "addinfo" }, true)]
     public class AddInfoCommand : ICommand
     {
-        private IChatbotContextFactory _chatbotContextFactory;
+        private readonly ICustomChatCommandsClient _customChatCommandsClient;
         private readonly ILogger<AddInfoCommand> _logger;
 
         public AddInfoCommand(
-            IChatbotContextFactory chatbotContextFactory,
+            ICustomChatCommandsClient customChatCommandsClient,
             ILogger<AddInfoCommand> logger
             )
         {
-            _chatbotContextFactory = chatbotContextFactory;
+            _customChatCommandsClient = customChatCommandsClient;
             _logger = logger;
         }
 
-        public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
+        public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
             try
             {
                 // Parse Input
-                var splitInput = commandText.Split('"', StringSplitOptions.RemoveEmptyEntries).ToArray();
+                var splitInput = commandText.Split('"', StringSplitOptions.RemoveEmptyEntries)
+                    .Where(c => !string.IsNullOrWhiteSpace(c)).ToArray();
                 if (splitInput.Length != 3)
                 {
                     client.SendMessage(joinedChannel,
@@ -40,6 +43,7 @@ namespace CoreCodedChatbot.Commands
 
                 var aliases = splitInput[0]
                     .Split(new[] { ", ", "," }, StringSplitOptions.RemoveEmptyEntries)
+                    .Where(k => !string.IsNullOrWhiteSpace(k))
                     .ToArray();
                 var info = splitInput[1];
                 var helpText = splitInput[2];
@@ -53,39 +57,19 @@ namespace CoreCodedChatbot.Commands
                     return;
                 }
 
-                // Check that info aliases aren't already in use
-                using (var context = _chatbotContextFactory.Create())
+                var success = await _customChatCommandsClient.AddCommand(new AddCommandRequest
                 {
-                    if (context.InfoCommandKeywords.Any(ik => aliases.Contains(ik.InfoCommandKeywordText)))
-                    {
-                        client.SendMessage(joinedChannel,
-                            $"Hey @{username}, looks like one of those commands is already in use! Please check your aliases and try again");
-                        return;
-                    }
-
-                    // Add command to db
-                    var infoCommand = new Database.Context.Models.InfoCommand
-                    {
-                        InfoText = "{0}" + info,
-                        InfoHelpText = "Hey {0}! " + helpText
-                    };
-
-                    context.InfoCommands.Add(infoCommand);
-
-                    // Add aliases
-                    var infoCommandKeywords = aliases.Select(a => new InfoCommandKeyword
-                    {
-                        InfoCommandId = infoCommand.InfoCommandId,
-                        InfoCommandKeywordText = a
-                    });
-
-                    context.InfoCommandKeywords.AddRange(infoCommandKeywords);
-                    context.SaveChanges();
-                }
+                    Aliases = aliases.ToList(),
+                    InformationText = info,
+                    HelpText = helpText,
+                    Username = username
+                });
 
                 // Respond
                 client.SendMessage(joinedChannel,
-                    $"Hey @{username}, I have added that command, give it a quick go by using any of these commands: {string.Join(", ", aliases)}");
+                    success
+                        ? $"Hey @{username}, I have added that command, give it a quick go by using any of these commands: {string.Join(", ", aliases)}"
+                        : $"Hey @{username}, I couldn't add that command right now, please try again in a few minutes or type !help addinfo");
             }
             catch (Exception e)
             {

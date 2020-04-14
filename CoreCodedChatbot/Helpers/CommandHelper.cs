@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using CoreCodedChatbot.ApiClient.ApiClients;
 using CoreCodedChatbot.Commands;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Library.Models.Data;
@@ -19,11 +20,13 @@ namespace CoreCodedChatbot.Helpers
         private List<ICommand> Commands { get; set; }
         private bool allowModCommand = true;
         private System.Threading.Timer ModCommandTimeout { get; set; }
-        private IChatbotContextFactory chatbotContextFactory;
+        private readonly ICustomChatCommandsClient _customChatCommandsClient;
 
-        public CommandHelper(IChatbotContextFactory chatbotContextFactory)
+        public CommandHelper(
+            ICustomChatCommandsClient customChatCommandsClient
+            )
         {
-            this.chatbotContextFactory = chatbotContextFactory;
+            _customChatCommandsClient = customChatCommandsClient;
         }
 
         public void Init(IServiceProvider serviceProvider)
@@ -40,7 +43,7 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        public void ProcessCommand(string userCommand, TwitchClient client, string username,
+        public async void ProcessCommand(string userCommand, TwitchClient client, string username,
             string userParameters, bool userIsModOrBroadcaster, JoinedChannel joinedRoom)
         {
             if (userParameters.Contains("www.") || userParameters.Contains("http"))
@@ -59,21 +62,17 @@ namespace CoreCodedChatbot.Helpers
                 c.GetType().GetTypeInfo().GetCustomAttributes<ChatCommand>()
                     .Any(m => m.CommandAliases.Contains(userCommand.ToLower())));
 
-            // Check if this command exists in the db as an info command
-            using (var context = chatbotContextFactory.Create())
+            if (command == null)
             {
-                var selectedInfoCommand = context.InfoCommandKeywords.FirstOrDefault(ik => 
-                    ik.InfoCommandKeywordText == userCommand);
+                // Check if this command exists in the db as an info command
+                var infoText = await _customChatCommandsClient.GetCommandText(userCommand.ToLower());
 
-                if (selectedInfoCommand != null)
+                if (infoText != null)
                 {
                     command = Commands.Single(c => c.GetType().GetTypeInfo().GetCustomAttributes<ChatCommand>()
                         .Any(m => m.CommandAliases.Contains("chatbotinfocommand")));
 
-                    var infoCommand =
-                        context.InfoCommands.Single(ic => ic.InfoCommandId == selectedInfoCommand.InfoCommandId);
-
-                    command.Process(client, userParameters, infoCommand.InfoText, userIsModOrBroadcaster,
+                    command.Process(client, userParameters, infoText.CommandText, userIsModOrBroadcaster,
                         joinedRoom);
 
                     return;
@@ -118,7 +117,7 @@ namespace CoreCodedChatbot.Helpers
                 TimeSpan.FromSeconds(0));
         }
 
-        private void ProcessHelp(TwitchClient client, string commandName, string username, JoinedChannel joinedChannel)
+        private async void ProcessHelp(TwitchClient client, string commandName, string username, JoinedChannel joinedChannel)
         {
             var command = Commands.SingleOrDefault(c =>
                 c.GetType().GetTypeInfo().GetCustomAttributes<ChatCommand>()
@@ -126,15 +125,11 @@ namespace CoreCodedChatbot.Helpers
 
             if (command == null)
             {
-                using (var context = chatbotContextFactory.Create())
+                var helpText = await _customChatCommandsClient.GetCommandHelpText(commandName);
+                if (helpText != null)
                 {
-                    var selectedInfoCommand = context.InfoCommandKeywords.FirstOrDefault(ik =>
-                        ik.InfoCommandKeywordText == commandName);
-
-                    if (selectedInfoCommand != null)
-                    {
-                        client.SendMessage(joinedChannel, string.Format(selectedInfoCommand.InfoCommand.InfoHelpText, username));
-                    }
+                    client.SendMessage(joinedChannel, string.Format(helpText.HelpText, username));
+                    return;
                 }
 
                 client.SendMessage(joinedChannel, "Sorry, I can't help with that :(");
