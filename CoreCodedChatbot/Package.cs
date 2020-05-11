@@ -27,6 +27,7 @@ namespace CoreCodedChatbot
             client.Initialize(creds, configService.Get<string>("StreamerChannel"));
 
             var api = new TwitchAPI();
+            api.Settings.ClientId = secretService.GetSecret<string>("ChatbotAccessClientId");
             api.Settings.AccessToken = secretService.GetSecret<string>("ChatbotAccessToken");
 
             var liveStreamMonitor = new LiveStreamMonitorService(api);
