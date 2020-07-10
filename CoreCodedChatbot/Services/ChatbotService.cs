@@ -296,9 +296,19 @@ namespace CoreCodedChatbot.Services
             {
                 _logger.LogInformation("Streamer is online");
 
-                _client.SendMessage(e.Channel,
-                    $"Looks like @{e.Channel} has come online, better get to work!");
-                
+                if (_client.IsConnected && _client.JoinedChannels.Any())
+                {
+                    _client.SendMessage(e.Channel,
+                        $"Looks like @{e.Channel} has come online, better get to work!");
+                }
+                else
+                {
+                    _client.Connect();
+
+                    _client.SendMessage(e.Channel,
+                        $"What?? @{e.Channel} is live?!? POWERING UP!");
+                }
+
                 _streamStatusApiClient.SaveStreamStatus(new PutStreamStatusRequest
                 {
                     BroadcasterUsername = e.Channel.ToLower(),
@@ -319,7 +329,7 @@ namespace CoreCodedChatbot.Services
             {
                 _logger.LogInformation("Streamer is offline");
 
-                if (_client.IsConnected)
+                if (_client.IsConnected && _client.JoinedChannels.Any())
                 {
                     _client.SendMessage(e.Channel, $"Looks like @{e.Channel} has gone offline, *yawn* powering down");
                 }
