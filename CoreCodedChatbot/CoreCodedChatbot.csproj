@@ -20,8 +20,11 @@
 
   <ItemGroup>
     <Compile Remove="Models\**" />
+    <Compile Remove="NewFolder\**" />
     <EmbeddedResource Remove="Models\**" />
+    <EmbeddedResource Remove="NewFolder\**" />
     <None Remove="Models\**" />
+    <None Remove="NewFolder\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -64,10 +67,6 @@
     <PackageReference Include="System.Net.Sockets" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Extensions" Version="4.3.0" />
     <PackageReference Include="TwitchLib" Version="3.1.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="NewFolder\" />
   </ItemGroup>
 
 </Project>
