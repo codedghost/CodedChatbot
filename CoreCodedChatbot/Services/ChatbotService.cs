@@ -101,6 +101,7 @@ namespace CoreCodedChatbot.Services
             _client.OnRaidNotification += OnRaidNotification;
             _client.OnDisconnected += OnDisconnected;
             _client.OnError += OnError;
+            _client.OnConnectionError += OnConnectionError;
             _client.Connect();
             
             _liveStreamMonitor.SetChannelsByName(new List<string>{_streamerChannel});
@@ -116,6 +117,11 @@ namespace CoreCodedChatbot.Services
             _pubsub.OnListenResponse += OnListenResponse;
 
             _pubsub.Connect();
+        }
+
+        private void OnConnectionError(object sender, OnConnectionErrorArgs e)
+        {
+            _logger.LogError($"Error encountered when connected to chat: {e.Error.Message}");
         }
 
         private void JoinChannel()
@@ -386,6 +392,7 @@ namespace CoreCodedChatbot.Services
 
         private async void ScheduleStreamTasks(string streamGame = "Rocksmith 2014")
         {
+            _logger.LogError($"Stream tasks scheduled: {streamGame}");
             var isStreamingRocksmith = streamGame == "Rocksmith 2014"; // TODO: This needs to query the actual game id as this currently doesn't work correctly
             var maxTimerMinutes =
                 TimeSpan.FromMinutes(isStreamingRocksmith ? _maxTimerMinutesRocksmith : _maxTimerMinutesGaming);
