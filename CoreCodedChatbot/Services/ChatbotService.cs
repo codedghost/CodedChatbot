@@ -508,6 +508,7 @@ namespace CoreCodedChatbot.Services
             RocksmithChallengeTimer?.Dispose();
             BytesTimer?.Dispose();
             DonationsTimer?.Dispose();
+            ChatConnectionTimer?.Dispose();
         }
 
         private TimeSpan AssignChattyTimer()
