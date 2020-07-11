@@ -309,7 +309,10 @@ namespace CoreCodedChatbot.Services
                 }
                 else
                 {
-                    _client.Connect();
+                    if (!_client.IsConnected)
+                        _client.Connect();
+                    if (!_client.JoinedChannels.Any())
+                        _client.JoinChannel(e.Channel);
 
                     _client.SendMessage(e.Channel,
                         $"What?? @{e.Channel} is live?!? POWERING UP!");
