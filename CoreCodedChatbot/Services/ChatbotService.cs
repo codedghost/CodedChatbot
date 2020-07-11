@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.ApiContract.RequestModels.ChannelRewards;
 using CoreCodedChatbot.ApiContract.RequestModels.StreamStatus;
 using CoreCodedChatbot.ApiContract.RequestModels.Vip;
 using CoreCodedChatbot.ApiContract.SharedExternalRequestModels;
@@ -35,6 +36,7 @@ namespace CoreCodedChatbot.Services
         private readonly IVipApiClient _vipApiClient;
         private readonly IConfigService _configService;
         private readonly IStreamStatusApiClient _streamStatusApiClient;
+        private readonly IChannelRewardsClient _channelRewardsClient;
         private readonly ISecretService _secretService; 
         private readonly ILogger<ChatbotService> _logger;
         private readonly LiveStreamMonitorService _liveStreamMonitor;
@@ -73,6 +75,7 @@ namespace CoreCodedChatbot.Services
             IVipApiClient vipApiClient,
             IConfigService configService,
             IStreamStatusApiClient streamStatusApiClient,
+            IChannelRewardsClient channelRewardsClient,
             ISecretService secretService,
             ILogger<ChatbotService> logger)
         {
@@ -84,6 +87,7 @@ namespace CoreCodedChatbot.Services
             _vipApiClient = vipApiClient;
             _configService = configService;
             _streamStatusApiClient = streamStatusApiClient;
+            _channelRewardsClient = channelRewardsClient;
             _secretService = secretService;
             _logger = logger;
 
@@ -113,10 +117,54 @@ namespace CoreCodedChatbot.Services
             _liveStreamMonitor.Start();
 
             _pubsub.OnPubSubServiceConnected += OnPubSubConnected;
-            _pubsub.OnBitsReceived += OnBitsReceived;
             _pubsub.OnListenResponse += OnListenResponse;
+            _pubsub.OnBitsReceived += OnBitsReceived;
+
+            _pubsub.OnCustomRewardCreated += OnCustomRewardCreated;
+            _pubsub.OnCustomRewardUpdated += OnCustomRewardUpdated;
+            _pubsub.OnCustomRewardDeleted += OnCustomRewardDeleted;
+            _pubsub.OnRewardRedeemed += OnRewardRedeemed;
+            _pubsub.OnPubSubServiceError += OnPubSubServiceError;
 
             _pubsub.Connect();
+        }
+
+        private void OnPubSubServiceError(object sender, OnPubSubServiceErrorArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void OnCustomRewardDeleted(object sender, OnCustomRewardDeletedArgs e)
+        {
+        }
+
+        private void OnCustomRewardUpdated(object sender, OnCustomRewardUpdatedArgs e)
+        {
+            _channelRewardsClient.CreateOrUpdate(new CreateOrUpdateChannelRewardRequest
+            {
+                ChannelRewardId = e.RewardId,
+                RewardTitle = e.RewardTitle,
+                RewardDescription = e.RewardPrompt
+            });
+        }
+
+        private void OnCustomRewardCreated(object sender, OnCustomRewardCreatedArgs e)
+        {
+            _channelRewardsClient.CreateOrUpdate(new CreateOrUpdateChannelRewardRequest
+            {
+                ChannelRewardId = e.RewardId,
+                RewardTitle = e.RewardTitle,
+                RewardDescription = e.RewardPrompt
+            });
+        }
+
+        private void OnRewardRedeemed(object sender, OnRewardRedeemedArgs e)
+        {
+            _channelRewardsClient.StoreRedemption(new StoreRewardRedemptionRequest
+            {
+                ChannelRewardId = e.RewardId,
+                RedeemedBy = e.Login
+            });
         }
 
         private void OnConnectionError(object sender, OnConnectionErrorArgs e)
@@ -259,7 +307,10 @@ namespace CoreCodedChatbot.Services
             {
                 _logger.LogInformation("PubSub Connected!");
 
-                _pubsub.ListenToBitsEvents(_configService.Get<string>("ChannelId"));
+                var channelTwitchId = _configService.Get<string>("ChannelId");
+
+                _pubsub.ListenToBitsEvents(channelTwitchId);
+                _pubsub.ListenToRewards(channelTwitchId);
 
                 _pubsub.SendTopics(_secretService.GetSecret<string>("ChatbotAccessToken"));
             }
@@ -272,7 +323,9 @@ namespace CoreCodedChatbot.Services
         private void OnListenResponse(object sender, OnListenResponseArgs e)
         {
             if (e.Successful)
+            {
                 _logger.LogInformation($"Successfully verified listening to topic: {e.Topic}");
+            }
             else 
                 _logger.LogError($"OnListenResponse - Failed to listen! {e.Topic} - Error: {e.Response.Error}");
         }

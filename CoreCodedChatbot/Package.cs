@@ -33,6 +33,8 @@ namespace CoreCodedChatbot
             var liveStreamMonitor = new LiveStreamMonitorService(api);
 
             var pubsub = new TwitchPubSub();
+            var channelTwitchId = configService.Get<string>("ChannelId");
+            
 
             // Register all external Twitch services
             services.AddSingleton(api);
