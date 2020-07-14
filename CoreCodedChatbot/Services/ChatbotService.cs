@@ -400,22 +400,23 @@ namespace CoreCodedChatbot.Services
             var maxTimerMinutes =
                 TimeSpan.FromMinutes(isStreamingRocksmith ? _maxTimerMinutesRocksmith : _maxTimerMinutesGaming);
 
-            // Align database with any potentially missed or offline subs
-            try
-            {
-                var subs = await _api.V5.Channels.GetAllSubscribersAsync(_configService.Get<string>("ChannelId"),
-                    _secretService.GetSecret<string>("ChatbotAccessToken"));
+            //// TODO: This can only be done once Helix exposes the Total Months value.
+            //// Align database with any potentially missed or offline subs
+            //try
+            //{
+            //    var subs = await _api.V5.Channels.GetAllSubscribersAsync(_configService.Get<string>("ChannelId"),
+            //        _secretService.GetSecret<string>("ChatbotAccessToken"));
 
-                // TODO: Need to consider length of sub in db alignment
-                await _vipApiClient.GiveSubscriptionVips(new GiveSubscriptionVipsRequest
-                {
-                    Username = subs.Select(s => s.User.DisplayName).ToList()
-                });
-            }
-            catch (NotPartneredException)
-            {
-                _logger.LogWarning("Schedule stream tasks. Not really an issue - Not a partner. Skipping sub setup.");
-            }
+            //    // TODO: Need to consider length of sub in db alignment
+            //    await _vipApiClient.GiveSubscriptionVips(new GiveSubscriptionVipsRequest
+            //    {
+            //        Username = subs.Select(s => s.User.DisplayName).ToList()
+            //    });
+            //}
+            //catch (NotPartneredException)
+            //{
+            //    _logger.LogWarning("Schedule stream tasks. Not really an issue - Not a partner. Skipping sub setup.");
+            //}
             
 
             var joinedRoom = _client.JoinedChannels.FirstOrDefault(jc =>
