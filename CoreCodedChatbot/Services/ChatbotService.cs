@@ -4,10 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.ApiContract.Enums.VIP;
 using CoreCodedChatbot.ApiContract.RequestModels.StreamStatus;
 using CoreCodedChatbot.ApiContract.RequestModels.Vip;
+using CoreCodedChatbot.ApiContract.RequestModels.Vip.ChildModels;
 using CoreCodedChatbot.ApiContract.SharedExternalRequestModels;
 using CoreCodedChatbot.Config;
+using CoreCodedChatbot.Helpers;
 using Newtonsoft.Json;
 
 using CoreCodedChatbot.Interfaces;
@@ -23,6 +26,7 @@ using TwitchLib.Api.Services.Events;
 using TwitchLib.Api.Services.Events.LiveStreamMonitor;
 using TwitchLib.Communication.Events;
 using TwitchLib.PubSub;
+using TwitchLib.PubSub.Enums;
 
 namespace CoreCodedChatbot.Services
 {
@@ -93,9 +97,6 @@ namespace CoreCodedChatbot.Services
 
             _client.OnJoinedChannel += OnJoinedChannel;
             _client.OnChatCommandReceived += OnCommandReceived;
-            _client.OnNewSubscriber += OnNewSub;
-            _client.OnReSubscriber += OnReSub;
-            _client.OnGiftedSubscription += OnGiftSub;
             _client.OnCommunitySubscription += OnSubBomb;
             _client.OnBeingHosted += OnBeingHosted;
             _client.OnRaidNotification += OnRaidNotification;
@@ -115,6 +116,7 @@ namespace CoreCodedChatbot.Services
             _pubsub.OnPubSubServiceConnected += OnPubSubConnected;
             _pubsub.OnBitsReceived += OnBitsReceived;
             _pubsub.OnListenResponse += OnListenResponse;
+            _pubsub.OnChannelSubscription += OnSub;
 
             _pubsub.Connect();
         }
@@ -128,20 +130,6 @@ namespace CoreCodedChatbot.Services
         {
             if (_isDevelopmentBuild)
             {
-                //api.V5.Chat.GetChatRoomsByChannelAsync(config.ChannelId, config.ChatbotAccessToken)
-                //    .ContinueWith(
-                //        rooms =>
-                //        {
-                //            if (!rooms.IsCompletedSuccessfully) return;
-                //            DevelopmentRoomId = rooms.Result.Rooms.SingleOrDefault(r => r.Name == "dev")?.Id;
-                //            if (!string.IsNullOrWhiteSpace(DevelopmentRoomId))
-                //            {
-                //                client.JoinRoom(config.ChannelId, DevelopmentRoomId);
-                //                client.SendMessage(client.JoinedChannels.FirstOrDefault(jc => jc.Channel.Contains(DevelopmentRoomId)),
-                //                    $"BEEP BOOP: {config.ChatbotNick} has joined dev!");
-                //            }
-                //        });
-
                 ScheduleStreamTasks(); // If we are in development we should leave chatty tasks running
             }
             else
@@ -181,56 +169,51 @@ namespace CoreCodedChatbot.Services
             }
         }
 
-        private void OnNewSub(object sender, OnNewSubscriberArgs e)
+        private void OnSub(object sender, OnChannelSubscriptionArgs e)
         {
             try
             {
-                _logger.LogInformation($"New Sub! WOOOOO - {e.Subscriber.DisplayName}");
+                _logger.LogInformation(
+                    $"Subscription! - {e.Subscription.DisplayName} - {e.Subscription.CumulativeMonths} months, {e.Subscription.StreakMonths} in a row!");
 
+                // Will work for both gifted and regular subs.
                 _vipApiClient.GiveSubscriptionVips(new GiveSubscriptionVipsRequest
                 {
-                    Username = new List<string> {e.Subscriber.DisplayName}
+                    UserSubDetails = new List<UserSubDetail>
+                    {
+                        new UserSubDetail
+                        {
+                            Username = e.Subscription.RecipientDisplayName,
+                            SubscriptionTier = VipHelper.GetSubTier(e),
+                            TotalSubMonths = e.Subscription.CumulativeMonths ?? 0,
+                            SubStreak = e.Subscription.StreakMonths ?? 0
+                        }
+                    }
                 });
+
+                if (e.Subscription.UserId != e.Subscription.RecipientId)
+                {
+                    // Gifted Sub!
+                    OnGiftSub(sender, e);
+                }
+
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error OnNewSub");
+                _logger.LogError(ex, "Error on Sub", new {e});
             }
         }
 
-        private void OnReSub(object sender, OnReSubscriberArgs e)
+        private void OnGiftSub(object sender, OnChannelSubscriptionArgs e)
         {
             try
             {
-                _logger.LogInformation($"ReSub!!! WOOOO - {e.ReSubscriber.DisplayName} - {e.ReSubscriber.Months}");
-
-                _vipApiClient.GiveSubscriptionVips(new GiveSubscriptionVipsRequest
-                {
-                    Username = new List<string> {e.ReSubscriber.DisplayName}
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error OnReSub");
-            }
-        }
-
-        private void OnGiftSub(object sender, OnGiftedSubscriptionArgs e)
-        {
-            try
-            {
-                _logger.LogInformation($"Gifted Sub! {e.GiftedSubscription.MsgParamRecipientUserName} has received a sub from {e.GiftedSubscription.DisplayName}");
-
-                // A whole vip for the recipient
-                _vipApiClient.GiveSubscriptionVips(new GiveSubscriptionVipsRequest
-                {
-                    Username = new List<string> { e.GiftedSubscription.MsgParamRecipientUserName }
-                });
+                _logger.LogInformation($"Gifted Sub! {e.Subscription.RecipientDisplayName} has received a sub from {e.Subscription.DisplayName}");
 
                 // Half as thanks to the gifter
                 _vipApiClient.GiveGiftSubBytes(new GiveGiftSubBytesRequest
                 {
-                    Username = e.GiftedSubscription.DisplayName
+                    Username = e.Subscription.DisplayName
                 });
             }
             catch (Exception ex)

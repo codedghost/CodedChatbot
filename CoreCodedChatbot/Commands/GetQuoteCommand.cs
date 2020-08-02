@@ -34,7 +34,7 @@ namespace CoreCodedChatbot.Commands
             }
 
             client.SendMessage(joinedChannel,
-                $"Hey @{username}, Here is Quote {quote.QuoteId}: {quote.QuoteText}");
+                $"Hey @{username}, Here is Quote {quote.Quote.QuoteId}: {quote.Quote.QuoteText}");
         }
 
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)
