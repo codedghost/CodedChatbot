@@ -46,7 +46,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CoreCodedChatbot.ApiClient" Version="1.0.695" />
+    <PackageReference Include="CoreCodedChatbot.ApiClient" Version="1.0.706" />
     <PackageReference Include="CoreCodedChatbot.Config" Version="1.0.345" />
     <PackageReference Include="CoreCodedChatbot.Logging" Version="1.0.401" />
     <PackageReference Include="CoreCodedChatbot.Secrets" Version="1.0.568" />
