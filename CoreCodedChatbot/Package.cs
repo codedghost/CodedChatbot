@@ -63,6 +63,7 @@ namespace CoreCodedChatbot
             services.AddTransient<CurrentSongCommand>();
             services.AddTransient<DiscordCommand>();
             services.AddTransient<EditRockRequestCommand>();
+            services.AddTransient<EditQuoteCommand>();
             services.AddTransient<FollowageCommand>();
             services.AddTransient<GetQuoteCommand>();
             services.AddTransient<GiftedVipsCommand>();
