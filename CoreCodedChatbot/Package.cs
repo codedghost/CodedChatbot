@@ -82,6 +82,7 @@ namespace CoreCodedChatbot
             services.AddTransient<OpenPlaylistCommand>();
             services.AddTransient<PromoteCommand>();
             services.AddTransient<RemoveCurrentRequestCommand>();
+            services.AddTransient<RemoveQuoteCommand>();
             services.AddTransient<RemoveRockRequestCommand>();
             services.AddTransient<RemoveSuperVipCommand>();
             services.AddTransient<RockRequestCommand>();
