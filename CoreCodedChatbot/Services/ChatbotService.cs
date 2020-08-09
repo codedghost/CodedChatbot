@@ -243,6 +243,7 @@ namespace CoreCodedChatbot.Services
                 _logger.LogInformation("PubSub Connected!");
 
                 _pubsub.ListenToBitsEvents(_configService.Get<string>("ChannelId"));
+                _pubsub.ListenToSubscriptions(_configService.Get<string>("ChannelId"));
 
                 _pubsub.SendTopics(_secretService.GetSecret<string>("ChatbotAccessToken"));
             }
