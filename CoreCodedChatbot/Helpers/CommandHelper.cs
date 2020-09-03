@@ -43,7 +43,9 @@ namespace CoreCodedChatbot.Helpers
         public async void ProcessCommand(string userCommand, TwitchClient client, string username,
             string userParameters, bool userIsModOrBroadcaster, JoinedChannel joinedRoom)
         {
-            if (userParameters.Contains("www.") || userParameters.Contains("http"))
+            if ((userParameters.Contains("www.", StringComparison.InvariantCultureIgnoreCase) || 
+                 userParameters.Contains("http", StringComparison.InvariantCultureIgnoreCase)) && 
+                !userCommand.Contains("info", StringComparison.InvariantCultureIgnoreCase))
             {
                 client.SendMessage(joinedRoom, $"Hey @{username}, no links in the chatbot, just request the track you want!");
                 return;
