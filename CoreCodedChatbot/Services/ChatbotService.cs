@@ -175,28 +175,41 @@ namespace CoreCodedChatbot.Services
             {
                 _logger.LogInformation(
                     $"Subscription! - {e.Subscription.DisplayName} - {e.Subscription.CumulativeMonths} months, {e.Subscription.StreakMonths} in a row!");
+                _logger.LogInformation(JsonConvert.ToString(e.Subscription));
 
-                // Will work for both gifted and regular subs.
-                _vipApiClient.GiveSubscriptionVips(new GiveSubscriptionVipsRequest
+                if (e.Subscription.Context == "subgift")
                 {
-                    UserSubDetails = new List<UserSubDetail>
+                    _vipApiClient.GiveSubscriptionVips(new GiveSubscriptionVipsRequest
                     {
-                        new UserSubDetail
+                        UserSubDetails = new List<UserSubDetail>
                         {
-                            Username = e.Subscription.RecipientDisplayName,
-                            SubscriptionTier = VipHelper.GetSubTier(e),
-                            TotalSubMonths = e.Subscription.CumulativeMonths ?? 0,
-                            SubStreak = e.Subscription.StreakMonths ?? 0
+                            new UserSubDetail
+                            {
+                                Username = e.Subscription.RecipientDisplayName,
+                                SubscriptionTier = VipHelper.GetSubTier(e),
+                                TotalSubMonths = e.Subscription.Months ?? 0
+                            }
                         }
-                    }
-                });
+                    });
 
-                if (e.Subscription.UserId != e.Subscription.RecipientId)
-                {
                     // Gifted Sub!
                     OnGiftSub(sender, e);
                 }
-
+                else
+                {
+                    _vipApiClient.GiveSubscriptionVips(new GiveSubscriptionVipsRequest
+                    {
+                        UserSubDetails = new List<UserSubDetail>
+                        {
+                            new UserSubDetail
+                            {
+                                Username = e.Subscription.DisplayName,
+                                SubscriptionTier = VipHelper.GetSubTier(e),
+                                TotalSubMonths = e.Subscription.CumulativeMonths ?? 0
+                            }
+                        }
+                    });
+                }
             }
             catch (Exception ex)
             {
