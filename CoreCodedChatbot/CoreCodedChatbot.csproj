@@ -48,7 +48,7 @@
   <ItemGroup>
     <PackageReference Include="CoreCodedChatbot.ApiClient" Version="1.0.706" />
     <PackageReference Include="CoreCodedChatbot.Config" Version="1.0.345" />
-    <PackageReference Include="CoreCodedChatbot.Logging" Version="1.0.401" />
+    <PackageReference Include="CoreCodedChatbot.Logging" Version="1.0.718" />
     <PackageReference Include="CoreCodedChatbot.Secrets" Version="1.0.568" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.1.3" />
