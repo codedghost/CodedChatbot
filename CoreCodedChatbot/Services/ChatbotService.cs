@@ -175,7 +175,6 @@ namespace CoreCodedChatbot.Services
             {
                 _logger.LogInformation(
                     $"Subscription! - {e.Subscription.DisplayName} - {e.Subscription.CumulativeMonths} months, {e.Subscription.StreakMonths} in a row!");
-                _logger.LogInformation(JsonConvert.ToString(e.Subscription));
 
                 if (e.Subscription.Context == "subgift")
                 {
