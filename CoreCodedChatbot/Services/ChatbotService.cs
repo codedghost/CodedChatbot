@@ -184,9 +184,9 @@ namespace CoreCodedChatbot.Services
                         {
                             new UserSubDetail
                             {
-                                Username = e.Subscription.RecipientDisplayName,
+                                Username = e.Subscription.RecipientName,
                                 SubscriptionTier = VipHelper.GetSubTier(e),
-                                TotalSubMonths = e.Subscription.Months ?? 0
+                                TotalSubMonths = e.Subscription.Months ?? 1
                             }
                         }
                     });
@@ -202,9 +202,9 @@ namespace CoreCodedChatbot.Services
                         {
                             new UserSubDetail
                             {
-                                Username = e.Subscription.DisplayName,
+                                Username = e.Subscription.Username,
                                 SubscriptionTier = VipHelper.GetSubTier(e),
-                                TotalSubMonths = e.Subscription.CumulativeMonths ?? 0
+                                TotalSubMonths = e.Subscription.CumulativeMonths ?? 1
                             }
                         }
                     });
@@ -225,7 +225,7 @@ namespace CoreCodedChatbot.Services
                 // Half as thanks to the gifter
                 _vipApiClient.GiveGiftSubBytes(new GiveGiftSubBytesRequest
                 {
-                    Username = e.Subscription.DisplayName
+                    Username = e.Subscription.Username
                 });
             }
             catch (Exception ex)
