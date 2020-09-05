@@ -173,11 +173,11 @@ namespace CoreCodedChatbot.Services
         {
             try
             {
-                _logger.LogInformation(
-                    $"Subscription! - {e.Subscription.DisplayName} - {e.Subscription.CumulativeMonths} months, {e.Subscription.StreakMonths} in a row!");
-
                 if (e.Subscription.Context == "subgift")
                 {
+                    _logger.LogInformation(
+                        $"Gifted Sub! - {e.Subscription.RecipientName} - {e.Subscription.Months ?? 1} months, {e.Subscription.StreakMonths} in a row!");
+
                     _vipApiClient.GiveSubscriptionVips(new GiveSubscriptionVipsRequest
                     {
                         UserSubDetails = new List<UserSubDetail>
@@ -196,6 +196,9 @@ namespace CoreCodedChatbot.Services
                 }
                 else
                 {
+                    _logger.LogInformation(
+                        $"Subscription! - {e.Subscription.Username} - {e.Subscription.CumulativeMonths ?? 1} months, {e.Subscription.StreakMonths} in a row!");
+
                     _vipApiClient.GiveSubscriptionVips(new GiveSubscriptionVipsRequest
                     {
                         UserSubDetails = new List<UserSubDetail>
@@ -220,7 +223,7 @@ namespace CoreCodedChatbot.Services
         {
             try
             {
-                _logger.LogInformation($"Gifted Sub! {e.Subscription.RecipientDisplayName} has received a sub from {e.Subscription.DisplayName}");
+                _logger.LogInformation($"Gifted Sub! {e.Subscription.RecipientName} has received a sub from {e.Subscription.Username}");
 
                 // Half as thanks to the gifter
                 _vipApiClient.GiveGiftSubBytes(new GiveGiftSubBytesRequest
