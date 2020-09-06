@@ -173,6 +173,8 @@ namespace CoreCodedChatbot.Services
         {
             try
             {
+                _logger.LogInformation(e.Subscription.JsonString);
+
                 if (e.Subscription.Context == "subgift")
                 {
                     _logger.LogInformation(

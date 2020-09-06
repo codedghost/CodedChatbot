@@ -68,7 +68,10 @@
     <PackageReference Include="System.Reflection.Extensions" Version="4.3.0" />
     <PackageReference Include="TwitchLib.Api" Version="3.1.3" />
     <PackageReference Include="TwitchLib.Client" Version="3.1.5" />
-    <PackageReference Include="TwitchLib.PubSub" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CodedTwitchLib.PubSub\CodedTwitchLib.PubSub.csproj" />
   </ItemGroup>
 
 </Project>
