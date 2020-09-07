@@ -227,11 +227,15 @@ namespace CoreCodedChatbot.Services
             {
                 _logger.LogInformation($"Gifted Sub! {e.Subscription.RecipientName} has received a sub from {e.Subscription.Username}");
 
-                // Half as thanks to the gifter
-                _vipApiClient.GiveGiftSubBytes(new GiveGiftSubBytesRequest
+                // Anonymous gift will be blank
+                if (!string.IsNullOrWhiteSpace(e.Subscription.Username))
                 {
-                    Username = e.Subscription.Username
-                });
+                    // Half as thanks to the gifter
+                    _vipApiClient.GiveGiftSubBytes(new GiveGiftSubBytesRequest
+                    {
+                        Username = e.Subscription.Username
+                    });
+                }
             }
             catch (Exception ex)
             {
