@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using CodedChatbot.TwitchFactories.Interfaces;
 using CoreCodedChatbot.Interfaces;
 using TwitchLib.Client;
 using TwitchLib.Client.Interfaces;
@@ -11,11 +12,11 @@ namespace CoreCodedChatbot.Helpers
 {
     public class HelpHelper : IHelpHelper
     {
-        private readonly ITwitchClient client;
+        private readonly ITwitchClientFactory _twithClientFactory;
 
-        public HelpHelper(ITwitchClient client)
+        public HelpHelper(ITwitchClientFactory twithClientFactory)
         {
-            this.client = client;
+            _twithClientFactory = twithClientFactory;
         }
 
         public void ProcessHelp(string commandName, string username, JoinedChannel joinedChannel)
@@ -28,13 +29,15 @@ namespace CoreCodedChatbot.Helpers
                 c.GetTypeInfo().GetCustomAttributes<ChatCommand>()
                     .Any(m => m.CommandAliases.Contains(commandName)));
 
+            var twitchClient = _twithClientFactory.Get();
+
             if (command == null)
             {
-                client.SendMessage(joinedChannel, "Sorry, I can't help with that :(");
+                twitchClient.SendMessage(joinedChannel, "Sorry, I can't help with that :(");
                 return;
             }
 
-            command.ShowHelp((TwitchClient)client, username, joinedChannel);
+            command.ShowHelp((TwitchClient)twitchClient, username, joinedChannel);
         }
     }
 }

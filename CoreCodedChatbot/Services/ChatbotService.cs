@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using CodedChatbot.TwitchFactories.Interfaces;
 using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.ApiContract.Enums.VIP;
 using CoreCodedChatbot.ApiContract.RequestModels.StreamStatus;
@@ -33,14 +34,15 @@ namespace CoreCodedChatbot.Services
     public class ChatbotService : IChatbotService
     {
         private readonly ICommandHelper _commandHelper;
-        private readonly TwitchClient _client;
-        private readonly TwitchAPI _api;
         private readonly TwitchPubSub _pubsub;
+        private readonly ITwitchLiveStreamMonitorFactory _twitchLiveStreamMonitorFactory;
         private readonly IVipApiClient _vipApiClient;
         private readonly IConfigService _configService;
         private readonly IStreamStatusApiClient _streamStatusApiClient;
         private readonly ISecretService _secretService; 
         private readonly ILogger<ChatbotService> _logger;
+        private readonly TwitchClient _client;
+
         private readonly LiveStreamMonitorService _liveStreamMonitor;
 
         private readonly string _streamerChannel;
@@ -70,10 +72,9 @@ namespace CoreCodedChatbot.Services
         private readonly string _developmentRoomId = string.Empty; // Only for use in debug mode
 
         public ChatbotService(ICommandHelper commandHelper,
-            TwitchClient client, 
-            TwitchAPI api, 
+            ITwitchClientFactory twitchClientFactory,
             TwitchPubSub pubsub, 
-            LiveStreamMonitorService liveStreamMonitor,
+            ITwitchLiveStreamMonitorFactory twitchLiveStreamMonitorFactory,
             IVipApiClient vipApiClient,
             IConfigService configService,
             IStreamStatusApiClient streamStatusApiClient,
@@ -81,10 +82,8 @@ namespace CoreCodedChatbot.Services
             ILogger<ChatbotService> logger)
         {
             _commandHelper = commandHelper;
-            _client = client;
-            _api = api;
             _pubsub = pubsub;
-            _liveStreamMonitor = liveStreamMonitor;
+            _twitchLiveStreamMonitorFactory = twitchLiveStreamMonitorFactory;
             _vipApiClient = vipApiClient;
             _configService = configService;
             _streamStatusApiClient = streamStatusApiClient;
@@ -95,6 +94,8 @@ namespace CoreCodedChatbot.Services
             _isDevelopmentBuild = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" ||
                                   Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Local";
 
+            _client = twitchClientFactory.Get();
+
             _client.OnJoinedChannel += OnJoinedChannel;
             _client.OnChatCommandReceived += OnCommandReceived;
             _client.OnCommunitySubscription += OnSubBomb;
@@ -104,6 +105,8 @@ namespace CoreCodedChatbot.Services
             _client.OnError += OnError;
             _client.OnConnectionError += OnConnectionError;
             _client.Connect();
+
+            _liveStreamMonitor = _twitchLiveStreamMonitorFactory.Get();
             
             _liveStreamMonitor.SetChannelsByName(new List<string>{_streamerChannel});
             _liveStreamMonitor.OnStreamOnline += OnStreamOnline;
@@ -173,8 +176,6 @@ namespace CoreCodedChatbot.Services
         {
             try
             {
-                _logger.LogInformation(e.Subscription.JsonString);
-
                 if (e.Subscription.Context == "subgift")
                 {
                     _logger.LogInformation(

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CodedChatbot.TwitchFactories.Interfaces;
 using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -14,28 +15,29 @@ namespace CoreCodedChatbot.Commands
     public class FollowageCommand : ICommand
     {
         private readonly IConfigService _configService;
-        private TwitchAPI _twitchApi;
+        private readonly ITwitchApiFactory _twitchApiFactory;
         private readonly ILogger<FollowageCommand> _logger;
 
         public FollowageCommand(
             IConfigService configService, 
-            TwitchAPI twitchApi,
+            ITwitchApiFactory twitchApiFactory,
             ILogger<FollowageCommand> logger)
         {
             _configService = configService;
-            this._twitchApi = twitchApi;
+            _twitchApiFactory = twitchApiFactory;
             _logger = logger;
         }
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
             try
             {
-                var users = await _twitchApi.Helix.Users.GetUsersAsync(logins: new List<string>(new[] {username}));
+                var twitchApi = _twitchApiFactory.Get();
+                var users = await twitchApi.Helix.Users.GetUsersAsync(logins: new List<string>(new[] {username}));
                 var userId = users.Users[0].Id;
 
                 if (userId == null) return;
 
-                var follows = await _twitchApi.Helix.Users.GetUsersFollowsAsync(fromId:userId, toId: _configService.Get<string>("ChannelId"));
+                var follows = await twitchApi.Helix.Users.GetUsersFollowsAsync(fromId:userId, toId: _configService.Get<string>("ChannelId"));
 
                 var followedChannel = follows?.Follows?.SingleOrDefault();
                 if (followedChannel == null) return;

@@ -1,4 +1,5 @@
-﻿using CoreCodedChatbot.Commands;
+﻿using CodedChatbot.TwitchFactories;
+using CoreCodedChatbot.Commands;
 using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
@@ -17,28 +18,11 @@ namespace CoreCodedChatbot
     {
         public static IServiceCollection AddTwitchServices(this IServiceCollection services)
         {
-            var provider = services.BuildServiceProvider();
-
-            var configService = provider.GetService<IConfigService>();
-            var secretService = provider.GetService<ISecretService>();
-
-            var creds = new ConnectionCredentials(configService.Get<string>("ChatbotNick"), secretService.GetSecret<string>("ChatbotPass"));
-            var client = new TwitchClient();
-            client.Initialize(creds, configService.Get<string>("StreamerChannel"));
-
-            var api = new TwitchAPI();
-            api.Settings.ClientId = secretService.GetSecret<string>("ChatbotAccessClientId");
-            api.Settings.AccessToken = secretService.GetSecret<string>("ChatbotAccessToken");
-
-            var liveStreamMonitor = new LiveStreamMonitorService(api);
+            services.AddTwitchFactories();
 
             var pubsub = new TwitchPubSub();
 
-            // Register all external Twitch services
-            services.AddSingleton(api);
-            services.AddSingleton(client);
             services.AddSingleton(pubsub);
-            services.AddSingleton(liveStreamMonitor);
 
             return services;
         }

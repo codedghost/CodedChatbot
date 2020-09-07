@@ -1,7 +1,9 @@
 ﻿using System;
+using CodedChatbot.TwitchFactories.Interfaces;
 using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Interfaces;
 using TwitchLib.Api;
+using TwitchLib.Api.Interfaces;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
@@ -10,18 +12,19 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new[] { "uptime", "live" }, false)]
     public class UptimeCommand : ICommand
     {
-        private readonly TwitchAPI api;
+        private readonly ITwitchApiFactory _twitchApiFactory;
         private readonly IConfigService _configService;
 
-        public UptimeCommand(TwitchAPI api, IConfigService configService)
+        public UptimeCommand(ITwitchApiFactory twitchApiFactory, IConfigService configService)
         {
-            this.api = api;
+            _twitchApiFactory = twitchApiFactory;
             _configService = configService;
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            var Stream = await api.V5.Streams.GetStreamByUserAsync(_configService.Get<string>("ChannelId"));
+            var twitchApi = _twitchApiFactory.Get();
+            var Stream = await twitchApi.V5.Streams.GetStreamByUserAsync(_configService.Get<string>("ChannelId"));
             var streamGoLiveTime = Stream?.Stream?.CreatedAt;
 
             if (streamGoLiveTime != null)

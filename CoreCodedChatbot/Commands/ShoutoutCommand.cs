@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using CodedChatbot.TwitchFactories.Interfaces;
 using CoreCodedChatbot.Interfaces;
 using TwitchLib.Api;
 using TwitchLib.Client;
@@ -10,11 +11,11 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new []{"shoutout", "so"}, true)]
     public class ShoutoutCommand : ICommand
     {
-        private TwitchAPI _twitchApi;
+        private readonly ITwitchApiFactory _twitchApiFactory;
 
-        public ShoutoutCommand(TwitchAPI twitchApi)
+        public ShoutoutCommand(ITwitchApiFactory twitchApiFactory)
         {
-            this._twitchApi = twitchApi;
+            _twitchApiFactory = twitchApiFactory;
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
@@ -27,8 +28,10 @@ namespace CoreCodedChatbot.Commands
                 return;
             }
 
+            var twitchApi = _twitchApiFactory.Get();
+
             // Query twitch api to ensure that this user exists.
-            var apiResult = await _twitchApi.Helix.Users.GetUsersAsync(logins: new List<string> {commandSplit[0].Trim('@')});
+            var apiResult = await twitchApi.Helix.Users.GetUsersAsync(logins: new List<string> {commandSplit[0].Trim('@')});
 
             var verifiedUser = apiResult.Users.FirstOrDefault();
             if (verifiedUser == null)
