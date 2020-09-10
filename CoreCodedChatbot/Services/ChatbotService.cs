@@ -57,12 +57,14 @@ namespace CoreCodedChatbot.Services
         private Timer DonationsTimer { get; set; }
         private Timer PlaylistTimer { get; set; }
         private Timer YoutubeTimer { get; set; }
-        private Timer MerchTimer { get; set; }
+        //private Timer MerchTimer { get; set; }
+        private Timer ShredFestTimer { get; set; }
+        private Timer LegatorTimer { get; set; }
         private Timer RocksmithChallengeTimer { get; set; }
         private Timer ChatConnectionTimer { get; set; }
 
-        private int _maxTimerMinutesRocksmith = 135;
-        private int _maxTimerMinutesGaming = 90;
+        private int _maxTimerMinutesRocksmith = 165;
+        private int _maxTimerMinutesGaming = 120;
 
         private int _chattyTimerCounter = 0;
         private int _minutesBetweenChattyCommands = 15;
@@ -402,7 +404,7 @@ namespace CoreCodedChatbot.Services
         private async void ScheduleStreamTasks(string streamGame = "Rocksmith 2014")
         {
             _logger.LogError($"Stream tasks scheduled: {streamGame}");
-            var isStreamingRocksmith = streamGame == "Rocksmith 2014"; // TODO: This needs to query the actual game id as this currently doesn't work correctly
+            var isStreamingRocksmith = streamGame.Contains("!request"); // TODO: This needs to query the actual game id as this currently doesn't work correctly
             var maxTimerMinutes =
                 TimeSpan.FromMinutes(isStreamingRocksmith ? _maxTimerMinutesRocksmith : _maxTimerMinutesGaming);
 
@@ -449,6 +451,15 @@ namespace CoreCodedChatbot.Services
                 e => _commandHelper.ProcessCommand("discord", _client, "Chatbot", string.Empty, true, joinedRoom),
                 null,
                 AssignChattyTimer(), maxTimerMinutes);
+            LegatorTimer = new Timer(
+                e => _commandHelper.ProcessCommand("legator", _client, "Chatbot", string.Empty, true, joinedRoom),
+                null,
+                AssignChattyTimer(), maxTimerMinutes);
+
+            ShredFestTimer = new Timer(
+                e => _commandHelper.ProcessCommand("shredfest", _client, "Chatbot", string.Empty, true, joinedRoom),
+                null,
+                AssignChattyTimer(), maxTimerMinutes);
             InstagramTimer = new Timer(
                 e => _commandHelper.ProcessCommand("instagram", _client, "Chatbot", string.Empty, true, joinedRoom),
                 null,
@@ -465,10 +476,10 @@ namespace CoreCodedChatbot.Services
                 e => _commandHelper.ProcessCommand("challenge", _client, "Chatbot", string.Empty, true, joinedRoom),
                 null,
                 AssignChattyTimer(), maxTimerMinutes);
-            MerchTimer = new Timer(
-                e => _commandHelper.ProcessCommand("merch", _client, "Chatbot", string.Empty, true, joinedRoom),
-                null,
-                AssignChattyTimer(), maxTimerMinutes);
+            //MerchTimer = new Timer(
+            //    e => _commandHelper.ProcessCommand("merch", _client, "Chatbot", string.Empty, true, joinedRoom),
+            //    null,
+            //    AssignChattyTimer(), maxTimerMinutes);
 
             ChatConnectionTimer = new Timer(
                 async e =>
@@ -521,7 +532,9 @@ namespace CoreCodedChatbot.Services
             InstagramTimer?.Dispose();
             TwitterTimer?.Dispose();
             YoutubeTimer?.Dispose();
-            MerchTimer?.Dispose();
+            //MerchTimer?.Dispose();
+            LegatorTimer?.Dispose();
+            ShredFestTimer?.Dispose();
             RocksmithChallengeTimer?.Dispose();
             BytesTimer?.Dispose();
             DonationsTimer?.Dispose();
