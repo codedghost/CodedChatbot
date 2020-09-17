@@ -408,25 +408,6 @@ namespace CoreCodedChatbot.Services
             var maxTimerMinutes =
                 TimeSpan.FromMinutes(isStreamingRocksmith ? _maxTimerMinutesRocksmith : _maxTimerMinutesGaming);
 
-            //// TODO: This can only be done once Helix exposes the Total Months value.
-            //// Align database with any potentially missed or offline subs
-            //try
-            //{
-            //    var subs = await _api.V5.Channels.GetAllSubscribersAsync(_configService.Get<string>("ChannelId"),
-            //        _secretService.GetSecret<string>("ChatbotAccessToken"));
-
-            //    // TODO: Need to consider length of sub in db alignment
-            //    await _vipApiClient.GiveSubscriptionVips(new GiveSubscriptionVipsRequest
-            //    {
-            //        Username = subs.Select(s => s.User.DisplayName).ToList()
-            //    });
-            //}
-            //catch (NotPartneredException)
-            //{
-            //    _logger.LogWarning("Schedule stream tasks. Not really an issue - Not a partner. Skipping sub setup.");
-            //}
-            
-
             var joinedRoom = _client.JoinedChannels.FirstOrDefault(jc =>
                 // config.DevelopmentBuild ? jc.Channel.Contains(DevelopmentRoomId) :
                 jc.Channel == _configService.Get<string>("StreamerChannel"));
@@ -451,15 +432,6 @@ namespace CoreCodedChatbot.Services
                 e => _commandHelper.ProcessCommand("discord", _client, "Chatbot", string.Empty, true, joinedRoom),
                 null,
                 AssignChattyTimer(), maxTimerMinutes);
-            LegatorTimer = new Timer(
-                e => _commandHelper.ProcessCommand("legator", _client, "Chatbot", string.Empty, true, joinedRoom),
-                null,
-                AssignChattyTimer(), maxTimerMinutes);
-
-            ShredFestTimer = new Timer(
-                e => _commandHelper.ProcessCommand("shredfest", _client, "Chatbot", string.Empty, true, joinedRoom),
-                null,
-                AssignChattyTimer(), maxTimerMinutes);
             InstagramTimer = new Timer(
                 e => _commandHelper.ProcessCommand("instagram", _client, "Chatbot", string.Empty, true, joinedRoom),
                 null,
@@ -472,10 +444,10 @@ namespace CoreCodedChatbot.Services
                 e => _commandHelper.ProcessCommand("youtube", _client, "Chatbot", string.Empty, true, joinedRoom),
                 null,
                 AssignChattyTimer(), maxTimerMinutes);
-            RocksmithChallengeTimer = new Timer(
-                e => _commandHelper.ProcessCommand("challenge", _client, "Chatbot", string.Empty, true, joinedRoom),
-                null,
-                AssignChattyTimer(), maxTimerMinutes);
+            //RocksmithChallengeTimer = new Timer(
+            //    e => _commandHelper.ProcessCommand("challenge", _client, "Chatbot", string.Empty, true, joinedRoom),
+            //    null,
+            //    AssignChattyTimer(), maxTimerMinutes);
             //MerchTimer = new Timer(
             //    e => _commandHelper.ProcessCommand("merch", _client, "Chatbot", string.Empty, true, joinedRoom),
             //    null,
