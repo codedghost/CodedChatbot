@@ -41,6 +41,7 @@ namespace CoreCodedChatbot
             services.AddTransient<AddInfoCommand>();
             services.AddTransient<AddQuoteCommand>();
             services.AddTransient<AwwCommand>();
+            services.AddTransient<BackgroundSongCommand>();
             services.AddTransient<ClaimAllVipsCommand>();
             services.AddTransient<ClaimVipCommand>();
             services.AddTransient<ClosePlaylistCommand>();
