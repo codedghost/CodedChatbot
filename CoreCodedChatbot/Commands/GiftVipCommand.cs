@@ -21,7 +21,7 @@ namespace CoreCodedChatbot.Commands
         {
             var commandSplit = commandText.Split(" ");
 
-            if (!commandSplit.Any() || commandSplit.Length != 1 || !commandSplit[0].Contains("@"))
+            if (!commandSplit.Any() || !commandSplit[0].Contains("@"))
             {
                 client.SendMessage(joinedChannel, $"Hey @{username}, you need to @ someone to gift a vip!");
                 return;
@@ -30,7 +30,8 @@ namespace CoreCodedChatbot.Commands
             var giftVipModel = new GiftVipRequest
             {
                 DonorUsername = username,
-                ReceiverUsername = commandSplit[0].Trim('@')
+                ReceiverUsername = commandSplit[0].Trim('@'),
+                NumberOfVips = int.TryParse(commandSplit[1].Trim(), out var numberOfVips) ? numberOfVips : 1
             };
             
             var giftVipResult = await _vipApiClient.GiftVip(giftVipModel);
