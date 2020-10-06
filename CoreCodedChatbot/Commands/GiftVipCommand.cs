@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Net;
 using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.ApiContract.RequestModels.Vip;
 using CoreCodedChatbot.Interfaces;
@@ -27,11 +28,16 @@ namespace CoreCodedChatbot.Commands
                 return;
             }
 
+            var numberOfVipsGiven = commandSplit.Length == 2;
+
             var giftVipModel = new GiftVipRequest
             {
                 DonorUsername = username,
                 ReceiverUsername = commandSplit[0].Trim('@'),
-                NumberOfVips = int.TryParse(commandSplit[1].Trim(), out var numberOfVips) ? numberOfVips : 1
+                NumberOfVips = numberOfVipsGiven ? 
+                    int.TryParse(commandSplit[1].Trim(), out var numberOfVips) 
+                        ? numberOfVips : 1 
+                    : 1
             };
             
             var giftVipResult = await _vipApiClient.GiftVip(giftVipModel);
