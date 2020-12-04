@@ -6,7 +6,7 @@ using TwitchLib.Client.Models;
 
 namespace CoreCodedChatbot.Commands
 {
-    [CustomAttributes.ChatCommand(new[] { "background", "music" }, false)]
+    [CustomAttributes.ChatCommand(new[] { "background", "music", "song" }, false)]
     public class BackgroundSongCommand : ICommand
     {
         private readonly IClientTriggerClient _clientTriggerClient;
