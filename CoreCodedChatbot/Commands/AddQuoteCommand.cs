@@ -18,6 +18,12 @@ namespace CoreCodedChatbot.Commands
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
+            if (string.IsNullOrWhiteSpace(commandText))
+            {
+                client.SendMessage(joinedChannel, $"Hey @{username}, Please enter some quote text!");
+                return;
+            }
+
             var request = new AddQuoteRequest
             {
                 QuoteText = commandText,
