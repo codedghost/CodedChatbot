@@ -8,7 +8,7 @@ using TwitchLib.Client.Models;
 
 namespace CoreCodedChatbot.Commands
 {
-    [CustomAttributes.ChatCommand(new []{"supervip", "svip", "super"}, false)]
+    [CustomAttributes.ChatCommand(new []{"supervip", "svip", "svsr", "super"}, false)]
     public class SuperVipCommand : ICommand
     {
         private readonly IConfigService _configService;
