@@ -7,7 +7,7 @@ using TwitchLib.Client.Models;
 
 namespace CoreCodedChatbot.Commands
 {
-    [CustomAttributes.ChatCommand(new []{"vip", "viprequest"}, false)]
+    [CustomAttributes.ChatCommand(new []{"vip", "viprequest", "vsr"}, false)]
     public class VipCommand : ICommand
     {
         private readonly IPlaylistApiClient _playlistApiClient;
