@@ -160,13 +160,15 @@ namespace CoreCodedChatbot.Services
                     return;
                 }
 
+                var senderClient = (TwitchClient)sender;
+
                 _commandHelper.ProcessCommand(
                     e.Command.CommandText,
-                    (TwitchClient)sender,
+                    senderClient,
                     e.Command.ChatMessage.Username,
                     e.Command.ArgumentsAsString,
                     e.Command.ChatMessage.IsModerator || e.Command.ChatMessage.IsBroadcaster,
-                    _client.JoinedChannels.FirstOrDefault(jc => jc.Channel == e.Command.ChatMessage.Channel));
+                    senderClient.JoinedChannels.FirstOrDefault(jc => jc.Channel == e.Command.ChatMessage.Channel));
             }
             catch (Exception ex)
             {
