@@ -162,7 +162,7 @@ namespace CoreCodedChatbot.Services
 
                 _commandHelper.ProcessCommand(
                     e.Command.CommandText,
-                    _client,
+                    (TwitchClient)sender,
                     e.Command.ChatMessage.Username,
                     e.Command.ArgumentsAsString,
                     e.Command.ChatMessage.IsModerator || e.Command.ChatMessage.IsBroadcaster,
