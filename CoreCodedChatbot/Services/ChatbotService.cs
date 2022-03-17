@@ -161,6 +161,10 @@ namespace CoreCodedChatbot.Services
                 }
 
                 var senderClient = (TwitchClient)sender;
+                if (!senderClient.JoinedChannels.Any())
+                {
+                    senderClient.JoinChannel(_streamerChannel);
+                }
 
                 _commandHelper.ProcessCommand(
                     e.Command.CommandText,
