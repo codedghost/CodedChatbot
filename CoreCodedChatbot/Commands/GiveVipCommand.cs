@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.ApiContract.RequestModels.Vip;
+using CoreCodedChatbot.Extensions;
 using CoreCodedChatbot.Interfaces;
 using Microsoft.Extensions.Logging;
 using TwitchLib.Client;
@@ -25,7 +26,7 @@ namespace CoreCodedChatbot.Commands
         public async void Process(TwitchClient client, string username, string commandText, bool isMod,
             JoinedChannel joinedChannel)
         {
-            var splitCommandText = commandText.Split(" ");
+            var splitCommandText = commandText.SplitCommandText();
 
             if (commandText.Contains("@"))
             {
@@ -62,7 +63,7 @@ namespace CoreCodedChatbot.Commands
 
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)
         {
-            client.SendMessage(joinedChannel, $"Hey @{username}, this command is used by moderators to give out VIP requests. Hint: Ensure you use the '@'. Usage: !gvip <username> <optionalAmount>");
+            client.SendMessage(joinedChannel, $"Hey @{username}, this command is used by moderators to give out VIP requests. Hint: Ensure you use the '@'. Usage (remove <>): !gvip <username> <optionalAmount>");
         }
     }
 }

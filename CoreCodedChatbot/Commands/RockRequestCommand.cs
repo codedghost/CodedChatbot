@@ -64,7 +64,7 @@ namespace CoreCodedChatbot.Commands
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)
         {
             client.SendMessage(joinedChannel,
-                $"Hey @{username}, this command is used to add a song request to the queue. Usage: !request <SongArtist> - <SongName>");
+                $"Hey @{username}, this command is used to add a song request to the queue. Usage (remove <>): !request <SongArtist> - <SongName>");
         }
     }
 }

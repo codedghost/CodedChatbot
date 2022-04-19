@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using CodedChatbot.TwitchFactories.Interfaces;
+using CoreCodedChatbot.Extensions;
 using CoreCodedChatbot.Interfaces;
 using TwitchLib.Api;
 using TwitchLib.Client;
@@ -20,7 +21,7 @@ namespace CoreCodedChatbot.Commands
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            var commandSplit = commandText.Split(" ");
+            var commandSplit = commandText.SplitCommandText();
 
             if (!commandSplit.Any() || commandSplit.Length != 1 || !commandSplit[0].Contains("@"))
             {
@@ -47,7 +48,7 @@ namespace CoreCodedChatbot.Commands
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)
         {
             client.SendMessage(joinedChannel,
-                $"Hey @{username}, this command will shoutout the user you @ mention! Usage: !so @<username>");
+                $"Hey @{username}, this command will shoutout the user you @ mention! Usage (remove <>): !so @<username>");
         }
     }
 }

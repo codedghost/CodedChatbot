@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.Extensions;
 using CoreCodedChatbot.Interfaces;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
@@ -21,7 +22,7 @@ namespace CoreCodedChatbot.Commands
             var usernameToCheck = username;
             if (!string.IsNullOrWhiteSpace(commandText) && commandText.Contains("@"))
             {
-                username = commandText.Split(" ").First();
+                username = commandText.SplitCommandText().First();
             }
 
             var giftedVips = await _vipApiClient.GetGiftedVips(usernameToCheck);

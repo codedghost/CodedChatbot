@@ -73,7 +73,7 @@ namespace CoreCodedChatbot.Commands
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)
         {
             client.SendMessage(joinedChannel,
-                $"Hey @{username}, if you have a VIP request, this command will bump your song request right to the top of the queue. Usage: !vip <SongArtist> - <SongName> - (Guitar or Bass)");
+                $"Hey @{username}, if you have a VIP request, this command will bump your song request right to the top of the queue. Usage (remove <>): !vip <SongArtist> - <SongName> - (Guitar or Bass)");
         }
     }
 }

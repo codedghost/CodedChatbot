@@ -2,6 +2,7 @@
 using System.Net;
 using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.ApiContract.RequestModels.Vip;
+using CoreCodedChatbot.Extensions;
 using CoreCodedChatbot.Interfaces;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
@@ -20,7 +21,7 @@ namespace CoreCodedChatbot.Commands
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            var commandSplit = commandText.Split(" ");
+            var commandSplit = commandText.SplitCommandText();
 
             if (!commandSplit.Any() || !commandSplit[0].Contains("@"))
             {
@@ -28,7 +29,14 @@ namespace CoreCodedChatbot.Commands
                 return;
             }
 
+            if (commandSplit.Length > 2)
+            {
+                client.SendMessage(joinedChannel,
+                    $"Hey @{username}, you've provided too much info, run !help giftvip to see how this command works");
+            }
+
             var numberOfVipsGiven = commandSplit.Length == 2;
+
 
             var giftVipModel = new GiftVipRequest
             {
@@ -45,18 +53,18 @@ namespace CoreCodedChatbot.Commands
             if (giftVipResult)
             {
                 client.SendMessage(joinedChannel,
-                    $"Hey @{username}, I have given @{giftVipModel.ReceiverUsername} one of your VIPs");
+                    $"Hey @{username}, I have given @{giftVipModel.ReceiverUsername} {giftVipModel.NumberOfVips} of your VIPs");
                 return;
             }
 
             client.SendMessage(joinedChannel,
-                $"Hey @{username}, I couldn't give the VIP for some reason, did you mistype the @?");
+                $"Hey @{username}, I couldn't give the VIP for some reason, do you have enough VIPs or did you mistype the @?");
         }
 
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)
         {
             client.SendMessage(joinedChannel,
-                $"Hey @{username}, this command lets you gift a vip to another viewer. Usage: !giftvip @<username>");
+                $"Hey @{username}, this command lets you gift a vip to another viewer. Usage (remove <>): !giftvip @<username> <numberofvipstogive>");
         }
     }
 }
