@@ -323,10 +323,13 @@ namespace CoreCodedChatbot.Services
                 }
                 else
                 {
-                    if (!_client.IsConnected)
-                        _client.Connect();
                     if (!_client.JoinedChannels.Any())
                         _client.JoinChannel(e.Channel);
+                    if (!_client.IsConnected)
+                    {
+                        _logger.LogInformation("Client Disconnected - Attempting Connect");
+                        _client.Connect();
+                    }
 
                     _client.SendMessage(e.Channel,
                         $"What?? @{e.Channel} is live?!? POWERING UP!");
@@ -364,6 +367,8 @@ namespace CoreCodedChatbot.Services
                 }).Wait();
 
                 UnScheduleStreamTasks();
+
+                _client.Disconnect();
             }
             catch (Exception ex)
             {
@@ -409,7 +414,7 @@ namespace CoreCodedChatbot.Services
 
         private async void ScheduleStreamTasks(string streamGame = "Rocksmith 2014")
         {
-            _logger.LogError($"Stream tasks scheduled: {streamGame}");
+            _logger.LogInformation($"Stream tasks scheduled: {streamGame}");
             var isStreamingRocksmith = streamGame.Contains("!request"); // TODO: This needs to query the actual game id as this currently doesn't work correctly
             var maxTimerMinutes =
                 TimeSpan.FromMinutes(isStreamingRocksmith ? _maxTimerMinutesRocksmith : _maxTimerMinutesGaming);
