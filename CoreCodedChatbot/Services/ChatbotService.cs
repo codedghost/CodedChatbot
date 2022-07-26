@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using CodedChatbot.TwitchFactories;
 using CodedChatbot.TwitchFactories.Interfaces;
 using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.ApiContract.Enums.VIP;
@@ -34,6 +35,7 @@ namespace CoreCodedChatbot.Services
     public class ChatbotService : IChatbotService
     {
         private readonly ICommandHelper _commandHelper;
+        private readonly ITwitchClientFactory _twitchClientFactory;
         private readonly TwitchPubSub _pubsub;
         private readonly ITwitchLiveStreamMonitorFactory _twitchLiveStreamMonitorFactory;
         private readonly IVipApiClient _vipApiClient;
@@ -41,7 +43,7 @@ namespace CoreCodedChatbot.Services
         private readonly IStreamStatusApiClient _streamStatusApiClient;
         private readonly ISecretService _secretService; 
         private readonly ILogger<ChatbotService> _logger;
-        private readonly TwitchClient _client;
+        private TwitchClient _client;
 
         private readonly LiveStreamMonitorService _liveStreamMonitor;
 
@@ -71,8 +73,6 @@ namespace CoreCodedChatbot.Services
 
         private static readonly HttpClient _httpClient = new HttpClient();
 
-        private readonly string _developmentRoomId = string.Empty; // Only for use in debug mode
-
         public ChatbotService(ICommandHelper commandHelper,
             ITwitchClientFactory twitchClientFactory,
             TwitchPubSub pubsub, 
@@ -84,6 +84,7 @@ namespace CoreCodedChatbot.Services
             ILogger<ChatbotService> logger)
         {
             _commandHelper = commandHelper;
+            _twitchClientFactory = twitchClientFactory;
             _pubsub = pubsub;
             _twitchLiveStreamMonitorFactory = twitchLiveStreamMonitorFactory;
             _vipApiClient = vipApiClient;
@@ -96,17 +97,7 @@ namespace CoreCodedChatbot.Services
             _isDevelopmentBuild = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development" ||
                                   Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Local";
 
-            _client = twitchClientFactory.Get();
-
-            _client.OnJoinedChannel += OnJoinedChannel;
-            _client.OnChatCommandReceived += OnCommandReceived;
-            _client.OnCommunitySubscription += OnSubBomb;
-            _client.OnBeingHosted += OnBeingHosted;
-            _client.OnRaidNotification += OnRaidNotification;
-            _client.OnDisconnected += OnDisconnected;
-            _client.OnError += OnError;
-            _client.OnConnectionError += OnConnectionError;
-            _client.Connect();
+            InitialiseClientEvents();
 
             _liveStreamMonitor = _twitchLiveStreamMonitorFactory.Get();
             
@@ -124,6 +115,21 @@ namespace CoreCodedChatbot.Services
             _pubsub.OnChannelSubscription += OnSub;
 
             _pubsub.Connect();
+        }
+
+        private void InitialiseClientEvents()
+        {
+            _client = _twitchClientFactory.Get();
+
+            _client.OnJoinedChannel += OnJoinedChannel;
+            _client.OnChatCommandReceived += OnCommandReceived;
+            _client.OnCommunitySubscription += OnSubBomb;
+            _client.OnBeingHosted += OnBeingHosted;
+            _client.OnRaidNotification += OnRaidNotification;
+            _client.OnDisconnected += OnDisconnected;
+            _client.OnError += OnError;
+            _client.OnConnectionError += OnConnectionError;
+            _client.Connect();
         }
 
         private void OnConnectionError(object sender, OnConnectionErrorArgs e)
@@ -152,14 +158,6 @@ namespace CoreCodedChatbot.Services
         {
             try
             {
-                if (
-                    (_isDevelopmentBuild && !e.Command.ChatMessage.Channel.Contains(_developmentRoomId))
-                    || (!_isDevelopmentBuild && e.Command.ChatMessage.Channel.Contains(_developmentRoomId)
-                        && !string.IsNullOrWhiteSpace(_developmentRoomId)))
-                {
-                    return;
-                }
-
                 var senderClient = (TwitchClient)sender;
                 if (!senderClient.JoinedChannels.Any())
                 {
@@ -323,16 +321,10 @@ namespace CoreCodedChatbot.Services
                 }
                 else
                 {
-                    if (!_client.JoinedChannels.Any())
-                        _client.JoinChannel(e.Channel);
-                    if (!_client.IsConnected)
-                    {
-                        _logger.LogInformation("Client Disconnected - Attempting Connect");
-                        _client.Connect();
-                    }
+                    _logger.LogInformation("Attempting Reconnect");
+                    _twitchClientFactory.Reconnect();
 
-                    _client.SendMessage(e.Channel,
-                        $"What?? @{e.Channel} is live?!? POWERING UP!");
+                    InitialiseClientEvents();
                 }
 
                 _streamStatusApiClient.SaveStreamStatus(new PutStreamStatusRequest
@@ -482,7 +474,8 @@ namespace CoreCodedChatbot.Services
 
                             _logger.LogError($"DISCONNECTED FROM CHAT, RECONNECTING");
 
-                            _client.Connect();
+                            _twitchClientFactory.Reconnect();
+                            InitialiseClientEvents();
                         }
                         else _logger.LogError("Could not retrieve Chatters JSON from TMI service in ChatConnectionTimer");
                     }
