@@ -6,7 +6,7 @@ using TwitchLib.Client.Models;
 
 namespace CoreCodedChatbot.Commands
 {
-    [CustomAttributes.ChatCommand(new[] { "resetgg" }, true)]
+    [CustomAttributes.ChatCommand(new[] { "resetgg", "ggez" }, true)]
     public class FixGuessingGameCommand : ICommand
     {
         private readonly ISettingsApiClient _settingsApiClient;
