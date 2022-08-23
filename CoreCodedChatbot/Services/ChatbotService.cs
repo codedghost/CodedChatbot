@@ -3,10 +3,8 @@ using System.Net.Http;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using CodedChatbot.TwitchFactories;
 using CodedChatbot.TwitchFactories.Interfaces;
 using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
-using CoreCodedChatbot.ApiContract.Enums.VIP;
 using CoreCodedChatbot.ApiContract.RequestModels.StreamStatus;
 using CoreCodedChatbot.ApiContract.RequestModels.Vip;
 using CoreCodedChatbot.ApiContract.RequestModels.Vip.ChildModels;
@@ -21,14 +19,11 @@ using Microsoft.Extensions.Logging;
 using TwitchLib.Client.Events;
 using TwitchLib.PubSub.Events;
 using TwitchLib.Client;
-using TwitchLib.Api;
-using TwitchLib.Api.Core.Exceptions;
 using TwitchLib.Api.Services;
 using TwitchLib.Api.Services.Events;
 using TwitchLib.Api.Services.Events.LiveStreamMonitor;
 using TwitchLib.Communication.Events;
 using TwitchLib.PubSub;
-using TwitchLib.PubSub.Enums;
 
 namespace CoreCodedChatbot.Services
 {
@@ -485,7 +480,7 @@ namespace CoreCodedChatbot.Services
                     }
                 },
                 null,
-                TimeSpan.Zero,
+                TimeSpan.FromSeconds(120),
                 TimeSpan.FromSeconds(10));
         }
         
