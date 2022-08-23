@@ -62,6 +62,7 @@ namespace CoreCodedChatbot
             services.AddTransient<InfoCommand>();
             services.AddTransient<InstagramCommand>();
             services.AddTransient<KittyCommand>();
+            services.AddTransient<Magic8BallCommand>();
             services.AddTransient<MerchCommand>();
             services.AddTransient<MyBytesCommand>();
             services.AddTransient<MyRockRequestsCommand>();

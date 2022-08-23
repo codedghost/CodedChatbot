@@ -71,6 +71,7 @@
 
   <ItemGroup>
     <Folder Include="Extensions\" />
+    <Folder Include="Constants\" />
   </ItemGroup>
 
 </Project>
