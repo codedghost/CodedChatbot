@@ -49,7 +49,7 @@ namespace CoreCodedChatbot.Commands
                         message = $"Hey @{username}, you've requested the max regular requests!";
                         break;
                     default:
-                        message = $"Hey @{username}, I have queued {commandText} for you!";
+                        message = $"Hey @{username}, I have queued {result.FormattedSongText} for you!";
                         break;
                 }
             }

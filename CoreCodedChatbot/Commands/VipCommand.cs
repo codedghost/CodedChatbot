@@ -39,10 +39,8 @@ namespace CoreCodedChatbot.Commands
                 switch (addSongResult.Result)
                 {
                     case AddRequestResult.Success:
-                        var playlistPosition = addSongResult.PlaylistPosition;
-
                         client.SendMessage(joinedChannel,
-                            $"Hey @{username}, I have queued {commandText} for you, you're #{playlistPosition} in the queue!");
+                            $"Hey @{username}, I have queued {addSongResult.FormattedSongText} for you, you're #{addSongResult.PlaylistPosition} in the queue!");
 
                         return;
                     case AddRequestResult.PlaylistVeryClosed:

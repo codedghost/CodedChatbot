@@ -55,7 +55,7 @@ namespace CoreCodedChatbot.Commands
                         return;
                     case AddRequestResult.Success:
                         client.SendMessage(joinedChannel,
-                            $"Hey @{username}, I have queued {commandText} for you, your request will be played next!");
+                            $"Hey @{username}, I have queued {addSuperResponse.FormattedSongText} for you, your request will be played next!");
                         return;
                     case AddRequestResult.UnSuccessful:
                         client.SendMessage(joinedChannel,
