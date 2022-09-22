@@ -480,8 +480,8 @@ namespace CoreCodedChatbot.Services
                     }
                 },
                 null,
-                TimeSpan.FromSeconds(120),
-                TimeSpan.FromSeconds(10));
+                TimeSpan.FromSeconds(600),
+                TimeSpan.FromSeconds(120));
         }
         
         private void OnError(object sender, OnErrorEventArgs e)
