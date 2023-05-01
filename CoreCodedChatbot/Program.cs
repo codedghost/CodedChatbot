@@ -21,7 +21,8 @@ namespace CoreCodedChatbot
                 .AddChatbotSecretServiceCollection(
                     config.Get<string>("KeyVaultAppId"),
                     config.Get<string>("KeyVaultCertThumbprint"),
-                    config.Get<string>("KeyVaultBaseUrl")
+                    config.Get<string>("KeyVaultBaseUrl"),
+                    config.Get<string>("ActiveDirectoryTenantId")
                 )
                 .AddChatbotNLog()
                 .AddApiClientServices()

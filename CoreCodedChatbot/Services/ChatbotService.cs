@@ -119,7 +119,6 @@ namespace CoreCodedChatbot.Services
             _client.OnJoinedChannel += OnJoinedChannel;
             _client.OnChatCommandReceived += OnCommandReceived;
             _client.OnCommunitySubscription += OnSubBomb;
-            _client.OnBeingHosted += OnBeingHosted;
             _client.OnRaidNotification += OnRaidNotification;
             _client.OnDisconnected += OnDisconnected;
             _client.OnError += OnError;
@@ -265,7 +264,7 @@ namespace CoreCodedChatbot.Services
             {
                 _logger.LogInformation("PubSub Connected!");
 
-                _pubsub.ListenToBitsEvents(_configService.Get<string>("ChannelId"));
+                _pubsub.ListenToBitsEventsV2(_configService.Get<string>("ChannelId"));
                 _pubsub.ListenToSubscriptions(_configService.Get<string>("ChannelId"));
 
                 _pubsub.SendTopics(_secretService.GetSecret<string>("ChatbotAccessToken"));
@@ -385,11 +384,6 @@ namespace CoreCodedChatbot.Services
             {
                 _logger.LogError($"Raid Notification count is not a number: {e.RaidNotification?.MsgParamViewerCount}");
             }
-        }
-
-        private void OnBeingHosted(object sender, OnBeingHostedArgs e)
-        {
-            WelcomeRaidOrHost(e.BeingHostedNotification.Channel, e.BeingHostedNotification.HostedByChannel, e.BeingHostedNotification.Viewers, false);
         }
 
         private void WelcomeRaidOrHost(string hostedChannelName, string username, int numberofRaiders, bool isRaid)

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using CodedChatbot.TwitchFactories.Interfaces;
 using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Interfaces;
@@ -24,8 +26,13 @@ namespace CoreCodedChatbot.Commands
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
             var twitchApi = _twitchApiFactory.Get();
-            var Stream = await twitchApi.V5.Streams.GetStreamByUserAsync(_configService.Get<string>("ChannelId"));
-            var streamGoLiveTime = Stream?.Stream?.CreatedAt;
+            var userIds = new List<string>
+            {
+                _configService.Get<string>("ChannelId")
+            };
+
+            var stream = await twitchApi.Helix.Streams.GetStreamsAsync(userIds: userIds);
+            var streamGoLiveTime = stream?.Streams.FirstOrDefault()?.StartedAt;
 
             if (streamGoLiveTime != null)
             {

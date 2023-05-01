@@ -68,3 +68,5 @@
 /CoreCodedChatbot.Web/bin/Debug/netcoreapp3.0
 /CodedTwitchLib.PubSub/bin/Debug/netcoreapp3.1
 /CodedTwitchLib.PubSub/obj
+/CoreCodedChatbot/Properties
+/CoreCodedChatbot/Settings.job
