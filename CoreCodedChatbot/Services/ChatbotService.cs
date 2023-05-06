@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Secrets;
 using Microsoft.Extensions.Logging;
+using TwitchLib.Api;
 using TwitchLib.Client.Events;
 using TwitchLib.PubSub.Events;
 using TwitchLib.Client;
@@ -67,10 +68,12 @@ namespace CoreCodedChatbot.Services
         private int _minutesBetweenChattyCommands = 15;
 
         private static readonly HttpClient _httpClient = new HttpClient();
+        private readonly TwitchAPI _twitchApi;
 
         public ChatbotService(ICommandHelper commandHelper,
             ITwitchClientFactory twitchClientFactory,
-            TwitchPubSub pubsub, 
+            ITwitchApiFactory twitchApiFactory,
+        TwitchPubSub pubsub, 
             ITwitchLiveStreamMonitorFactory twitchLiveStreamMonitorFactory,
             IVipApiClient vipApiClient,
             IConfigService configService,
@@ -80,6 +83,7 @@ namespace CoreCodedChatbot.Services
         {
             _commandHelper = commandHelper;
             _twitchClientFactory = twitchClientFactory;
+            _twitchApi = twitchApiFactory.Get();
             _pubsub = pubsub;
             _twitchLiveStreamMonitorFactory = twitchLiveStreamMonitorFactory;
             _vipApiClient = vipApiClient;
@@ -450,16 +454,13 @@ namespace CoreCodedChatbot.Services
                 {
                     try
                     {
-                        var currentChattersJson = await _httpClient.GetAsync($"https://tmi.twitch.tv/group/user/{_configService.Get<string>("StreamerChannel")}/chatters");
+                        var authToken = await _twitchApi.Helix.Users.GetUsersAsync();
+                        var chattersResponse = await _twitchApi.Helix.Chat.GetChattersAsync(authToken.Users.FirstOrDefault()?.Id, authToken.Users.FirstOrDefault()?.Id, 1000);
 
-                        if (currentChattersJson.IsSuccessStatusCode)
+                        if (chattersResponse.Data.Any())
                         {
-                            // process json into username list.
-                            var chattersModel =
-                                JsonConvert.DeserializeObject<TmiChattersIntermediate>(currentChattersJson.Content
-                                    .ReadAsStringAsync().Result);
-
-                            if (chattersModel.ChattersIntermediate.Mods.Contains(_configService.Get<string>("ChatbotNick"))) return;
+                            var chatters = chattersResponse.Data.Select(d => d.UserLogin);
+                            if (chatters.Contains(_configService.Get<string>("ChatbotNick"))) return;
 
                             _logger.LogError($"DISCONNECTED FROM CHAT, RECONNECTING");
 
