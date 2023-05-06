@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using CodedChatbot.TwitchFactories.Interfaces;
 using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.ApiContract.RequestModels.ChannelRewards;
 using CoreCodedChatbot.ApiContract.RequestModels.StreamStatus;
 using CoreCodedChatbot.ApiContract.RequestModels.Vip;
 using CoreCodedChatbot.ApiContract.RequestModels.Vip.ChildModels;
@@ -37,7 +38,8 @@ namespace CoreCodedChatbot.Services
         private readonly IVipApiClient _vipApiClient;
         private readonly IConfigService _configService;
         private readonly IStreamStatusApiClient _streamStatusApiClient;
-        private readonly ISecretService _secretService; 
+        private readonly ISecretService _secretService;
+        private readonly IChannelRewardsClient _channelRewardsClient;
         private readonly ILogger<ChatbotService> _logger;
         private TwitchClient _client;
 
@@ -79,6 +81,7 @@ namespace CoreCodedChatbot.Services
             IConfigService configService,
             IStreamStatusApiClient streamStatusApiClient,
             ISecretService secretService,
+            IChannelRewardsClient channelRewardsClient,
             ILogger<ChatbotService> logger)
         {
             _commandHelper = commandHelper;
@@ -90,6 +93,7 @@ namespace CoreCodedChatbot.Services
             _configService = configService;
             _streamStatusApiClient = streamStatusApiClient;
             _secretService = secretService;
+            _channelRewardsClient = channelRewardsClient;
             _logger = logger;
 
             _streamerChannel = _configService.Get<string>("StreamerChannel");
@@ -112,6 +116,7 @@ namespace CoreCodedChatbot.Services
             _pubsub.OnBitsReceived += OnBitsReceived;
             _pubsub.OnListenResponse += OnListenResponse;
             _pubsub.OnChannelSubscription += OnSub;
+            _pubsub.OnChannelPointsRewardRedeemed += OnChannelPointsRewardRedeemed;
 
             _pubsub.Connect();
         }
@@ -270,6 +275,7 @@ namespace CoreCodedChatbot.Services
 
                 _pubsub.ListenToBitsEventsV2(_configService.Get<string>("ChannelId"));
                 _pubsub.ListenToSubscriptions(_configService.Get<string>("ChannelId"));
+                _pubsub.ListenToChannelPoints(_configService.Get<string>("ChannelId"));
 
                 _pubsub.SendTopics(_secretService.GetSecret<string>("ChatbotAccessToken"));
             }
@@ -395,6 +401,15 @@ namespace CoreCodedChatbot.Services
             var typeText = isRaid ? "raid" : "host";
             _client.SendMessage(hostedChannelName,
                 $"Hey everyone, we're getting a {typeText} from @{username} with {numberofRaiders} of their friends! Welcome one and all! codedgUitar");
+        }
+
+        private async void OnChannelPointsRewardRedeemed(object sender, OnChannelPointsRewardRedeemedArgs e)
+        {
+            await _channelRewardsClient.StoreRedemption(new StoreRewardRedemptionRequest
+            {
+                ChannelRewardId = new Guid(e.RewardRedeemed.Redemption.Reward.Id),
+                RedeemedBy = e.RewardRedeemed.Redemption.User.Login
+            });
         }
 
         private async void ScheduleStreamTasks(string streamGame = "Rocksmith 2014")
