@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using CodedChatbot.TwitchFactories.Interfaces;
 using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.ApiContract.Enums.ChannelRewards;
 using CoreCodedChatbot.ApiContract.RequestModels.ChannelRewards;
 using CoreCodedChatbot.ApiContract.RequestModels.StreamStatus;
 using CoreCodedChatbot.ApiContract.RequestModels.Vip;
@@ -405,11 +406,22 @@ namespace CoreCodedChatbot.Services
 
         private async void OnChannelPointsRewardRedeemed(object sender, OnChannelPointsRewardRedeemedArgs e)
         {
-            await _channelRewardsClient.StoreRedemption(new StoreRewardRedemptionRequest
+            var response = await _channelRewardsClient.StoreRedemption(new StoreRewardRedemptionRequest
             {
                 ChannelRewardId = new Guid(e.RewardRedeemed.Redemption.Reward.Id),
                 RedeemedBy = e.RewardRedeemed.Redemption.User.Login
             });
+
+            switch (response.CommandType)
+            {
+                case CommandTypes.None:
+                    return;
+                case CommandTypes.ConvertToVip:
+                    _client.SendMessage(_configService.Get<string>("StreamerChannel"), $"Hey @{e.RewardRedeemed.Redemption.User.DisplayName}, I have redeemed your VIP request!");
+                    break;
+                default:
+                    return;
+            }
         }
 
         private async void ScheduleStreamTasks(string streamGame = "Rocksmith 2014")
