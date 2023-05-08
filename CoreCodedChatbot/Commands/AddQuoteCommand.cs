@@ -1,6 +1,13 @@
-﻿using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+﻿using System.Net.Http;
+using CoreCodedChatbot.ApiClient.DataHelper;
+using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.ApiContract.RequestModels.Quotes;
+using CoreCodedChatbot.ApiContract.ResponseModels.Quotes;
+using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Interfaces;
+using CoreCodedChatbot.Secrets;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
@@ -9,11 +16,16 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new[] {"addquote"}, false)]
     public class AddQuoteCommand : ICommand
     {
-        private readonly IQuoteApiClient _quoteApiClient;
+        private readonly ILogger<AddQuoteCommand> _logger;
+        private readonly HttpClient _quoteApiClient;
 
-        public AddQuoteCommand(IQuoteApiClient quoteApiClient)
+        public AddQuoteCommand(
+            IConfigService configService,
+            ISecretService secretService,
+            ILogger<AddQuoteCommand> logger)
         {
-            _quoteApiClient = quoteApiClient;
+            _logger = logger;
+            _quoteApiClient = HttpClientHelper.BuildClient(configService, secretService, "Quote");
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
@@ -30,7 +42,7 @@ namespace CoreCodedChatbot.Commands
                 Username = username
             };
 
-            var quote = await _quoteApiClient.AddQuote(request);
+            var quote = await _quoteApiClient.PutAsync<AddQuoteRequest, AddQuoteResponse>("AddQuote", request, _logger);
 
             if (quote == null)
                 client.SendMessage(joinedChannel,

@@ -1,6 +1,12 @@
-﻿using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+﻿using System.Net.Http;
+using CoreCodedChatbot.ApiClient.DataHelper;
+using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.ApiContract.RequestModels.Quotes;
+using CoreCodedChatbot.ApiContract.ResponseModels.Quotes;
+using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Interfaces;
+using CoreCodedChatbot.Secrets;
+using Microsoft.Extensions.Logging;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
@@ -9,11 +15,16 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new[] { "quote" }, false)]
     public class GetQuoteCommand : ICommand
     {
-        private readonly IQuoteApiClient _quoteApiClient;
+        private readonly ILogger<GetQuoteCommand> _logger;
+        private readonly HttpClient _quoteApiClient;
 
-        public GetQuoteCommand(IQuoteApiClient quoteApiClient)
+        public GetQuoteCommand(
+            IConfigService configService,
+            ISecretService secretService,
+            ILogger<GetQuoteCommand> logger)
         {
-            _quoteApiClient = quoteApiClient;
+            _logger = logger;
+            _quoteApiClient = HttpClientHelper.BuildClient(configService, secretService, "Quote");
         }
 
         public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
@@ -24,7 +35,9 @@ namespace CoreCodedChatbot.Commands
                 QuoteId = parsed ? quoteId : (int?)null
             };
 
-            var quote = await _quoteApiClient.GetQuote(request);
+            var quote = await _quoteApiClient.GetAsync<GetQuoteResponse>("GetQuote" + 
+                (request.QuoteId.HasValue ? $"?quoteId={request.QuoteId.Value}" : string.Empty),
+                _logger);
 
             if (quote == null)
             {
