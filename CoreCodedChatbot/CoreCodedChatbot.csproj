@@ -39,7 +39,7 @@
   <ItemGroup>
     <PackageReference Include="CodedChatbot.TwitchFactories" Version="1.0.1094" />
     <PackageReference Include="CodedGhost.Config" Version="1.0.1065" />
-    <PackageReference Include="CoreCodedChatbot.ApiClient" Version="1.0.1138" />
+    <PackageReference Include="CoreCodedChatbot.ApiClient" Version="1.0.1153" />
     <PackageReference Include="CoreCodedChatbot.Logging" Version="1.0.1082" />
     <PackageReference Include="CoreCodedChatbot.Secrets" Version="1.0.1067" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.5" />
