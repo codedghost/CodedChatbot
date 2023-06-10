@@ -59,19 +59,19 @@ namespace CoreCodedChatbot.Commands
 
             if (match.Groups["counterName"].Success)
             {
-                counterName = match.Groups["counterName"].Value;
+                counterName = match.Groups["counterName"].Value.Trim();
 
                 requestUri.Append($"?counterName={counterName}");
             }
 
             if (match.Groups["preText"].Success)
             {
-                counterSuffix = match.Groups["preText"].Value;
+                counterSuffix = match.Groups["preText"].Value.Trim();
             }
 
             if (match.Groups["startIndex"].Success)
             {
-                initialValue = int.Parse(match.Groups["startIndex"].Value);
+                initialValue = int.Parse(match.Groups["startIndex"].Value.Trim());
             }
             
 
