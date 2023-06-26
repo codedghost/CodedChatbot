@@ -27,6 +27,7 @@ using TwitchLib.Api.Services.Events;
 using TwitchLib.Api.Services.Events.LiveStreamMonitor;
 using TwitchLib.Communication.Events;
 using TwitchLib.PubSub;
+using CoreCodedChatbot.ApiClient.DataHelper;
 
 namespace CoreCodedChatbot.Services
 {
@@ -38,7 +39,7 @@ namespace CoreCodedChatbot.Services
         private readonly ITwitchLiveStreamMonitorFactory _twitchLiveStreamMonitorFactory;
         private readonly IVipApiClient _vipApiClient;
         private readonly IConfigService _configService;
-        private readonly IStreamStatusApiClient _streamStatusApiClient;
+        private readonly HttpClient _streamStatusApiClient;
         private readonly ISecretService _secretService;
         private readonly IChannelRewardsClient _channelRewardsClient;
         private readonly ILogger<ChatbotService> _logger;
@@ -92,7 +93,7 @@ namespace CoreCodedChatbot.Services
             _twitchLiveStreamMonitorFactory = twitchLiveStreamMonitorFactory;
             _vipApiClient = vipApiClient;
             _configService = configService;
-            _streamStatusApiClient = streamStatusApiClient;
+            _streamStatusApiClient = HttpClientHelper.BuildClient(configService, secretService, "StreamStatus");
             _secretService = secretService;
             _channelRewardsClient = channelRewardsClient;
             _logger = logger;
@@ -332,11 +333,11 @@ namespace CoreCodedChatbot.Services
                     InitialiseClientEvents();
                 }
 
-                _streamStatusApiClient.SaveStreamStatus(new PutStreamStatusRequest
+                _streamStatusApiClient.PutAsync("PutStreamStatus", HttpClientHelper.GetJsonData(new PutStreamStatusRequest
                 {
                     BroadcasterUsername = e.Channel.ToLower(),
                     IsOnline = true
-                }).Wait();
+                })).Wait();
 
                 ScheduleStreamTasks(e.Stream.Title);
             }
@@ -356,12 +357,12 @@ namespace CoreCodedChatbot.Services
                 {
                     _client.SendMessage(e.Channel, $"Looks like @{e.Channel} has gone offline, *yawn* powering down");
                 }
-
-                _streamStatusApiClient.SaveStreamStatus(new PutStreamStatusRequest
+                
+                _streamStatusApiClient.PutAsync("PutStreamStatus", HttpClientHelper.GetJsonData(new PutStreamStatusRequest
                 {
                     BroadcasterUsername = e.Channel.ToLower(),
-                    IsOnline = false
-                }).Wait();
+                    IsOnline = true
+                })).Wait();
 
                 UnScheduleStreamTasks();
 
