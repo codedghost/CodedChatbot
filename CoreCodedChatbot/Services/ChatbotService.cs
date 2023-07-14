@@ -10,11 +10,8 @@ using CoreCodedChatbot.ApiContract.RequestModels.ChannelRewards;
 using CoreCodedChatbot.ApiContract.RequestModels.StreamStatus;
 using CoreCodedChatbot.ApiContract.RequestModels.Vip;
 using CoreCodedChatbot.ApiContract.RequestModels.Vip.ChildModels;
-using CoreCodedChatbot.ApiContract.SharedExternalRequestModels;
 using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Helpers;
-using Newtonsoft.Json;
-
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Secrets;
 using Microsoft.Extensions.Logging;
@@ -81,7 +78,6 @@ namespace CoreCodedChatbot.Services
             ITwitchLiveStreamMonitorFactory twitchLiveStreamMonitorFactory,
             IVipApiClient vipApiClient,
             IConfigService configService,
-            IStreamStatusApiClient streamStatusApiClient,
             ISecretService secretService,
             IChannelRewardsClient channelRewardsClient,
             ILogger<ChatbotService> logger)
