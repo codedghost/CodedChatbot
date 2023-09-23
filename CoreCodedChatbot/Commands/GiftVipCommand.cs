@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using System.Net;
 using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.ApiContract.RequestModels.Vip;
 using CoreCodedChatbot.Extensions;

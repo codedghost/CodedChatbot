@@ -1,15 +1,9 @@
 ﻿using CodedChatbot.TwitchFactories;
 using CoreCodedChatbot.Commands;
-using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Helpers;
 using CoreCodedChatbot.Interfaces;
-using CoreCodedChatbot.Secrets;
 using CoreCodedChatbot.Services;
 using Microsoft.Extensions.DependencyInjection;
-using TwitchLib.Api;
-using TwitchLib.Api.Services;
-using TwitchLib.Client;
-using TwitchLib.Client.Models;
 using TwitchLib.PubSub;
 
 namespace CoreCodedChatbot
@@ -84,6 +78,7 @@ namespace CoreCodedChatbot
             services.AddTransient<TwitterCommand>();
             services.AddTransient<UptimeCommand>();
             services.AddTransient<VipCommand>();
+            services.AddTransient<WatchTimeCommand>();
             services.AddTransient<YoutubeCommand>();
 
             // Register CommandHelper

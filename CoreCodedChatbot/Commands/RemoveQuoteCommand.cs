@@ -1,7 +1,5 @@
-﻿using System.Linq;
-using System.Net.Http;
+﻿using System.Net.Http;
 using CoreCodedChatbot.ApiClient.DataHelper;
-using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.ApiContract.RequestModels.Quotes;
 using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Extensions;

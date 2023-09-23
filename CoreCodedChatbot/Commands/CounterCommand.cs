@@ -2,16 +2,11 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using CoreCodedChatbot.ApiClient.DataHelper;
-using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.ApiContract.RequestModels.Counters;
-using CoreCodedChatbot.ApiContract.RequestModels.Quotes;
 using CoreCodedChatbot.ApiContract.ResponseModels.Counters;
-using CoreCodedChatbot.ApiContract.ResponseModels.Quotes;
 using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Secrets;
-using Microsoft.AspNetCore.Razor.TagHelpers;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;

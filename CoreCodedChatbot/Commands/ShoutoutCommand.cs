@@ -3,7 +3,6 @@ using System.Linq;
 using CodedChatbot.TwitchFactories.Interfaces;
 using CoreCodedChatbot.Extensions;
 using CoreCodedChatbot.Interfaces;
-using TwitchLib.Api;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 

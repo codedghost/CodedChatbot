@@ -1,7 +1,6 @@
 ﻿using System;
 using CoreCodedChatbot.Constants;
 using CoreCodedChatbot.Interfaces;
-using Microsoft.VisualBasic;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 

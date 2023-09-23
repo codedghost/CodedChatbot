@@ -4,7 +4,6 @@ using System.Reflection;
 using CodedChatbot.TwitchFactories.Interfaces;
 using CoreCodedChatbot.Interfaces;
 using TwitchLib.Client;
-using TwitchLib.Client.Interfaces;
 using TwitchLib.Client.Models;
 using ChatCommand = CoreCodedChatbot.CustomAttributes.ChatCommand;
 

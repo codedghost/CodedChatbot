@@ -1,14 +1,12 @@
 ﻿using System.Linq;
 using System.Net.Http;
 using CoreCodedChatbot.ApiClient.DataHelper;
-using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.ApiContract.RequestModels.Quotes;
 using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Extensions;
 using CoreCodedChatbot.Interfaces;
 using CoreCodedChatbot.Secrets;
 using Microsoft.Extensions.Logging;
-using NLog;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
