@@ -357,7 +357,7 @@ namespace CoreCodedChatbot.Services
                 _streamStatusApiClient.PutAsync("PutStreamStatus", HttpClientHelper.GetJsonData(new PutStreamStatusRequest
                 {
                     BroadcasterUsername = e.Channel.ToLower(),
-                    IsOnline = true
+                    IsOnline = false
                 })).Wait();
 
                 UnScheduleStreamTasks();
