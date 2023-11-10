@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using CoreCodedChatbot.Interfaces;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
@@ -15,7 +16,7 @@ namespace CoreCodedChatbot.Commands
             _rand = new Random();
         }
 
-        public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
+        public async Task Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
             if (int.TryParse(commandText, out var diceSides) && diceSides > 1 && diceSides <= 100)
             {

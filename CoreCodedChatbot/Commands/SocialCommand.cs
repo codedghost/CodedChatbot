@@ -1,5 +1,6 @@
 ﻿using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Interfaces;
+using System.Threading.Tasks;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
@@ -17,12 +18,12 @@ namespace CoreCodedChatbot.Commands
             this._commandHelper = commandHelper;
         }
 
-        public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
+        public async Task Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            _commandHelper.ProcessCommand("discord", client, "Chatbot", string.Empty, true, joinedChannel);
-            _commandHelper.ProcessCommand("yt", client, "Chatbot", string.Empty, true, joinedChannel);
-            _commandHelper.ProcessCommand("insta", client, "Chatbot", string.Empty, true, joinedChannel);
-            _commandHelper.ProcessCommand("twitter", client, "Chatbot", string.Empty, true, joinedChannel);
+            await _commandHelper.ProcessCommand("discord", client, "Chatbot", string.Empty, true, joinedChannel);
+            await _commandHelper.ProcessCommand("yt", client, "Chatbot", string.Empty, true, joinedChannel);
+            await _commandHelper.ProcessCommand("insta", client, "Chatbot", string.Empty, true, joinedChannel);
+            await _commandHelper.ProcessCommand("twitter", client, "Chatbot", string.Empty, true, joinedChannel);
         }
 
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)

@@ -2,6 +2,7 @@
 using CoreCodedChatbot.ApiContract.Enums.Playlist;
 using CoreCodedChatbot.ApiContract.RequestModels.Playlist;
 using CoreCodedChatbot.Interfaces;
+using System.Threading.Tasks;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
@@ -17,7 +18,7 @@ namespace CoreCodedChatbot.Commands
             _playlistApiClient = playlistApiClient;
         }
 
-        public async void Process(TwitchClient client, string username, string commandText, bool isMod,
+        public async Task Process(TwitchClient client, string username, string commandText, bool isMod,
             JoinedChannel joinedChannel)
         {
             if (string.IsNullOrWhiteSpace(commandText))

@@ -2,6 +2,7 @@
 using CoreCodedChatbot.ApiContract.RequestModels.GuessingGame;
 using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Interfaces;
+using System.Threading.Tasks;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
@@ -19,7 +20,7 @@ namespace CoreCodedChatbot.Commands
             _configService = configService;
         }
 
-        public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
+        public async Task Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
             var trimPercent = commandText.Trim('%');
             if (!decimal.TryParse(trimPercent, out decimal decimalGuess))

@@ -1,4 +1,5 @@
-﻿using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+﻿using System.Threading.Tasks;
+using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.ApiContract.RequestModels.Vip;
 using CoreCodedChatbot.Interfaces;
 
@@ -17,7 +18,7 @@ namespace CoreCodedChatbot.Commands
             _vipApiClient = vipApiClient;
         }
 
-        public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
+        public async Task Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
             int.TryParse(commandText, out var numberOfTokens);
             if (numberOfTokens == 0) numberOfTokens = 1;

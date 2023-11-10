@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using CodedChatbot.TwitchFactories.Interfaces;
 using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Interfaces;
@@ -21,7 +22,7 @@ namespace CoreCodedChatbot.Commands
             _configService = configService;
         }
 
-        public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
+        public async Task Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
             var twitchApi = _twitchApiFactory.Get();
             var userIds = new List<string>

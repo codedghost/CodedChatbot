@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using CoreCodedChatbot.Interfaces;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
@@ -15,7 +16,7 @@ namespace CoreCodedChatbot.Commands
         {
         }
 
-        public void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
+        public async Task Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
             var commandsToOutput = string.Join(", ", Assembly.GetEntryAssembly().GetTypes()
                 .Where(t => String.Equals(t.Namespace, "CoreCodedChatbot.Commands", StringComparison.Ordinal) &&

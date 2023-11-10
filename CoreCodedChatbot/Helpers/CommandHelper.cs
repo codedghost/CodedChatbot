@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using CoreCodedChatbot.ApiClient.ApiClients;
 using CoreCodedChatbot.Commands;
 using CoreCodedChatbot.Interfaces;
@@ -31,7 +32,7 @@ namespace CoreCodedChatbot.Helpers
             Commands = new List<ICommand>();
 
             var types = Assembly.GetEntryAssembly().GetTypes()
-                .Where(t => String.Equals(t.Namespace, "CoreCodedChatbot.Commands", StringComparison.Ordinal) && t.IsVisible).ToList();
+                .Where(t => string.Equals(t.Namespace, "CoreCodedChatbot.Commands", StringComparison.Ordinal) && t.IsVisible).ToList();
 
             foreach (var type in types)
             {
@@ -40,7 +41,7 @@ namespace CoreCodedChatbot.Helpers
             }
         }
 
-        public async void ProcessCommand(string userCommand, TwitchClient client, string username,
+        public async Task ProcessCommand(string userCommand, TwitchClient client, string username,
             string userParameters, bool userIsModOrBroadcaster, JoinedChannel joinedRoom)
         {
             if ((userParameters.Contains("www.", StringComparison.InvariantCultureIgnoreCase) || 
@@ -53,7 +54,7 @@ namespace CoreCodedChatbot.Helpers
 
             if (userCommand.ToLower() == "help" && !string.IsNullOrWhiteSpace(userParameters))
             {
-                ProcessHelp(client, userParameters.ToLower(), username, joinedRoom);
+                await ProcessHelp(client, userParameters.ToLower(), username, joinedRoom);
                 return;
             }
             
@@ -71,7 +72,7 @@ namespace CoreCodedChatbot.Helpers
                     command = Commands.Single(c => c.GetType().GetTypeInfo().GetCustomAttributes<ChatCommand>()
                         .Any(m => m.CommandAliases.Contains("chatbotinfocommand")));
 
-                    command.Process(client, userParameters, infoText.CommandText, userIsModOrBroadcaster,
+                    await command.Process(client, userParameters, infoText.CommandText, userIsModOrBroadcaster,
                         joinedRoom);
 
                     return;
@@ -91,7 +92,7 @@ namespace CoreCodedChatbot.Helpers
             if (userIsModOrBroadcaster && allowModCommand && isCommandModOnly)
             {
                 TimeoutModCommand();
-                command.Process(client, username, userParameters, userIsModOrBroadcaster, joinedRoom);
+                await command.Process(client, username, userParameters, userIsModOrBroadcaster, joinedRoom);
             }
             else if (!isCommandModOnly)
             {
@@ -99,7 +100,7 @@ namespace CoreCodedChatbot.Helpers
                 {
                     TimeoutModCommand();
                 }
-                command.Process(client, username, userParameters, userIsModOrBroadcaster, joinedRoom);
+                await command.Process(client, username, userParameters, userIsModOrBroadcaster, joinedRoom);
             }
         }
 
@@ -116,7 +117,7 @@ namespace CoreCodedChatbot.Helpers
                 TimeSpan.FromSeconds(0));
         }
 
-        private async void ProcessHelp(TwitchClient client, string commandName, string username, JoinedChannel joinedChannel)
+        private async Task ProcessHelp(TwitchClient client, string commandName, string username, JoinedChannel joinedChannel)
         {
             var command = Commands.SingleOrDefault(c =>
                 c.GetType().GetTypeInfo().GetCustomAttributes<ChatCommand>()

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using CoreCodedChatbot.Interfaces;
 using Microsoft.Extensions.Logging;
 using TwitchLib.Client;
@@ -20,7 +21,7 @@ namespace CoreCodedChatbot.Commands
             _logger = logger;
         }
 
-        public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
+        public async Task Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
             try
             {

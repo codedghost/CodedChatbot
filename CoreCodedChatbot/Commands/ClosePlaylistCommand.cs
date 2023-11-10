@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.Interfaces;
 using TwitchLib.Client;
@@ -16,7 +17,7 @@ namespace CoreCodedChatbot.Commands
             _playlistApiClient = playlistApiClient;
         }
 
-        public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
+        public async Task Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
             bool response;
             if (commandText.Equals("very", StringComparison.OrdinalIgnoreCase))

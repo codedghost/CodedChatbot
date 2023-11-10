@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using CodedChatbot.TwitchFactories.Interfaces;
 using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.ApiContract.Enums.ChannelRewards;
@@ -74,7 +75,7 @@ namespace CoreCodedChatbot.Services
         public ChatbotService(ICommandHelper commandHelper,
             ITwitchClientFactory twitchClientFactory,
             ITwitchApiFactory twitchApiFactory,
-        TwitchPubSub pubsub, 
+            TwitchPubSub pubsub, 
             ITwitchLiveStreamMonitorFactory twitchLiveStreamMonitorFactory,
             IVipApiClient vipApiClient,
             IConfigService configService,
@@ -123,14 +124,29 @@ namespace CoreCodedChatbot.Services
         {
             _client = _twitchClientFactory.Get();
 
+            _client.OnJoinedChannel -= OnJoinedChannel;
             _client.OnJoinedChannel += OnJoinedChannel;
-            _client.OnChatCommandReceived += OnCommandReceived;
+
+            var chatCommandDelegate = new EventHandler<OnChatCommandReceivedArgs>(async (s, e)
+                => await OnCommandReceived(s, e));
+
+            _client.OnChatCommandReceived -= chatCommandDelegate;
+            _client.OnChatCommandReceived += chatCommandDelegate;
+
+            _client.OnCommunitySubscription -= OnSubBomb;
             _client.OnCommunitySubscription += OnSubBomb;
+
+            _client.OnRaidNotification -= OnRaidNotification;
             _client.OnRaidNotification += OnRaidNotification;
+
+            _client.OnDisconnected -= OnDisconnected;
             _client.OnDisconnected += OnDisconnected;
+
+            _client.OnError -= OnError;
             _client.OnError += OnError;
+
+            _client.OnConnectionError -= OnConnectionError;
             _client.OnConnectionError += OnConnectionError;
-            _client.Connect();
         }
 
         private void OnConnectionError(object sender, OnConnectionErrorArgs e)
@@ -155,7 +171,7 @@ namespace CoreCodedChatbot.Services
             JoinChannel();
         }
 
-        private void OnCommandReceived(object sender, OnChatCommandReceivedArgs e)
+        private async Task OnCommandReceived(object sender, OnChatCommandReceivedArgs e)
         {
             try
             {
@@ -165,7 +181,7 @@ namespace CoreCodedChatbot.Services
                     senderClient.JoinChannel(_streamerChannel);
                 }
 
-                _commandHelper.ProcessCommand(
+                await _commandHelper.ProcessCommand(
                     e.Command.CommandText,
                     senderClient,
                     e.Command.ChatMessage.Username,

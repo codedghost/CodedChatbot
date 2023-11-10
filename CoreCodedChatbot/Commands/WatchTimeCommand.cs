@@ -3,8 +3,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using CoreCodedChatbot.ApiClient.DataHelper;
-using CoreCodedChatbot.ApiContract.RequestModels.Quotes;
-using CoreCodedChatbot.ApiContract.ResponseModels.Quotes;
 using CoreCodedChatbot.ApiContract.ResponseModels.WatchTime;
 using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Interfaces;
@@ -30,7 +28,7 @@ namespace CoreCodedChatbot.Commands
             _watchTimeApiClient = HttpClientHelper.BuildClient(configService, secretService, "WatchTime");
         }
 
-        public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
+        public async Task Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
             var watchTimeResponse = await _watchTimeApiClient.GetAsync<GetWatchTimeResponse>($"GetWatchTime?username={username}", _logger);
 

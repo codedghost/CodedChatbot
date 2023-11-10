@@ -1,5 +1,6 @@
 ﻿using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.Interfaces;
+using System.Threading.Tasks;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
@@ -15,7 +16,7 @@ namespace CoreCodedChatbot.Commands
             _vipApiClient = vipApiClient;
         }
 
-        public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
+        public async Task Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
             var bytes = await _vipApiClient.GetUserByteCount(username);
 

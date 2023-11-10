@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using System.Threading.Tasks;
 using CoreCodedChatbot.ApiClient.DataHelper;
 using CoreCodedChatbot.ApiContract.RequestModels.Quotes;
 using CoreCodedChatbot.ApiContract.ResponseModels.Quotes;
@@ -26,7 +27,7 @@ namespace CoreCodedChatbot.Commands
             _quoteApiClient = HttpClientHelper.BuildClient(configService, secretService, "Quote");
         }
 
-        public async void Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
+        public async Task Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
             var parsed = int.TryParse(commandText, out var quoteId);
             var request = new GetQuoteRequest
