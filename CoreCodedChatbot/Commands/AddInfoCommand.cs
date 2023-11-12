@@ -1,27 +1,33 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using CoreCodedChatbot.ApiClient.ApiClients;
+using CoreCodedChatbot.ApiClient.DataHelper;
 using CoreCodedChatbot.ApiContract.RequestModels.CustomChatCommands;
+using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Interfaces;
+using CoreCodedChatbot.Secrets;
 using Microsoft.Extensions.Logging;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
+using TwitchLib.Communication.Interfaces;
 
 namespace CoreCodedChatbot.Commands
 {
     [CustomAttributes.ChatCommand(new[] { "addinfo" }, true)]
     public class AddInfoCommand : ICommand
     {
-        private readonly ICustomChatCommandsClient _customChatCommandsClient;
+        private readonly HttpClient _customChatCommandsClient;
         private readonly ILogger<AddInfoCommand> _logger;
 
         public AddInfoCommand(
-            ICustomChatCommandsClient customChatCommandsClient,
+            IConfigService configService,
+            ISecretService secretService,
             ILogger<AddInfoCommand> logger
             )
         {
-            _customChatCommandsClient = customChatCommandsClient;
+            _customChatCommandsClient = HttpClientHelper.BuildClient(configService, secretService, "CustomChatCommands");
             _logger = logger;
         }
 
@@ -55,13 +61,27 @@ namespace CoreCodedChatbot.Commands
                     return;
                 }
 
-                var success = await _customChatCommandsClient.AddCommand(new AddCommandRequest
+                bool success;
+                var request = new AddCommandRequest
                 {
                     Aliases = aliases.ToList(),
                     InformationText = info,
                     HelpText = helpText,
                     Username = username
-                });
+                };
+
+                try
+                {
+                    var result =
+                        await _customChatCommandsClient.PostAsync("AddCommand", HttpClientHelper.GetJsonData(request));
+
+                    success = result.IsSuccessStatusCode;
+                }
+                catch (Exception e)
+                {
+                    success = HttpClientHelper.LogError<bool>(_logger, e,
+                        new object[] {request.Aliases, request.InformationText, request.HelpText, request.Username});
+                }
 
                 // Respond
                 client.SendMessage(joinedChannel,
