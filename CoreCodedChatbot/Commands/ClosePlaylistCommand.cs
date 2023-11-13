@@ -1,7 +1,12 @@
 ﻿using System;
+using System.Net.Http;
 using System.Threading.Tasks;
+using CoreCodedChatbot.ApiClient.DataHelper;
 using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
+using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Interfaces;
+using CoreCodedChatbot.Secrets;
+using Microsoft.Extensions.Logging;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
 
@@ -10,23 +15,37 @@ namespace CoreCodedChatbot.Commands
     [CustomAttributes.ChatCommand(new[] { "cp", "closeplaylist", "sp", "shutplaylist" }, true)]
     public class ClosePlaylistCommand : ICommand
     {
-        private readonly IPlaylistApiClient _playlistApiClient;
+        private readonly ILogger<ClosePlaylistCommand> _logger;
+        private readonly HttpClient _playlistApiClient;
 
-        public ClosePlaylistCommand(IPlaylistApiClient playlistApiClient)
+        public ClosePlaylistCommand(
+            IConfigService configService,
+            ISecretService secretService,
+            ILogger<ClosePlaylistCommand> logger)
         {
-            _playlistApiClient = playlistApiClient;
+            _logger = logger;
+            _playlistApiClient = HttpClientHelper.BuildClient(configService, secretService, "Playlist");
         }
 
-        public async Task Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
+        public async Task Process(TwitchClient client, string username, string commandText, bool isMod,
+            JoinedChannel joinedChannel)
         {
-            bool response;
+            var closePlaylistUrl = "ClosePlaylist";
             if (commandText.Equals("very", StringComparison.OrdinalIgnoreCase))
             {
-                response = await _playlistApiClient.VeryClosePlaylist();
-            } 
-            else
+                closePlaylistUrl = "VeryClosePlaylist";
+            }
+
+            bool response;
+            try
             {
-                response = await _playlistApiClient.ClosePlaylist();
+                var apiResponse = await _playlistApiClient.GetAsync(closePlaylistUrl);
+
+                response = apiResponse.IsSuccessStatusCode;
+            }
+            catch (Exception e)
+            {
+                response = HttpClientHelper.LogError<bool>(_logger, e, new object[] { });
             }
 
             client.SendMessage(joinedChannel, response
