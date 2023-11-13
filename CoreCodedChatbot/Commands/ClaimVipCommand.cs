@@ -1,32 +1,62 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Azure.Core;
+using CoreCodedChatbot.ApiClient.DataHelper;
 using CoreCodedChatbot.ApiClient.Interfaces.ApiClients;
 using CoreCodedChatbot.ApiContract.RequestModels.Vip;
+using CoreCodedChatbot.ApiContract.ResponseModels.Vip;
+using CoreCodedChatbot.Config;
 using CoreCodedChatbot.Interfaces;
-
+using CoreCodedChatbot.Secrets;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using TwitchLib.Client;
 using TwitchLib.Client.Models;
+using TwitchLib.Communication.Interfaces;
 
 namespace CoreCodedChatbot.Commands
 {
     [CustomAttributes.ChatCommand(new[] { "claimvip", "convertvip" }, false)]
     public class ClaimVipCommand : ICommand
     {
-        private readonly IVipApiClient _vipApiClient;
+        private readonly ILogger<ClaimVipCommand> _logger;
+        private readonly HttpClient _vipApiClient;
 
-        public ClaimVipCommand(IVipApiClient vipApiClient)
+        public ClaimVipCommand(
+            IConfigService configService,
+            ISecretService secretService,
+            ILogger<ClaimVipCommand> logger)
         {
-            _vipApiClient = vipApiClient;
+            _logger = logger;
+            _vipApiClient = HttpClientHelper.BuildClient(configService, secretService, "Vip");
         }
 
         public async Task Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
-            int.TryParse(commandText, out var numberOfTokens);
-            if (numberOfTokens == 0) numberOfTokens = 1;
-            var convertResponse = await _vipApiClient.ConvertBytes(new ConvertVipsRequest
+            if (!int.TryParse(commandText, out var numberOfTokens))
+            {
+                numberOfTokens = 1;
+            }
+
+            var request = new ConvertVipsRequest
             {
                 Username = username,
                 NumberOfBytes = numberOfTokens
-            });
+            };
+            ByteConversionResponse convertResponse;
+            try
+            {
+                var result = await _vipApiClient.PostAsync("ConvertBytes", HttpClientHelper.GetJsonData(request));
+
+                convertResponse = JsonConvert.DeserializeObject<ByteConversionResponse>(
+                    await result.Content.ReadAsStringAsync());
+            }
+            catch (Exception e)
+            {
+                convertResponse = HttpClientHelper.LogError<ByteConversionResponse>(_logger, e,
+                    new object[] { request.Username, request.NumberOfBytes });
+            }
 
             if (convertResponse == null)
             {
