@@ -57,7 +57,7 @@ namespace CoreCodedChatbot.Services
         private Timer DonationsTimer { get; set; }
         private Timer PlaylistTimer { get; set; }
         private Timer YoutubeTimer { get; set; }
-        //private Timer MerchTimer { get; set; }
+        private Timer MerchTimer { get; set; }
         private Timer ShredFestTimer { get; set; }
         private Timer LegatorTimer { get; set; }
         private Timer RocksmithChallengeTimer { get; set; }
@@ -484,10 +484,10 @@ namespace CoreCodedChatbot.Services
             //    e => _commandHelper.ProcessCommand("challenge", _client, "Chatbot", string.Empty, true, joinedRoom),
             //    null,
             //    AssignChattyTimer(), maxTimerMinutes);
-            //MerchTimer = new Timer(
-            //    e => _commandHelper.ProcessCommand("merch", _client, "Chatbot", string.Empty, true, joinedRoom),
-            //    null,
-            //    AssignChattyTimer(), maxTimerMinutes);
+            MerchTimer = new Timer(
+                e => _commandHelper.ProcessCommand("merch", _client, "Chatbot", string.Empty, true, joinedRoom),
+                null,
+                AssignChattyTimer(), maxTimerMinutes);
 
             ChatConnectionTimer = new Timer(
                 async e =>
@@ -538,7 +538,7 @@ namespace CoreCodedChatbot.Services
             InstagramTimer?.Dispose();
             TwitterTimer?.Dispose();
             YoutubeTimer?.Dispose();
-            //MerchTimer?.Dispose();
+            MerchTimer?.Dispose();
             LegatorTimer?.Dispose();
             ShredFestTimer?.Dispose();
             RocksmithChallengeTimer?.Dispose();
