@@ -4,9 +4,9 @@ namespace CoreCodedChatbot.Extensions
 {
     public static class CommandTextExtensions
     {
-        public static string[] SplitCommandText(this string commandText)
+        public static string[] SplitCommandText(this string commandText, string characterToSplitOn = " ")
         {
-            return commandText.Split(" ").Where(c => !string.IsNullOrWhiteSpace(c)).ToArray();
+            return commandText.Split(characterToSplitOn).Where(c => !string.IsNullOrWhiteSpace(c)).ToArray();
         }
     }
 }
