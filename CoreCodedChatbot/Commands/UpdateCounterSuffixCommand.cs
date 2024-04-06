@@ -30,7 +30,7 @@ namespace CoreCodedChatbot.Commands
         public async Task Process(TwitchClient client, string username, string commandText, bool isMod, JoinedChannel joinedChannel)
         {
             var commandTerms = commandText.SplitCommandText(" - ");
-            if (commandTerms.Length != 2)
+            if (commandTerms.Length != 3)
             {
                 client.SendMessage(joinedChannel,
                     $"Hey @{username}, looks like you haven't provided a valid counter name and new suffix");
