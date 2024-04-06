@@ -68,6 +68,7 @@ namespace CoreCodedChatbot
             services.AddTransient<RemoveQuoteCommand>();
             services.AddTransient<RemoveRockRequestCommand>();
             services.AddTransient<RemoveSuperVipCommand>();
+            services.AddTransient<ResetCounterCommand>();
             services.AddTransient<RockRequestCommand>();
             services.AddTransient<RocksmithChallengeCommand>();
             services.AddTransient<ShoutoutCommand>();
@@ -76,6 +77,7 @@ namespace CoreCodedChatbot
             services.AddTransient<SuperVipCommand>();
             services.AddTransient<TopTenCommand>();
             services.AddTransient<TwitterCommand>();
+            services.AddTransient<UpdateCounterSuffixCommand>();
             services.AddTransient<UptimeCommand>();
             services.AddTransient<VipCommand>();
             services.AddTransient<WatchTimeCommand>();
