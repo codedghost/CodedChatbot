@@ -8,7 +8,7 @@ using TwitchLib.Client.Models;
 
 namespace CoreCodedChatbot.Commands
 {
-    [CustomAttributes.ChatCommand(new [] { "promote"}, false)]
+    [CustomAttributes.ChatCommand(new [] { "promote" }, false)]
     public class PromoteCommand : ICommand
     {
         private readonly IPlaylistApiClient _playlistApiClient;

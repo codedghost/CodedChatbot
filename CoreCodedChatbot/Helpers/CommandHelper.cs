@@ -60,7 +60,7 @@ namespace CoreCodedChatbot.Helpers
             
             var command = Commands.SingleOrDefault(c =>
                 c.GetType().GetTypeInfo().GetCustomAttributes<ChatCommand>()
-                    .Any(m => m.CommandAliases.Contains(userCommand.ToLower())));
+                    .Any(m => m.CommandAliases.ToLower() == userCommand.ToLower()));
 
             if (command == null)
             {
