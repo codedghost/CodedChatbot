@@ -34,6 +34,7 @@ namespace CoreCodedChatbot
         {
             services.AddTransient<AddInfoCommand>();
             services.AddTransient<AddQuoteCommand>();
+            services.AddTransient<ArchiveCounterCommand>();
             services.AddTransient<AwwCommand>();
             services.AddTransient<BackgroundSongCommand>();
             services.AddTransient<ClaimAllVipsCommand>();
@@ -47,6 +48,7 @@ namespace CoreCodedChatbot
             services.AddTransient<EditQuoteCommand>();
             services.AddTransient<FixGuessingGameCommand>();
             services.AddTransient<FollowageCommand>();
+            services.AddTransient<GetCounterCommand>();
             services.AddTransient<GetQuoteCommand>();
             services.AddTransient<GiftedVipsCommand>();
             services.AddTransient<GiftVipCommand>();
