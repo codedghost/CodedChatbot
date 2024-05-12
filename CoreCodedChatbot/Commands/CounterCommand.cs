@@ -99,7 +99,10 @@ namespace CoreCodedChatbot.Commands
             if (updateResult != null)
             {
                 client.SendMessage(joinedChannel, $"Hey @{username}, I've updated the counter, the new count is: {updateResult.Counter.CounterValue}");
+                return;
             }
+
+            client.SendMessage(joinedChannel, $"Hey @{username}, I couldn't update the counter. Is it archived?");
         }
 
         public void ShowHelp(TwitchClient client, string username, JoinedChannel joinedChannel)
