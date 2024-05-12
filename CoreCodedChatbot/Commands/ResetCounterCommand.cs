@@ -12,7 +12,7 @@ using TwitchLib.Client.Models;
 
 namespace CoreCodedChatbot.Commands
 {
-    [CustomAttributes.ChatCommand(new[] { "resetOofs", "resetCounter" }, true)]
+    [CustomAttributes.ChatCommand(new[] { "resetOof", "resetCounter" }, true)]
     public class ResetCounterCommand : ICommand
     {
         private readonly ILogger<ResetCounterCommand> _logger;
